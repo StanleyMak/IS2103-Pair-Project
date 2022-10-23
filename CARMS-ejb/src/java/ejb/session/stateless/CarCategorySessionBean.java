@@ -38,5 +38,6 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         
         return (CarCategoryEntity) query.getSingleResult();
     }
+    //
     
 }
