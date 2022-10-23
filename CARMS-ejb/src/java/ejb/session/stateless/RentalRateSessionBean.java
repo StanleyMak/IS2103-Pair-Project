@@ -5,19 +5,27 @@
  */
 package ejb.session.stateless;
 
+import entity.RentalRateEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
- * @author hanyang
+ * @author stonley
  */
 @Stateless
-public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSessionBeanLocal {
+public class RentalRateSessionBean implements RentalRateSessionBeanRemote, RentalRateSessionBeanLocal {
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
 
+    public Long createNewRentalRate(RentalRateEntity rentalRate) {
+        em.persist(rentalRate);
+        em.flush();
+        
+        return rentalRate.getRentalRateID();
+    }
     
 }

@@ -16,10 +16,7 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class ReservationSessionBean implements ReservationSessionBeanRemote, ReservationSessionBeanLocal {
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
-    
-    
+
 }

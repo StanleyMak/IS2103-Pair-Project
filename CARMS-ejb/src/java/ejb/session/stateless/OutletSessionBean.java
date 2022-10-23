@@ -5,19 +5,20 @@
  */
 package ejb.session.stateless;
 
+import entity.OutletEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 /**
  *
- * @author hanyang
+ * @author stonley
  */
 @Stateless
-public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSessionBeanLocal {
+public class OutletSessionBean implements OutletSessionBeanRemote, OutletSessionBeanLocal {
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
 
-    
+    //no need to create outlet
 }

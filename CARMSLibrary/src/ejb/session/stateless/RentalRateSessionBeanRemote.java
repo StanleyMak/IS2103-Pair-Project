@@ -3,22 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ejb.session.singleton;
+package ejb.session.stateless;
 
-import javax.annotation.PostConstruct;
-import javax.ejb.Singleton;
-import javax.ejb.LocalBean;
-import javax.ejb.Startup;
+import javax.ejb.Remote;
 
 /**
  *
  * @author stonley
  */
-@Singleton
-@LocalBean
-@Startup
-public class DataInitSessionBean {
-
-    
+@Remote
+public interface RentalRateSessionBeanRemote {
     
 }
