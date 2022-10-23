@@ -21,22 +21,4 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
-    
-    public Long createNewCarCategory(CarCategoryEntity carCategory) {
-        em.persist(carCategory);
-        em.flush();
-        return carCategory.getCarCategoryID();
-    }
-    
-    public CarCategoryEntity retrieveCarCategory(Long carCategoryID) {
-        return em.find(CarCategoryEntity.class, carCategoryID);
-    }
-    
-    public CarCategoryEntity retrieveCarCategoryByCarCategory(String carCategory) {
-        Query query = em.createQuery("SELECT c FROM CarCategoryEntity c WHERE c.category = ?1")
-                .setParameter(1, carCategory);
-        
-        return (CarCategoryEntity) query.getSingleResult();
-    }
-    
 }
