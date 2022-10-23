@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CustomerEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,7 +20,16 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
-
     
+    public Long createNewCustomer(CustomerEntity customer) {
+        em.persist(customer); 
+        em.flush();
+        
+        return customer.getCustomerID(); 
+    }
     
+    public CustomerEntity retrieveCustomerByID(Long customerID) {
+        return em.find(CustomerEntity.class, customerID);
+    }
+   
 }
