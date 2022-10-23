@@ -18,6 +18,5 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
-    // comment
     
 }
