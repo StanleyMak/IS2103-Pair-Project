@@ -28,4 +28,27 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         return rentalRate.getRentalRateID();
     }
     
+    public RentalRateEntity retrieveRentalRateByRentalRateID(Long rentalRateID) {
+        RentalRateEntity rentalRate = em.find(RentalRateEntity.class, rentalRateID);
+        return rentalRate;
+    }
+    
+    public RentalRateEntity retrieveRentalRateByRentalRateName(String rentalRateName) {
+        Query query = em.createQuery("SELECT r FROM RentalRateEntity r WHERE r.name = ?1")
+                .setParameter(1, rentalRateName);
+        RentalRateEntity rentalRate = (RentalRateEntity) query.getSingleResult();
+        return rentalRate;
+    }
+    
+    public void updateRentalRate(RentalRateEntity rentalRate) {
+        
+    }
+    
+    public void deleteRentalRate(Long rentalRateID) {
+        RentalRateEntity rentalRate = em.find(RentalRateEntity.class, rentalRateID);
+        
+        //dissociate
+        
+        em.remove(rentalRate);
+    }
 }
