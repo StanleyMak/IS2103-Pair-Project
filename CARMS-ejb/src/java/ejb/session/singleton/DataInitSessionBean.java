@@ -17,7 +17,13 @@ import javax.ejb.Startup;
 @Singleton
 @LocalBean
 @Startup
+
 public class DataInitSessionBean {
+    
+    @PostConstruct
+    public void postConstruct() {
+        
+    }
 
     
     
