@@ -28,8 +28,16 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         return partnerEntity.getPartnerID();
     }
     
-    public PartnerEntity retrievePartnerEntityByID(Long partnerID) {
-        return em.find(PartnerEntity.class, partnerID); 
+    public PartnerEntity retrievePartnerByID(Long partnerID) {
+        PartnerEntity partner = em.find(PartnerEntity.class, partnerID); 
+        //partner.getXX().size();
+        return partner; 
+    }
+    
+    public void deletePartner(Long partnerID) {
+        PartnerEntity partner = retrievePartnerByID(partnerID);
+        //dissociate
+        em.remove(partner);
     }
     
 }

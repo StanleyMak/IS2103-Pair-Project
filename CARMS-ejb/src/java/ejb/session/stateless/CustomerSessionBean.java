@@ -29,7 +29,15 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     public CustomerEntity retrieveCustomerByID(Long customerID) {
-        return em.find(CustomerEntity.class, customerID);
+        CustomerEntity customer = em.find(CustomerEntity.class, customerID);
+        //customer.getXX.size();
+        return customer;
+    }
+    
+    public void deleteCustomer(Long customerID) {
+        CustomerEntity customer = retrieveCustomerByID(customerID);
+        //dissociate
+        em.remove(customer);
     }
    
 }

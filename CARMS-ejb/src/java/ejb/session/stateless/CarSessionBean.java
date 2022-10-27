@@ -30,6 +30,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     
     public CarEntity retrieveCarByCarID(Long carID) {
         CarEntity car = em.find(CarEntity.class, carID);
+        //car.getXX().size();
         return car;
     }
 
@@ -37,6 +38,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.licensePlateNumber = ?1")
                 .setParameter(1, licensePlateNumber);
         CarEntity car = (CarEntity) query.getSingleResult();
+        //car.getXX().size();
         return car;
     }
     
@@ -45,7 +47,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
     
     public void deleteCar(Long carID) {
-        CarEntity car = em.find(CarEntity.class, carID);
+        CarEntity car = retrieveCarByCarID(carID);
         
         //dissociate
         em.remove(car);

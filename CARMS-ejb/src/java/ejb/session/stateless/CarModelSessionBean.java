@@ -30,6 +30,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     
     public CarModelEntity retrieveCarModelByCarModelID(Long carModelID) {
         CarModelEntity carModel = em.find(CarModelEntity.class, carModelID);
+        //carModel.getXX().size();
         return carModel;
     }
     
@@ -37,7 +38,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         Query query = em.createQuery("SELECT c FROM CarModel c WHERE c.model = ?1")
                 .setParameter(1, carModelModel);
         CarModelEntity carModel = (CarModelEntity) query.getSingleResult();
-        
+        //carModel.getXX().size();
         return carModel;
     }
     

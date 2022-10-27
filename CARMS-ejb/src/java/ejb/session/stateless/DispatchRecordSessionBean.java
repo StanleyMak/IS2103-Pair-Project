@@ -36,9 +36,9 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
     public DispatchRecordEntity retrieveCarModelByDispatchRecordName(String dispatchRecordName) {
         Query query = em.createQuery("SELECT c FROM CarModel c WHERE c.model = ?1")
                 .setParameter(1, dispatchRecordName);
-        DispatchRecordEntity carModel = (DispatchRecordEntity) query.getSingleResult();
+        DispatchRecordEntity dispatchRecord = (DispatchRecordEntity) query.getSingleResult();
         
-        return carModel;
+        return dispatchRecord;
     }
     
     private void updateDispatchRecord(DispatchRecordEntity dispatchRecord) {
@@ -46,10 +46,10 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
     }
     
     private void deleteDispatchRecord(Long dispatchRecordID) {
-        DispatchRecordEntity carModel = em.find(DispatchRecordEntity.class, dispatchRecordID);
+        DispatchRecordEntity dispatchRecord = retrieveCarModelByDispatchRecordID(dispatchRecordID);
         //dissociate
         
-        em.remove(carModel);
+        em.remove(dispatchRecord);
     }
     
 }

@@ -30,6 +30,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     
     public RentalRateEntity retrieveRentalRateByRentalRateID(Long rentalRateID) {
         RentalRateEntity rentalRate = em.find(RentalRateEntity.class, rentalRateID);
+        //rentalRate.getXX().size();
         return rentalRate;
     }
     
@@ -45,7 +46,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
     
     public void deleteRentalRate(Long rentalRateID) {
-        RentalRateEntity rentalRate = em.find(RentalRateEntity.class, rentalRateID);
+        RentalRateEntity rentalRate = retrieveRentalRateByRentalRateID(rentalRateID);
         
         //dissociate
         

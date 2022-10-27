@@ -28,7 +28,15 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
     
     public ReservationEntity retrieveReservationByID(Long reservationID) {
-        return em.find(ReservationEntity.class, reservationID);
+        ReservationEntity reservation = em.find(ReservationEntity.class, reservationID);
+        //reservation.getXX().size();
+        return reservation;
+    }
+    
+    public void deleteReservation(Long reservationID) {
+        ReservationEntity reservation = retrieveReservationByID(reservationID);
+        //dissociate
+        em.remove(reservation);
     }
 
 }
