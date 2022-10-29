@@ -6,12 +6,14 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import util.enumeration.StatusEnum;
 
 /**
@@ -25,20 +27,68 @@ public class CarEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carID;
+    @Column(nullable = false, length = 64)
     private String licensePlateNumber;
+    @Column(nullable = false, length = 32)
     private String colour;
     @Enumerated (EnumType.STRING)
     private StatusEnum status;
     
+    @ManyToOne
     private CarModelEntity model;
     
-    private CarCategoryEntity category;
-    
+    @ManyToOne
     private OutletEntity currOutlet;
+
+    public CarEntity() {
+    }
+
+    public CarEntity(String licensePlateNumber, String colour, StatusEnum status) {
+        this.licensePlateNumber = licensePlateNumber;
+        this.colour = colour;
+        this.status = status;
+    }
+
+    public String getLicensePlateNumber() {
+        return licensePlateNumber;
+    }
+
+    public void setLicensePlateNumber(String licensePlateNumber) {
+        this.licensePlateNumber = licensePlateNumber;
+    }
+
+    public String getColour() {
+        return colour;
+    }
+
+    public void setColour(String colour) {
+        this.colour = colour;
+    }
+
+    public StatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusEnum status) {
+        this.status = status;
+    }
+
+    public CarModelEntity getModel() {
+        return model;
+    }
+
+    public void setModel(CarModelEntity model) {
+        this.model = model;
+    }
+
+    public OutletEntity getCurrOutlet() {
+        return currOutlet;
+    }
+
+    public void setCurrOutlet(OutletEntity currOutlet) {
+        this.currOutlet = currOutlet;
+    }
     
-    private DispatchRecordEntity dispatchRecord;
-    
-    private RentalRateEntity rentalRate;
 
     public Long getCarID() {
         return carID;

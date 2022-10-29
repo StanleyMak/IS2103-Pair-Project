@@ -7,10 +7,15 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -23,19 +28,80 @@ public class DispatchRecordEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dispatchRecordID;
+    @Column(nullable = false, length = 64)
     private Boolean isCompleted;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, length = 64)
     private Date pickUpTime;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, length = 64)
     private Date returnTime;
     
-    private ReservationEntity reservation;
-    
-    private CarEntity car;
-    
+    @ManyToMany
     private OutletEntity currOutlet;
     
+    @ManyToMany
     private OutletEntity returnOutlet;
     
+    @OneToOne
     private EmployeeEntity employee;
+
+    public DispatchRecordEntity() {
+    }
+    
+    public DispatchRecordEntity(Boolean isCompleted, Date pickUpTime, Date returnTime) {
+        this.isCompleted = isCompleted;
+        this.pickUpTime = pickUpTime;
+        this.returnTime = returnTime;
+    }
+
+    public Boolean getIsCompleted() {
+        return isCompleted;
+    }
+
+    public void setIsCompleted(Boolean isCompleted) {
+        this.isCompleted = isCompleted;
+    }
+
+    public Date getPickUpTime() {
+        return pickUpTime;
+    }
+
+    public void setPickUpTime(Date pickUpTime) {
+        this.pickUpTime = pickUpTime;
+    }
+
+    public Date getReturnTime() {
+        return returnTime;
+    }
+
+    public void setReturnTime(Date returnTime) {
+        this.returnTime = returnTime;
+    }
+
+    public OutletEntity getCurrOutlet() {
+        return currOutlet;
+    }
+
+    public void setCurrOutlet(OutletEntity currOutlet) {
+        this.currOutlet = currOutlet;
+    }
+
+    public OutletEntity getReturnOutlet() {
+        return returnOutlet;
+    }
+
+    public void setReturnOutlet(OutletEntity returnOutlet) {
+        this.returnOutlet = returnOutlet;
+    }
+
+    public EmployeeEntity getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(EmployeeEntity employee) {
+        this.employee = employee;
+    }
 
     public Long getDispatchRecordID() {
         return dispatchRecordID;

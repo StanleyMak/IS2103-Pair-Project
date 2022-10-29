@@ -30,6 +30,15 @@ public class PartnerEntity implements Serializable {
     @Column(nullable = false) 
     private String email; 
 
+    public PartnerEntity() {
+    }
+
+    public PartnerEntity(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
     public String getUsername() {
         return username;
     }

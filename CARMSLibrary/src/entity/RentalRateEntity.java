@@ -7,6 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,13 +24,24 @@ public class RentalRateEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rentalRateID;
-    private double rate;
+    @Column(nullable = false, length = 64)
+    private String rentalName; 
+    @Column(nullable = false, length = 64)
+    private double ratePerDay;
+    @Column(nullable = false, length = 64)
     private Date startDate;
+    @Column(nullable = false, length = 64)
     private Date endDate;
-    
-    private CarCategoryEntity category;
-    
-    private CarEntity car;
+
+    public RentalRateEntity() {
+    }
+
+    public RentalRateEntity(String rentalName, double ratePerDay, Date startDate, Date endDate) {
+        this.rentalName = rentalName;
+        this.ratePerDay = ratePerDay;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 
     public Long getRentalRateID() {
         return rentalRateID;
@@ -39,6 +51,38 @@ public class RentalRateEntity implements Serializable {
         this.rentalRateID = rentalRateID;
     }
 
+    public String getRentalName() {
+        return rentalName;
+    }
+
+    public void setRentalName(String rentalName) {
+        this.rentalName = rentalName;
+    }
+
+    public double getRatePerDay() {
+        return ratePerDay;
+    }
+
+    public void setRatePerDay(double ratePerDay) {
+        this.ratePerDay = ratePerDay;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

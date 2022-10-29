@@ -12,6 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -41,11 +43,48 @@ public class ReservationEntity implements Serializable {
     @Column(nullable = false)
     private Date endDateTime; 
     @Column(nullable = false)
+    private Long penaltyType;
+    
+    @ManyToOne
+    private CarCategoryEntity carCategory; 
+    
+    @ManyToOne
+    private PartnerEntity partner; 
+    
+    @OneToOne
     private OutletEntity pickUpOutlet;
-    @Column(nullable = false)
-    private OutletEntity returnOutlet; 
-    @Column(nullable = false)
-    private Long penaltyType; 
+    
+    @OneToOne
+    private OutletEntity returnOutlet;
+
+    public ReservationEntity() {
+    }
+
+    public ReservationEntity(double duration, double rentalFee, String creditCardNumber, String cvv, Date startDateTime, Date endDateTime, Long penaltyType) {
+        this.duration = duration;
+        this.rentalFee = rentalFee;
+        this.creditCardNumber = creditCardNumber;
+        this.cvv = cvv;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.penaltyType = penaltyType;
+    }
+
+    public CarCategoryEntity getCarCategory() {
+        return carCategory;
+    }
+
+    public void setCarCategory(CarCategoryEntity carCategory) {
+        this.carCategory = carCategory;
+    }
+
+    public PartnerEntity getPartner() {
+        return partner;
+    }
+
+    public void setPartner(PartnerEntity partner) {
+        this.partner = partner;
+    }
 
     public double getDuration() {
         return duration;
@@ -119,7 +158,6 @@ public class ReservationEntity implements Serializable {
         this.penaltyType = penaltyType;
     }
     
-
     public Long getReservationID() {
         return reservationID;
     }

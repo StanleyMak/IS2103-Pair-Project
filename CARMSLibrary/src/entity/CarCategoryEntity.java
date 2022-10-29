@@ -6,11 +6,14 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -24,14 +27,47 @@ public class CarCategoryEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carCategoryID;
     @Column(nullable = false, length = 64)
-    private String category; 
+    private String categoryName; 
+    
+    @OneToMany
+    private List<RentalRateEntity> rentalRates;
+    
+    @OneToMany
+    private List<CarModelEntity> carModels; 
 
-    public String getCategory() {
-        return category;
+    public CarCategoryEntity(String categoryName, List<RentalRateEntity> rentalRates) {
+        this();
+        this.categoryName = categoryName;
+        this.rentalRates = rentalRates;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public CarCategoryEntity() {
+       this.rentalRates = new ArrayList<>(); 
+       this.carModels = new ArrayList<>(); 
+    }
+
+    public List<RentalRateEntity> getRentalRates() {
+        return rentalRates;
+    }
+
+    public void setRentalRates(List<RentalRateEntity> rentalRates) {
+        this.rentalRates = rentalRates;
+    }
+
+    public List<CarModelEntity> getCarModels() {
+        return carModels;
+    }
+
+    public void setCarModels(List<CarModelEntity> carModels) {
+        this.carModels = carModels;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
     
     public Long getCarCategoryID() {

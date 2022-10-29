@@ -6,11 +6,15 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -26,7 +30,36 @@ public class CustomerEntity implements Serializable {
     @Column(nullable = false, length = 64)
     private String email;
     
+    @ManyToOne
+    private PartnerEntity partner; 
     
+    @OneToMany
+    private List<ReservationEntity> reservations; 
+
+    public CustomerEntity() {
+        this.reservations = new ArrayList<>(); 
+    }
+
+    public CustomerEntity(String email) {
+        this(); 
+        this.email = email;
+    }
+
+    public PartnerEntity getPartner() {
+        return partner;
+    }
+
+    public void setPartner(PartnerEntity partner) {
+        this.partner = partner;
+    }
+
+    public List<ReservationEntity> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<ReservationEntity> reservations) {
+        this.reservations = reservations;
+    }
 
     public String getEmail() {
         return email;

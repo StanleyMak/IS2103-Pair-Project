@@ -7,10 +7,12 @@ package entity;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -23,11 +25,18 @@ public class CarModelEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carModelID;
-    private String model;
+    @Column(nullable = false, length = 64)
+    private String modelName;
     
-    private List<CarEntity> cars;
-    
+    @ManyToOne
     private CarCategoryEntity category;
+
+    public CarModelEntity() {
+    }
+
+    public CarModelEntity(String modelName) {
+        this.modelName = modelName;
+    }
 
     public Long getCarModelID() {
         return carModelID;
@@ -35,6 +44,22 @@ public class CarModelEntity implements Serializable {
 
     public void setCarModelID(Long carModelID) {
         this.carModelID = carModelID;
+    }
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
+    }
+
+    public CarCategoryEntity getCategory() {
+        return category;
+    }
+
+    public void setCategory(CarCategoryEntity category) {
+        this.category = category;
     }
 
     @Override
