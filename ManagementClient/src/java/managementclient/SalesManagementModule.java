@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package carmsclient;
+package managementclient;
 
 import java.util.Scanner;
 import javax.faces.validator.Validator;
@@ -15,7 +15,7 @@ import javax.validation.ValidatorFactory;
  * @author stonley
  */
 public class SalesManagementModule {
-
+    
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
@@ -299,5 +299,5 @@ public class SalesManagementModule {
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }
-
+    
 }

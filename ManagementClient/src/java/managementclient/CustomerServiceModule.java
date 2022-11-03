@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package carmsclient;
+package managementclient;
 
 import java.util.Scanner;
 
@@ -12,7 +12,7 @@ import java.util.Scanner;
  * @author stonley
  */
 public class CustomerServiceModule {
-
+    
     public CustomerServiceModule() {
 
     }
@@ -67,4 +67,5 @@ public class CustomerServiceModule {
         sc.nextLine();
 
     }
+    
 }

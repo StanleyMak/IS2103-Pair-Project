@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package carmsreservationclient;
+package reservationclient;
 
 import java.util.Scanner;
 
@@ -12,7 +12,7 @@ import java.util.Scanner;
  * @author stonley
  */
 public class MainApp {
-
+    
     public MainApp() {
 
     }
@@ -180,4 +180,5 @@ public class MainApp {
         
     }
 
+    
 }

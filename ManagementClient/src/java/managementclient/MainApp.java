@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package carmsclient;
+package managementclient;
 
 import java.util.Scanner;
 import javax.jms.ConnectionFactory;
@@ -15,8 +15,8 @@ import util.exception.InvalidLoginCredentialException;
  * @author stonley
  */
 public class MainApp {
-
-//    private StaffEntitySessionBeanRemote staffEntitySessionBeanRemote;
+    
+    //    private StaffEntitySessionBeanRemote staffEntitySessionBeanRemote;
 //    private ProductEntitySessionBeanRemote productEntitySessionBeanRemote;
 //    private SaleTransactionEntitySessionBeanRemote saleTransactionEntitySessionBeanRemote;
 //    private CheckoutSessionBeanRemote checkoutBeanRemote;
@@ -139,7 +139,6 @@ public class MainApp {
             }
         }
     }
+
+    
 }
-
-// skeleton
-
