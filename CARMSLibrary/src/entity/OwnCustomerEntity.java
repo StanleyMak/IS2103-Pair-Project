@@ -20,32 +20,32 @@ public class OwnCustomerEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long ownCustomerID;
 
-    public Long getId() {
-        return id;
+    public Long getOwnCustomerID() {
+        return ownCustomerID;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setOwnCustomerID(Long ownCustomerID) {
+        this.ownCustomerID = ownCustomerID;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (ownCustomerID != null ? ownCustomerID.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO: Warning - this method won't work in the case the ownCustomerID fields are not set
         if (!(object instanceof OwnCustomerEntity)) {
             return false;
         }
         OwnCustomerEntity other = (OwnCustomerEntity) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.ownCustomerID == null && other.ownCustomerID != null) || (this.ownCustomerID != null && !this.ownCustomerID.equals(other.ownCustomerID))) {
             return false;
         }
         return true;
@@ -53,7 +53,7 @@ public class OwnCustomerEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.OwnCustomerEntity[ id=" + id + " ]";
+        return "entity.OwnCustomerEntity[ id=" + ownCustomerID + " ]";
     }
     
 }
