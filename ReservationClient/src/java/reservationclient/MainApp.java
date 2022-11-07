@@ -5,7 +5,15 @@
  */
 package reservationclient;
 
+import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.CustomerSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
+import entity.CarEntity;
+import entity.CustomerEntity;
+import entity.ReservationEntity;
+import java.util.List;
 import java.util.Scanner;
+import util.exception.InvalidLoginCredentialException;
 
 /**
  *
@@ -13,8 +21,13 @@ import java.util.Scanner;
  */
 public class MainApp {
     
+     CustomerSessionBeanRemote customerSessionBeanRemote; 
+     ReservationSessionBeanRemote reservationSessionBeanRemote; 
+     CarSessionBeanRemote carSessionBeanRemote; 
+     CustomerEntity loggedInCustomer; 
+    
     public MainApp() {
-
+        this.loggedInCustomer = null;
     }
 
     public void runApp() {
@@ -47,7 +60,7 @@ public class MainApp {
                 } else if (response == 2) {
                     doRegisterAsCustomer();
                 } else if (response == 3) {
-                    doSearchCar();
+                    doSearchCarForVisitor();
                 } else if (response == 4) {
                     break;
                 } else {
@@ -82,7 +95,7 @@ public class MainApp {
                 response = sc.nextInt();
 
                 if (response == 1) {
-                    doSearchCar();
+                    doSearchCarForCustomer();
                 } else if (response == 2) {
                     doReserveCar();
                 } else if (response == 3) {
@@ -103,24 +116,92 @@ public class MainApp {
     }
 
     public void doRegisterAsCustomer() {
-        Scanner sc = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client ::  ***\n");
-
-        System.out.println("Press Enter To Continue...");
-        sc.nextLine();
-
-    }
-
-    public void doSearchCar() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("*** CaRMS Reservation Client ::  ***\n");
-
-        System.out.println("Press Enter To Continue...");
-        sc.nextLine();
         
-
+        System.out.println("Enter password");
+        String email = scanner.nextLine().trim(); 
+        System.out.println("Enter desired password");
+        String password = scanner.nextLine().trim(); 
+        
+        CustomerEntity newCustomer = new CustomerEntity(); 
+        newCustomer.setEmail(email);
+        newCustomer.setPassword(password);
+        customerSessionBeanRemote.createNewCustomer(newCustomer);
+        
+        System.out.println("You have successfully registered as a customer!");
+        
+        System.out.println("Press Enter To Continue...");
+        scanner.nextLine();
     }
 
+    public void doSearchCarForVisitor() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("*** CaRMS Reservation Client ::  ***\n");
+        
+        System.out.println("Enter pick up date/time");
+        String pickUpDate = sc.nextLine().trim(); 
+        System.out.println("Enter pick up outlet");
+        String pickUpOutlet = sc.nextLine().trim(); 
+        
+        System.out.println("Enter return date/time");
+        String returnDate = sc.nextLine().trim(); 
+        System.out.println("Enter return outlet");
+        String returnOutlet = sc.nextLine().trim(); 
+        
+        int idx = 0;
+        List<CarEntity> availableCars = carSessionBeanRemote.retrieveCarsByDate(pickUpDate, pickUpOutlet, returnDate, returnOutlet); 
+        idx++; 
+        
+        for (CarEntity car : availableCars) {
+            System.out.println(String.format("%s. %s %s", idx, car.getModel(), car.getModel().getCategory()));
+        }
+        
+        List<ReservationEntity> reservations = reservationSessionBeanRemote.retrieveAllReservations();
+        
+        // check if car is available via reservations
+        
+        System.out.println("Press Enter To Continue...");
+        sc.nextLine();
+    }
+    
+    
+    public void doSearchCarForCustomer() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("*** CaRMS Reservation Client ::  ***\n");
+        
+        System.out.println("Enter pick up date/time");
+        String pickUpDate = sc.nextLine().trim(); 
+        System.out.println("Enter pick up outlet");
+        String pickUpOutlet = sc.nextLine().trim(); 
+        
+        System.out.println("Enter return date/time");
+        String returnDate = sc.nextLine().trim(); 
+        System.out.println("Enter return outlet");
+        String returnOutlet = sc.nextLine().trim(); 
+        
+        int idx = 0;
+        List<CarEntity> availableCars = carSessionBeanRemote.retrieveCarsByDate(pickUpDate, pickUpOutlet, returnDate, returnOutlet); 
+        idx++; 
+        for (CarEntity car : availableCars) {
+            System.out.println(String.format("%s. %s %s", idx, car.getModel(), car.getModel().getCategory()));
+        }
+        
+        
+        System.out.println("Do you want to reserve a car in the list? (yes/no)");
+        String response = sc.nextLine().trim(); 
+        
+        if (response.equals("yes")) {
+            doReserveCar(); 
+        } else {
+            // bye
+        }
+        
+        System.out.println("Press Enter To Continue...");
+        sc.nextLine();
+    }
+    
+    
     private void doLogin() { //throws InvalidLoginCredentialException {
         Scanner scanner = new Scanner(System.in);
         String username = "";
@@ -131,6 +212,12 @@ public class MainApp {
         username = scanner.nextLine().trim();
         System.out.print("Enter password> ");
         password = scanner.nextLine().trim();
+        
+        if (username.length() > 0 && password.length() > 0) {
+            customerSessionBeanRemote.customerLogin(username, password); 
+        } else {
+            throw new InvalidLoginCredentialException("Missing login credentials");
+        }
     }
     
     private void doReserveCar() {
@@ -142,10 +229,12 @@ public class MainApp {
         
     }
     
-    private void doCancelReservation() {
+    private void doCancelReservation(ReservationEntity reservationEntity) {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: Cancel Reservation ***\n");
-
+        
+        reservationSessionBeanRemote.deleteReservation(reservationEntity.getReservationID());
+        System.out.println("Reservation cancelled");
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
         
@@ -154,7 +243,21 @@ public class MainApp {
     private void doViewReservationDetails() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: View Reservation Details ***\n");
-
+        
+        System.out.println("Enter your reservation code");
+        String reservationCode = sc.nextLine().trim(); 
+        
+        ReservationEntity reservation = reservationSessionBeanRemote.retrieveReservationByReservationCode(reservationCode); 
+        
+        // print details
+        System.out.println(reservation.getReservationCode());
+        System.out.println(reservation.getDuration());
+        System.out.println(reservation.getRentalFee());
+        System.out.println(reservation.getStartDateTime());
+        System.out.println(reservation.getEndDateTime());
+        System.out.println(reservation.getPickUpOutlet());
+        System.out.println(reservation.getReturnOutlet());
+        
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
         
@@ -163,18 +266,28 @@ public class MainApp {
     private void doViewAllMyReservations() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: View All My Reservations ***\n");
-
-        System.out.println("Press Enter To Continue...");
-        sc.nextLine();
         
+        List<ReservationEntity> reservations = loggedInCustomer.getReservations(); 
+        
+        for (ReservationEntity res : reservations) {
+            System.out.println(res);
+        }
+         
+        System.out.println("Press Enter To Continue...");
+        sc.nextLine();   
     }
     
     private void doLogout() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: Logout ***\n");
-
-        System.out.println("You have been successfully logged out!\n");
         
+        if (loggedInCustomer != null) {
+            loggedInCustomer = null; 
+            System.out.println("You have been successfully logged out!\n");
+        } else {
+            System.out.println("Nobody is logged in!");
+        }
+
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
         

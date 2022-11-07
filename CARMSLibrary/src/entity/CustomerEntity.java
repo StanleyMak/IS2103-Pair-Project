@@ -29,6 +29,8 @@ public class CustomerEntity implements Serializable {
     private Long customerID;
     @Column(nullable = false, length = 64)
     private String email;
+    @Column(nullable = false, length = 64)
+    private String password; 
     
     @ManyToOne
     private PartnerEntity partner; 
@@ -47,6 +49,14 @@ public class CustomerEntity implements Serializable {
 
     public PartnerEntity getPartner() {
         return partner;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setPartner(PartnerEntity partner) {

@@ -44,6 +44,8 @@ public class ReservationEntity implements Serializable {
     private Date endDateTime; 
     @Column(nullable = false)
     private Long penaltyType;
+    @Column(nullable = false)
+    private String reservationCode; 
     
     @ManyToOne
     private CarCategoryEntity carCategory; 
@@ -92,6 +94,14 @@ public class ReservationEntity implements Serializable {
 
     public void setDuration(double duration) {
         this.duration = duration;
+    }
+
+    public String getReservationCode() {
+        return reservationCode;
+    }
+
+    public void setReservationCode(String reservationCode) {
+        this.reservationCode = reservationCode;
     }
 
     public double getRentalFee() {

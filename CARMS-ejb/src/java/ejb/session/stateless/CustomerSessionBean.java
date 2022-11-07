@@ -9,6 +9,8 @@ import entity.CustomerEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import util.exception.InvalidLoginCredentialException;
 
 
 /**
@@ -34,10 +36,38 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         return customer;
     }
     
+    public CustomerEntity retrieveCustomerByEmail(String email) {
+        
+        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email LIKE ?1")
+                .setParameter(1, email);
+        CustomerEntity customer = (CustomerEntity) query; 
+        //customer.getXX.size();
+        return customer;
+    }
+    
     public void deleteCustomer(Long customerID) {
         CustomerEntity customer = retrieveCustomerByID(customerID);
         //dissociate
         em.remove(customer);
     }
-   
+    
+    @Override
+    public CustomerEntity customerLogin(String email, String password) throws InvalidLoginCredentialException { 
+        try {
+            CustomerEntity customer = retrieveCustomerByEmail(email);
+            
+            if (password.equals(customer.getPassword())) {
+                // association
+                return customer; 
+            } else {
+                throw new InvalidLoginCredentialException("Invalid email or password"); 
+            }
+        } catch (CustomerNotFoundException ex) {
+            throw new InvalidLoginCredentialException("Invalid email or password");
+        }   
+    }
+    
+    
+            
+    
 }
