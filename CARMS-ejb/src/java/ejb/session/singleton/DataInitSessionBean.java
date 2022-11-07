@@ -5,10 +5,14 @@
  */
 package ejb.session.singleton;
 
+import entity.EmployeeEntity;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
 import javax.ejb.Startup;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import util.enumeration.EmployeeAccessRightEnum;
 
 /**
  *
@@ -19,12 +23,19 @@ import javax.ejb.Startup;
 @Startup
 
 public class DataInitSessionBean {
-    
+
+    @PersistenceContext(unitName = "CARMS-ejbPU")
+    private EntityManager em;
+
     @PostConstruct
     public void postConstruct() {
-        
+        if (em.find(EmployeeEntity.class, 1l) == null) {
+            EmployeeEntity employee = new EmployeeEntity("Stanley", "stanmail", "111");
+            employee.setEmployeeAccessRight(EmployeeAccessRightEnum.SALES_MANAGER);
+            
+            em.persist(employee);
+        }
+
     }
 
-    
-    
 }

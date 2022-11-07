@@ -18,14 +18,14 @@ import javax.persistence.Id;
  * @author stonley
  */
 @Entity
-public class RentalRateEntity implements Serializable {
+public class RentalRateEntity implements Serializable, Comparable<RentalRateEntity> {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rentalRateID;
     @Column(nullable = false, length = 64)
-    private String rentalName; 
+    private String rentalName;
     @Column(nullable = false, length = 64)
     private double ratePerDay;
     @Column(nullable = false, length = 64)
@@ -82,7 +82,7 @@ public class RentalRateEntity implements Serializable {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -107,5 +107,19 @@ public class RentalRateEntity implements Serializable {
     public String toString() {
         return "entity.RentalRateEntity[ id=" + rentalRateID + " ]";
     }
+
     
+    //REVIEW!!!!
+    @Override
+    public int compareTo(RentalRateEntity o) {
+
+        if (this.rentalName.compareTo(o.getRentalName()) == 0) {
+            return 0;
+        } else if (this.rentalName.compareTo(o.getRentalName()) > 0) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+
 }

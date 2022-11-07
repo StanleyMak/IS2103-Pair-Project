@@ -5,6 +5,8 @@
  */
 package ejb.session.stateless;
 
+import entity.RentalRateEntity;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +15,17 @@ import javax.ejb.Local;
  */
 @Local
 public interface RentalRateSessionBeanLocal {
+
+    public Long createNewRentalRate(RentalRateEntity rentalRate);
+
+    public List<RentalRateEntity> retrieveAllRentalRates();
+
+    public RentalRateEntity retrieveRentalRateByRentalRateID(Long rentalRateID);
+
+    public RentalRateEntity retrieveRentalRateByRentalRateName(String rentalRateName);
+
+    public void updateRentalRate(RentalRateEntity rentalRate);
+
+    public void deleteRentalRate(Long rentalRateID);
     
 }

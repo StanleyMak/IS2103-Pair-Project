@@ -5,9 +5,12 @@
  */
 package managementclient;
 
+import ejb.session.stateless.EmployeeSessionBeanRemote;
+import entity.EmployeeEntity;
 import java.util.Scanner;
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
+import util.enumeration.EmployeeAccessRightEnum;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -16,11 +19,12 @@ import util.exception.InvalidLoginCredentialException;
  */
 public class MainApp {
     
-    //    private StaffEntitySessionBeanRemote staffEntitySessionBeanRemote;
+//    private StaffEntitySessionBeanRemote staffEntitySessionBeanRemote;
 //    private ProductEntitySessionBeanRemote productEntitySessionBeanRemote;
 //    private SaleTransactionEntitySessionBeanRemote saleTransactionEntitySessionBeanRemote;
 //    private CheckoutSessionBeanRemote checkoutBeanRemote;
 //    private EmailSessionBeanRemote emailSessionBeanRemote;
+    private EmployeeSessionBeanRemote employeeSessionBeanRemote;
 
     private Queue queueCheckoutNotification;
     private ConnectionFactory queueCheckoutNotificationFactory;
@@ -28,7 +32,7 @@ public class MainApp {
     private CustomerServiceModule customerServiceModule;
     private SalesManagementModule salesManagementModule;
 
-    //private StaffEntity currentStaffEntity;
+    private EmployeeEntity currentEmployeeEntity;
 
     public MainApp() {
     }
@@ -85,20 +89,21 @@ public class MainApp {
 
     private void doLogin() throws InvalidLoginCredentialException {
         Scanner scanner = new Scanner(System.in);
-        String username = "";
+        String email = "";
         String password = "";
 
         System.out.println("*** CaRMS Management Client :: Login ***\n");
-        System.out.print("Enter username> ");
-        username = scanner.nextLine().trim();
+        System.out.print("Enter email> ");
+        email = scanner.nextLine().trim();
         System.out.print("Enter password> ");
         password = scanner.nextLine().trim();
-
-        if (username.length() > 0 && password.length() > 0) {
-            //currentStaffEntity = staffEntitySessionBeanRemote.staffLogin(username, password);
-        } else {
-            throw new InvalidLoginCredentialException("Missing login credential!");
+        
+        try {
+            currentEmployeeEntity = employeeSessionBeanRemote.loginEmployee(email, password);
+        } catch (InvalidLoginCredentialException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
         }
+        
     }
 
     private void menuMain() {
@@ -107,35 +112,23 @@ public class MainApp {
 
         while (true) {
             System.out.println("*** CaRMS Management Client ***\n"); //may not need, let the system auto recognise the employees access rights
-            //System.out.println("You are logged in as " + currentStaffEntity.getFirstName() + " " + currentStaffEntity.getLastName() + " with " + currentStaffEntity.getAccessRightEnum().toString() + " rights\n");
-            System.out.println("1: Customer Service");
-            System.out.println("2: Sales Management");
-            System.out.println("3: Logout\n");
-            response = 0;
-
-            while (response < 1 || response > 3) {
-                System.out.print("> ");
-
-                response = scanner.nextInt();
-
-                if (response == 1) {
-                    //customerServiceModule.menuCashierOperation();
-                } else if (response == 2) {
-                    salesManagementModule.menuSalesManagement();
+            //System.out.println("You are logged in as " + currentEmployeeEntity.getName() + " " + " with " + currentEmployeeEntity.getAccessRightEnum().toString() + " rights\n");
+            
+            if (currentEmployeeEntity.getEmployeeAccessRight() == EmployeeAccessRightEnum.SALES_MANAGER) {
+                salesManagementModule.menuSalesManagementForSales();
 //                    try {
 //                        salesManagementModule.menuSalesManagement();
 //                    } catch (InvalidAccessRightException ex) {
 //                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
 //                    }
-                } else if (response == 3) {
-                    break;
-                } else {
-                    System.out.println("Invalid option, please try again!\n");
-                }
             }
-
-            if (response == 3) {
-                break;
+            
+            if (currentEmployeeEntity.getEmployeeAccessRight() == EmployeeAccessRightEnum.OPERATIONS_MANAGER) {
+                salesManagementModule.menuSalesManagementForOperations();
+            }
+            
+            if (currentEmployeeEntity.getEmployeeAccessRight() == EmployeeAccessRightEnum.CUSTOMER_SERVICE_EXEC) {
+                customerServiceModule.menuCustomerService();
             }
         }
     }
