@@ -5,6 +5,8 @@
  */
 package ejb.session.stateless;
 
+import entity.RentalRateEntity;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -13,5 +15,17 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface RentalRateSessionBeanRemote {
+    
+    public Long createNewRentalRate(RentalRateEntity rentalRate);
+
+    public List<RentalRateEntity> retrieveAllRentalRates();
+
+    public RentalRateEntity retrieveRentalRateByRentalRateID(Long rentalRateID);
+
+    public RentalRateEntity retrieveRentalRateByRentalRateName(String rentalRateName);
+
+    public void updateRentalRate(RentalRateEntity rentalRate);
+
+    public void deleteRentalRate(Long rentalRateID);
     
 }

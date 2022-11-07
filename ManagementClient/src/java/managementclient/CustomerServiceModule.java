@@ -17,12 +17,12 @@ public class CustomerServiceModule {
 
     }
 
-    public void menuCashierOperation() {
+    public void menuCustomerService() {
         Scanner sc = new Scanner(System.in);
         Integer response = 0;
 
         while (true) {
-            System.out.println("*** CaRMS :: Cashier Operation ***\n");
+            System.out.println("*** CaRMS :: Customer Service ***\n");
             System.out.println("1: Pick Up Car");
             System.out.println("2: Return Car");
             System.out.println("4: Back\n");

@@ -22,27 +22,31 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
 
+    @Override
     public Long createNewCarCategory(CarCategoryEntity carCategory) {
         em.persist(carCategory);
         em.flush();
         return carCategory.getCarCategoryID();
     }
 
+    @Override
     public CarCategoryEntity retrieveCarCategoryByCarCategoryID(Long carCategoryID) {
         CarCategoryEntity carCategory = em.find(CarCategoryEntity.class, carCategoryID);
         //carCategory.getXXX().size();
         return carCategory;
     }
 
-    public CarCategoryEntity retrieveCarCategoryByCarCategory(String carCategoryCategory) {
-        Query query = em.createQuery("SELECT c FROM CarCategoryEntity c WHERE c.category = ?1")
-                .setParameter(1, carCategoryCategory);
+    @Override
+    public CarCategoryEntity retrieveCarCategoryByCarCategoryName(String carCategoryName) {
+        Query query = em.createQuery("SELECT c FROM CarCategoryEntity c WHERE c.name = ?1")
+                .setParameter(1, carCategoryName);
 
         CarCategoryEntity carCategory = (CarCategoryEntity) query.getSingleResult();
 
         return carCategory;
     }
     
+    @Override
      public void deleteCarCategory(Long carCategoryID) {
          CarCategoryEntity carCategory = retrieveCarCategoryByCarCategoryID(carCategoryID);
          //dissociate

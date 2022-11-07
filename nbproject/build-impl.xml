@@ -315,8 +315,8 @@ exists or setup the property manually. For example like this:
     <target name="-run-deploy-am" unless="no.deps">
         <!-- Task to deploy to the Access Manager runtime. -->
         <ant antfile="${project.CARMS-ejb}/build.xml" inheritall="false" target="-run-deploy-am"/>
-        <ant antfile="${project.CARMSClient}/build.xml" inheritall="false" target="-run-deploy-am"/>
-        <ant antfile="${project.HRSClient}/build.xml" inheritall="false" target="-run-deploy-am"/>
+        <ant antfile="${project.ManagementClient}/build.xml" inheritall="false" target="-run-deploy-am"/>
+        <ant antfile="${project.ReservationClient}/build.xml" inheritall="false" target="-run-deploy-am"/>
         <ant antfile="${project.ManagementClient}/build.xml" inheritall="false" target="-run-deploy-am"/>
         <ant antfile="${project.ReservationClient}/build.xml" inheritall="false" target="-run-deploy-am"/>
     </target>

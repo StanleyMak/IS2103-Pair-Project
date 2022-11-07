@@ -37,11 +37,11 @@ public class EmployeeEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private EmployeeAccessRightEnum employeeAccessRight;
     
-    @OneToOne
-    private DispatchRecordEntity dispatchRecord;
+//    @OneToOne
+//    private DispatchRecordEntity dispatchRecord;
     
-    @ManyToOne
-    private OutletEntity outlet;
+//    @ManyToOne
+//    private OutletEntity outlet;
 
     public EmployeeEntity() {
     }
@@ -91,23 +91,23 @@ public class EmployeeEntity implements Serializable {
     public void setEmployeeAccessRight(EmployeeAccessRightEnum employeeAccessRight) {
         this.employeeAccessRight = employeeAccessRight;
     }
-
-    public DispatchRecordEntity getDispatchRecord() {
-        return dispatchRecord;
-    }
-
-    public void setDispatchRecord(DispatchRecordEntity dispatchRecord) {
-        this.dispatchRecord = dispatchRecord;
-    }
-
-    public OutletEntity getOutlet() {
-        return outlet;
-    }
-
-    public void setOutlet(OutletEntity outlet) {
-        this.outlet = outlet;
-    }
-    
+//
+//    public DispatchRecordEntity getDispatchRecord() {
+//        return dispatchRecord;
+//    }
+//
+//    public void setDispatchRecord(DispatchRecordEntity dispatchRecord) {
+//        this.dispatchRecord = dispatchRecord;
+//    }
+//
+//    public OutletEntity getOutlet() {
+//        return outlet;
+//    }
+//
+//    public void setOutlet(OutletEntity outlet) {
+//        this.outlet = outlet;
+//    }
+//    
     
 
     @Override

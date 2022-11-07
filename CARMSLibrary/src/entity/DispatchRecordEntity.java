@@ -37,14 +37,11 @@ public class DispatchRecordEntity implements Serializable {
     @Column(nullable = false, length = 64)
     private Date returnTime;
     
-    @ManyToMany
-    private OutletEntity currOutlet;
+//    @ManyToMany
+//    private OutletEntity currOutlet;
     
-    @ManyToMany
-    private OutletEntity returnOutlet;
-    
-    @OneToOne
-    private EmployeeEntity employee;
+//    @OneToOne
+//    private EmployeeEntity employee;
 
     public DispatchRecordEntity() {
     }
@@ -79,29 +76,21 @@ public class DispatchRecordEntity implements Serializable {
         this.returnTime = returnTime;
     }
 
-    public OutletEntity getCurrOutlet() {
-        return currOutlet;
-    }
+//    public OutletEntity getCurrOutlet() {
+//        return currOutlet;
+//    }
+//
+//    public void setCurrOutlet(OutletEntity currOutlet) {
+//        this.currOutlet = currOutlet;
+//    }
 
-    public void setCurrOutlet(OutletEntity currOutlet) {
-        this.currOutlet = currOutlet;
-    }
-
-    public OutletEntity getReturnOutlet() {
-        return returnOutlet;
-    }
-
-    public void setReturnOutlet(OutletEntity returnOutlet) {
-        this.returnOutlet = returnOutlet;
-    }
-
-    public EmployeeEntity getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(EmployeeEntity employee) {
-        this.employee = employee;
-    }
+//    public EmployeeEntity getEmployee() {
+//        return employee;
+//    }
+//
+//    public void setEmployee(EmployeeEntity employee) {
+//        this.employee = employee;
+//    }
 
     public Long getDispatchRecordID() {
         return dispatchRecordID;

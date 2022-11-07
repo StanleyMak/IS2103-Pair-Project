@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarModelEntity;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +14,11 @@ import javax.ejb.Local;
  */
 @Local
 public interface CarModelSessionBeanLocal {
+
+    public Long createNewCarModel(CarModelEntity carModel, String carCategoryName);
+
+    public CarModelEntity retrieveCarModelByCarModelID(Long carModelID);
+
+    public CarModelEntity retrieveCarModelByCarModel(String carModelModel);
     
 }

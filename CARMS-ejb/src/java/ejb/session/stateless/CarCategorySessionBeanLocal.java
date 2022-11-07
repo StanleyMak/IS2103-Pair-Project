@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategoryEntity;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +14,13 @@ import javax.ejb.Local;
  */
 @Local
 public interface CarCategorySessionBeanLocal {
+
+    public Long createNewCarCategory(CarCategoryEntity carCategory);
+
+    public CarCategoryEntity retrieveCarCategoryByCarCategoryID(Long carCategoryID);
+    
+    public CarCategoryEntity retrieveCarCategoryByCarCategoryName(String carCategoryName);
+
+    public void deleteCarCategory(Long carCategoryID);
     
 }
