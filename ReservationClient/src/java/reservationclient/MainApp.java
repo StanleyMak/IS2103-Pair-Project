@@ -137,8 +137,10 @@ public class MainApp {
         System.out.print("Enter desired password> ");
         newCustomer.setPassword(scanner.nextLine().trim());
         
-        Long customerID = customerSessionBeanRemote.createNewCustomer(newCustomer);
-          
+        CustomerEntity newCustomer = new CustomerEntity(); 
+        newCustomer.setUsername(email);
+        newCustomer.setPassword(password);
+        customerSessionBeanRemote.createNewCustomer(newCustomer);
         
         System.out.println("You have successfully registered as a customer!");
         
