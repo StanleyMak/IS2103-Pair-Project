@@ -30,10 +30,10 @@ public class DispatchRecordEntity implements Serializable {
     private Long dispatchRecordID;
     @Column(nullable = false, length = 64)
     private Boolean isCompleted;
-    @Temporal(TemporalType.TIMESTAMP)
+    //@Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false, length = 64)
     private Date pickUpTime;
-    @Temporal(TemporalType.TIMESTAMP)
+    //@Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false, length = 64)
     private Date returnTime;
     

@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.CarCategoryEntity;
 import entity.CarModelEntity;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -47,20 +48,29 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
     
     @Override
-    public CarModelEntity retrieveCarModelByCarModel(String carModelModel) {
+    public CarModelEntity retrieveCarModelByCarModelName(String carModelName) {
         Query query = em.createQuery("SELECT c FROM CarModel c WHERE c.model = ?1")
-                .setParameter(1, carModelModel);
+                .setParameter(1, carModelName);
         CarModelEntity carModel = (CarModelEntity) query.getSingleResult();
         //carModel.getXX().size();
         return carModel;
     }
     
-    private void updateCarModel(CarModelEntity carModel) {
-        
+    @Override
+    public List<CarModelEntity> retrieveAllCarModels() {
+        Query query = em.createQuery("SELECT c FROM CarModel c");
+        List<CarModelEntity> carModels = query.getResultList();
+        return carModels;
     }
     
-    private void deleteCarModel(Long carModelID) {
-        CarModelEntity carModel = em.find(CarModelEntity.class, carModelID);
+    @Override
+    public void updateCarModel(CarModelEntity carModel) {
+        em.merge(carModel);
+    }
+    
+    @Override
+    public void deleteCarModel(String carModelName) {
+        CarModelEntity carModel = retrieveCarModelByCarModelName(carModelName);
         //dissociate
         
         em.remove(carModel);

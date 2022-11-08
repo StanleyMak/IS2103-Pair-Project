@@ -7,8 +7,13 @@ package managementclient;
 
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.DispatchRecordSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import entity.CarEntity;
 import entity.CarModelEntity;
+import entity.DispatchRecordEntity;
+import entity.EmployeeEntity;
 import entity.RentalRateEntity;
 import java.time.Clock;
 import java.util.Collections;
@@ -18,6 +23,7 @@ import java.util.Scanner;
 import javax.faces.validator.Validator;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
+import util.enumeration.StatusEnum;
 
 /**
  *
@@ -27,14 +33,26 @@ public class SalesManagementModule {
 
 //    private final ValidatorFactory validatorFactory;
 //    private final Validator validator;
-    
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
+    private CarSessionBeanRemote carSessionBeanRemote;
+    private DispatchRecordSessionBeanRemote dispatchRecordSessionBeanRemote;
+    
+    private EmployeeEntity currentEmployee;
 
     public SalesManagementModule() {
 //        this.validatorFactory = Validation.buildDefaultValidatorFactory();
 //        this.validator = (Validator) validatorFactory.getValidator();
+    }
+    
+    public SalesManagementModule(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, DispatchRecordSessionBeanRemote dispatchRecordSessionBeanRemote, EmployeeEntity currentEmployee) {
+        this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
+        this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
+        this.carModelSessionBeanRemote = carModelSessionBeanRemote;
+        this.carSessionBeanRemote = carSessionBeanRemote;
+        this.dispatchRecordSessionBeanRemote = dispatchRecordSessionBeanRemote;
+        this.currentEmployee = currentEmployee;
     }
 
     public void menuSalesManagementForSales() {
@@ -357,7 +375,7 @@ public class SalesManagementModule {
     private void doDeleteRentalRate(RentalRateEntity rentalRate) {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Sales) :: Delete Rental Rate ***\n");
-        
+
         rentalRateSessionBeanRemote.deleteRentalRate(rentalRate.getRentalRateID());
 
         System.out.println("Press Enter To Continue...");
@@ -369,13 +387,13 @@ public class SalesManagementModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: Create New Model ***\n");
         CarModelEntity carModel = new CarModelEntity();
-        
-        System.out.println("Enter Model Name> ");
+
+        System.out.print("Enter Model Name> ");
         carModel.setModelName(sc.nextLine().trim());
-        
-        System.out.println("Enter Car Category> ");
+
+        System.out.print("Enter Car Category> ");
         String carCategoryName = sc.nextLine().trim();
-        
+
         Long carModelID = carModelSessionBeanRemote.createNewCarModel(carModel, carCategoryName);
         System.out.println("New Car Model: " + carModelID + " successfully created!\n");
 
@@ -387,6 +405,13 @@ public class SalesManagementModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: View All Models ***\n");
 
+        List<CarModelEntity> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
+
+        //sort list
+        for (CarModelEntity carModel : carModels) {
+            System.out.println("Car Model: " + carModel.getModelName());
+        }
+
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }
@@ -394,6 +419,40 @@ public class SalesManagementModule {
     private void doUpdateModel() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: Update Model ***\n");
+        Integer response = 0;
+
+        System.out.println("Enter Car Model Name> ");
+        String carModelName = sc.nextLine();
+        CarModelEntity carModel = carModelSessionBeanRemote.retrieveCarModelByCarModelName(carModelName);
+
+        while (true) {
+            System.out.println("Update Car Model Name?");
+            System.out.println("1: Yes");
+            System.out.println("2: No");
+            response = 0;
+
+            while (response < 1 || response > 2) {
+                System.out.print("> ");
+
+                response = sc.nextInt();
+
+                if (response == 1) {
+                    System.out.print("Enter New Car Model Name> ");
+                    carModel.setModelName(sc.nextLine().trim());
+                } else if (response == 2) {
+                    break;
+                } else {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+            if (response == 2) {
+                break;
+            }
+        }
+
+        carModelSessionBeanRemote.updateCarModel(carModel);
+
+        System.out.println("Car Model: " + carModel.getModelName() + " successfully updated!\n");
 
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -403,6 +462,13 @@ public class SalesManagementModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: Delete Model ***\n");
 
+        System.out.print("Enter Car Model Name> ");
+        String carModelName = sc.nextLine();
+
+        carModelSessionBeanRemote.deleteCarModel(carModelName);
+
+        System.out.println("Car Model: " + carModelName + " successfully deleted!\n");
+
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }
@@ -410,6 +476,19 @@ public class SalesManagementModule {
     private void doCreateNewCar() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: Create New Car ***\n");
+
+        CarEntity car = new CarEntity();
+
+        System.out.print("Enter Car License Plate Number> ");
+        car.setLicensePlateNumber(sc.nextLine().trim());
+
+        System.out.print("Enter Car Colour> ");
+        car.setColour(sc.nextLine().trim());
+
+        car.setStatus(StatusEnum.AVAILABLE);
+
+        Long carID = carSessionBeanRemote.createNewCar(car);
+        System.out.println("New Car: " + car.getCarID() + " succcessfully created!\n");
 
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -419,6 +498,13 @@ public class SalesManagementModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: View All Cars ***\n");
 
+        List<CarEntity> cars = carSessionBeanRemote.retrieveAllCars();
+
+        //sort
+        for (CarEntity car : cars) {
+            System.out.println("Car License Plate Number: " + car.getLicensePlateNumber());
+        }
+
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }
@@ -427,21 +513,165 @@ public class SalesManagementModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: View Car Details ***\n");
 
+        System.out.print("Enter Car License Plate Number> ");
+        CarEntity car = carSessionBeanRemote.retrieveCarByCarLicensePlateNumber(sc.nextLine().trim());
+
+        System.out.println("Car License Plate Number: " + car.getLicensePlateNumber());
+        System.out.println("Car Colour: " + car.getColour());
+        System.out.println("Car Status: " + car.getStatus());
+
+        Integer response = 0;
+        while (true) {
+            System.out.println("1: Update Car");
+            System.out.println("2: Delete Car");
+            System.out.println("3: Back\n");
+            response = 0;
+
+            while (response < 1 || response > 3) {
+                System.out.print("> ");
+
+                response = sc.nextInt();
+
+                if (response == 1) {
+                    doUpdateCar(car);
+                } else if (response == 2) {
+                    doDeleteCar(car);
+                } else if (response == 3) {
+                    break;
+                } else {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+            if (response == 3) {
+                break;
+            }
+        }
+
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }
 
-    private void doUpdateCar() {
+    private void doUpdateCar(CarEntity car) {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: Update Car ***\n");
 
-        System.out.println("Press Enter To Continue...");
-        sc.nextLine();
+        Integer response = 0;
+        while (true) {
+            System.out.println("Update License Plate Number?");
+            System.out.println("1: Yes");
+            System.out.println("2: No");
+            response = 0;
+
+            while (response < 1 || response > 2) {
+                System.out.print("> ");
+
+                response = sc.nextInt();
+
+                if (response == 1) {
+                    System.out.print("Enter New License Plate Number> ");
+                    car.setLicensePlateNumber(sc.nextLine().trim());
+                } else if (response == 2) {
+                    break;
+                } else {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+            if (response == 2) {
+                break;
+            }
+
+            while (true) {
+                System.out.println("Update Colour?");
+                System.out.println("1: Yes");
+                System.out.println("2: No");
+                response = 0;
+
+                while (response < 1 || response > 2) {
+                    System.out.print("> ");
+
+                    response = sc.nextInt();
+
+                    if (response == 1) {
+                        System.out.print("Enter New Colour> ");
+                        car.setColour(sc.nextLine().trim());
+                    } else if (response == 2) {
+                        break;
+                    } else {
+                        System.out.println("Invalid option, please try again!\n");
+                    }
+                }
+                if (response == 2) {
+                    break;
+                }
+
+                while (true) {
+                    System.out.println("Update Status?");
+                    System.out.println("1: Yes");
+                    System.out.println("2: No");
+                    response = 0;
+
+                    while (response < 1 || response > 2) {
+                        System.out.print("> ");
+
+                        response = sc.nextInt();
+
+                        if (response == 1) {
+                            System.out.print("Enter New Status> ");
+                            Integer res = 0;
+                            while (true) {
+                                System.out.println("1: Available");
+                                System.out.println("2: On Rental");
+                                System.out.println("3: In Transit");
+                                System.out.println("4: Servicing");
+                                System.out.println("5: Disabled");
+                                System.out.println("6: Back\n");
+                                response = 0;
+
+                                while (response < 1 || response > 6) {
+                                    System.out.print("> ");
+
+                                    res = sc.nextInt();
+
+                                    if (res != 6) {
+                                        car.setStatus(StatusEnum.values()[res]);
+                                    } else if (res == 6) {
+                                        break;
+                                    } else {
+                                        System.out.println("Invalid option, please try again!\n");
+                                    }
+                                }
+                                if (res == 6) {
+                                    break;
+                                }
+                            }
+                        } else if (response == 2) {
+                            break;
+                        } else {
+                            System.out.println("Invalid option, please try again!\n");
+                        }
+                    }
+                    if (response == 2) {
+                        break;
+                    }
+
+                }
+            }
+            
+            carSessionBeanRemote.updateCar(car);
+            System.out.println("Car: " + car.getLicensePlateNumber() + " successfully updated!\n");
+            
+            System.out.println("Press Enter To Continue...");
+            sc.nextLine();
+
+        }
     }
 
-    private void doDeleteCar() {
+    private void doDeleteCar(CarEntity car) {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: Delete Car ***\n");
+        
+        carSessionBeanRemote.deleteCar(car.getCarID());
+        System.out.println("Car: " + car.getLicensePlateNumber() + " successfully deleted!\n");
 
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -451,6 +681,15 @@ public class SalesManagementModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: View Transit Dispatch Records For Current Day Reservations ***\n");
 
+        System.out.print("Enter Today's Date> ");
+        Date today = new Date(sc.nextLine());
+        
+//        List<DispatchRecordEntity> dispatchRecords = dispatchRecordSessionBeanRemote.retrieveDispatchRecordsForCurrentDayCurrentOutlet(today, currentEmployee.getOutlet());
+//        
+//        for (DispatchRecordEntity dispatchRecord : dispatchRecords) {
+//            System.out.println("Transit Driver Dispatch Record: " + dispatchRecord.getDispatchRecordID());
+//        }
+        
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }
@@ -466,7 +705,13 @@ public class SalesManagementModule {
     private void doUpdateTransitAsCompleted() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: Update Transit As Completed ***\n");
-
+        
+        System.out.print("Enter Dispatch Record ID> ");
+        Long dispatchRecordID = sc.nextLong();
+        
+        //dispatchRecordSessionBeanRemote.updateDispatchRecordAsCompleted(dispatchRecordID);
+        System.out.println("Dispatch Record: " + dispatchRecordID + " successfully updated as complete!\n");
+        
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }

@@ -36,10 +36,10 @@ public class ReservationEntity implements Serializable {
     private String creditCardNumber; 
     @Column(nullable = false)
     private String cvv; 
-    @Temporal(TemporalType.TIMESTAMP)
+    //@Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date startDateTime; 
-    @Temporal(TemporalType.TIMESTAMP)
+    //@Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date endDateTime; 
     @Column(nullable = false)
