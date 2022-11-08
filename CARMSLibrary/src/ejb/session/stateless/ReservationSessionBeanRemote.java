@@ -23,6 +23,7 @@ public interface ReservationSessionBeanRemote {
     public ReservationEntity retrieveReservationByReservationCode(String reservationCode);
     
     public void deleteReservation(Long reservationID);
+    
     public List<ReservationEntity> retrieveAllReservations();
     
 }

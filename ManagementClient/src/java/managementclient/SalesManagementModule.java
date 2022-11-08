@@ -208,7 +208,7 @@ public class SalesManagementModule {
         Collections.sort(rentalRates);
 
         for (RentalRateEntity rentalRate : rentalRates) {
-            System.out.println("Rental Rate " + rentalRate.getRentalName());
+            System.out.println("Rental Rate: " + rentalRate.getRentalName() + " | Category: " + rentalRate.getCarCategory().getCategoryName() + " | Validity Period: " + rentalRate.getStartDate());
         }
 
         System.out.println("Press Enter To Continue...");
@@ -278,6 +278,7 @@ public class SalesManagementModule {
                 System.out.print("> ");
 
                 response = sc.nextInt();
+                sc.nextLine();
 
                 if (response == 1) {
                     System.out.print("Enter Car Category> ");
@@ -303,6 +304,7 @@ public class SalesManagementModule {
                 System.out.print("> ");
 
                 response = sc.nextInt();
+                sc.nextLine();
 
                 if (response == 1) {
                     System.out.print("Enter Rate Per Day (in Dollars)> ");
@@ -328,6 +330,7 @@ public class SalesManagementModule {
                 System.out.print("> ");
 
                 response = sc.nextInt();
+                sc.nextLine();
 
                 if (response == 1) {
                     System.out.print("Enter Start Date (DD/MM/YYYY)> ");
@@ -356,6 +359,7 @@ public class SalesManagementModule {
                 System.out.print("> ");
 
                 response = sc.nextInt();
+                sc.nextLine();
 
                 if (response == 1) {
                     System.out.print("Enter End Date (DD/MM/YYYY)> ");
@@ -419,7 +423,7 @@ public class SalesManagementModule {
 
         //sort list
         for (CarModelEntity carModel : carModels) {
-            System.out.println("Car Model: " + carModel.getModelName());
+            System.out.println("Category: " + carModel.getCategory().getCategoryName() + " | Make: " + carModel.getModelMake() + " | Model: " + carModel.getModelName());
         }
 
         System.out.println("Press Enter To Continue...");
@@ -445,6 +449,7 @@ public class SalesManagementModule {
                 System.out.print("> ");
 
                 response = sc.nextInt();
+                sc.nextLine();
 
                 if (response == 1) {
                     System.out.print("Enter New Car Model Name> ");
@@ -512,7 +517,7 @@ public class SalesManagementModule {
 
         //sort
         for (CarEntity car : cars) {
-            System.out.println("Car License Plate Number: " + car.getLicensePlateNumber());
+            System.out.println("Category: " + car.getModel().getCategory().getCategoryName() + " | Make: " + car.getModel().getModelMake() + " | Model: " + car.getModel().getModelName() + " | Car License Plate Number: " + car.getLicensePlateNumber());
         }
 
         System.out.println("Press Enter To Continue...");
@@ -552,7 +557,7 @@ public class SalesManagementModule {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
-            if (response == 3) {
+            if (response == 2 || response == 3) {
                 break;
             }
         }
@@ -576,6 +581,7 @@ public class SalesManagementModule {
                 System.out.print("> ");
 
                 response = sc.nextInt();
+                sc.nextLine();
 
                 if (response == 1) {
                     System.out.print("Enter New License Plate Number> ");
@@ -600,6 +606,7 @@ public class SalesManagementModule {
                     System.out.print("> ");
 
                     response = sc.nextInt();
+                    sc.nextLine();
 
                     if (response == 1) {
                         System.out.print("Enter New Colour> ");
@@ -624,6 +631,7 @@ public class SalesManagementModule {
                         System.out.print("> ");
 
                         response = sc.nextInt();
+                        sc.nextLine();
 
                         if (response == 1) {
                             System.out.print("Enter New Status> ");
@@ -632,7 +640,7 @@ public class SalesManagementModule {
                                 System.out.println("1: Available");
                                 System.out.println("2: On Rental");
                                 System.out.println("3: In Transit");
-                                System.out.println("4: Servicing");
+                                System.out.println("4: Repair");
                                 System.out.println("5: Disabled");
                                 System.out.println("6: Back\n");
                                 response = 0;

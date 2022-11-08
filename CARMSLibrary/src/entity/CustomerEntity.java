@@ -42,11 +42,6 @@ public class CustomerEntity implements Serializable {
         this.reservations = new ArrayList<>(); 
     }
 
-    public CustomerEntity(String email) {
-        this(); 
-        this.username = email;
-    }
-
     public PartnerEntity getPartner() {
         return partner;
     }

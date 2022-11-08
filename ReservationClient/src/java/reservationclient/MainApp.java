@@ -131,15 +131,16 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client ::  ***\n");
         CustomerEntity newCustomer = new CustomerEntity();
+        
         System.out.print("Enter email> ");
         newCustomer.setUsername(scanner.nextLine().trim());
         
         System.out.print("Enter desired password> ");
         newCustomer.setPassword(scanner.nextLine().trim());
         
-        customerSessionBeanRemote.createNewCustomer(newCustomer);
+        Long customerID = customerSessionBeanRemote.createNewCustomer(newCustomer);
         
-        System.out.println("You have successfully registered as a customer!");
+        System.out.println("New Customer: " + customerID + " successfully registered as a customer!\n");
         
         System.out.println("Press Enter To Continue...");
         scanner.nextLine();

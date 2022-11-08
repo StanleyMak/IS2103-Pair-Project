@@ -32,12 +32,12 @@ public class CarCategoryEntity implements Serializable {
     @OneToMany
     private List<RentalRateEntity> rentalRates;
 
-    @OneToMany
-    private List<CarModelEntity> carModels;
+//    @OneToMany
+//    private List<CarModelEntity> carModels;
 
     public CarCategoryEntity() {
         this.rentalRates = new ArrayList<>();
-        this.carModels = new ArrayList<>();
+        //this.carModels = new ArrayList<>();
     }
 
     public CarCategoryEntity(String categoryName) {
@@ -53,13 +53,13 @@ public class CarCategoryEntity implements Serializable {
         this.rentalRates = rentalRates;
     }
 
-    public List<CarModelEntity> getCarModels() {
-        return carModels;
-    }
-
-    public void setCarModels(List<CarModelEntity> carModels) {
-        this.carModels = carModels;
-    }
+//    public List<CarModelEntity> getCarModels() {
+//        return carModels;
+//    }
+//
+//    public void setCarModels(List<CarModelEntity> carModels) {
+//        this.carModels = carModels;
+//    }
 
     public String getCategoryName() {
         return categoryName;

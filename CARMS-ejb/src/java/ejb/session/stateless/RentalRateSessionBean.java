@@ -32,7 +32,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     
     @Override
     public List<RentalRateEntity> retrieveAllRentalRates() {
-        Query query = em.createQuery("SELECT r FROM RentalRateEntity r");
+        Query query = em.createQuery("SELECT r FROM RentalRateEntity r ORDER BY r.carCategory.categoryName ASC, r.startDate ASC");
         List<RentalRateEntity> rentalRates = query.getResultList();
         return rentalRates;
     }

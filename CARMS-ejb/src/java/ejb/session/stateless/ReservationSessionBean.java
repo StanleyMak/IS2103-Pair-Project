@@ -57,9 +57,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     @Override 
     public List<ReservationEntity> retrieveAllReservations() {
         Query query = em.createQuery("SELECT r FROM ReservationEntity r");
-        return query.getResultList();
+        List<ReservationEntity> reservations = query.getResultList();
+        return reservations;
     }
-    
-    
 
 }

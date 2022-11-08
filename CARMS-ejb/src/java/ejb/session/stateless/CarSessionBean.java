@@ -57,7 +57,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     
     @Override
     public List<CarEntity> retrieveAllCars() {
-        Query query = em.createQuery("SELECT c FROM CarEntity c");
+        Query query = em.createQuery("SELECT c FROM CarEntity c ORDER BY c.model.category.categoryName ASC, c.model.modelMake ASC, c.model.modelName ASC, c.licensePlateNumber ASC");
         List<CarEntity> cars = query.getResultList();
         return cars;
     }

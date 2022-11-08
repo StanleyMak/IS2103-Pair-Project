@@ -32,7 +32,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     @Override
     public Long createNewCarModel(CarModelEntity carModel, String carCategoryName) {
         CarCategoryEntity carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
-        carCategory.getCarModels().add(carModel); //shld it be uni where model points at category
+        //carCategory.getCarModels().add(carModel); //shld it be uni where model points at category
         carModel.setCategory(carCategory);
         em.persist(carModel);
         em.flush();
@@ -49,7 +49,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     
     @Override
     public CarModelEntity retrieveCarModelByCarModelName(String carModelName) {
-        Query query = em.createQuery("SELECT c FROM CarModelEntity c WHERE c.model = ?1")
+        Query query = em.createQuery("SELECT c FROM CarModelEntity c WHERE c.modelName = ?1")
                 .setParameter(1, carModelName);
         CarModelEntity carModel = (CarModelEntity) query.getSingleResult();
         //carModel.getXX().size();
@@ -58,7 +58,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     
     @Override
     public List<CarModelEntity> retrieveAllCarModels() {
-        Query query = em.createQuery("SELECT c FROM CarModelEntity c");
+        Query query = em.createQuery("SELECT c FROM CarModelEntity c ORDER BY c.category.categoryName ASC, c.modelMake ASC, c.modelName ASC");
         List<CarModelEntity> carModels = query.getResultList();
         return carModels;
     }

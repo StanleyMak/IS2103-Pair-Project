@@ -92,6 +92,7 @@ public class MainApp {
 
                         customerServiceModule = new CustomerServiceModule();
                         salesManagementModule = new SalesManagementModule(rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, dispatchRecordSessionBeanRemote, currentEmployee);
+                        
                         menuMain();
                         
                     } catch (InvalidLoginCredentialException ex) {
