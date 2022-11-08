@@ -54,6 +54,7 @@ public class SalesManagementModule {
         this.dispatchRecordSessionBeanRemote = dispatchRecordSessionBeanRemote;
         this.currentEmployee = currentEmployee;
     }
+    //
 
     public void menuSalesManagementForSales() {
         Scanner sc = new Scanner(System.in);
