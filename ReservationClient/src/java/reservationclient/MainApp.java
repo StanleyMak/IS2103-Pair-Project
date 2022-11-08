@@ -137,8 +137,6 @@ public class MainApp {
         System.out.print("Enter desired password> ");
         newCustomer.setPassword(scanner.nextLine().trim());
         
-        
-        
         customerSessionBeanRemote.createNewCustomer(newCustomer);
         
         System.out.println("You have successfully registered as a customer!");

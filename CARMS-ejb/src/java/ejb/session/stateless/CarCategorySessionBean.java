@@ -28,7 +28,7 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         em.flush();
         return carCategory.getCarCategoryID();
     }
-
+/// 
     @Override
     public CarCategoryEntity retrieveCarCategoryByCarCategoryID(Long carCategoryID) {
         CarCategoryEntity carCategory = em.find(CarCategoryEntity.class, carCategoryID);
