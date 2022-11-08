@@ -43,11 +43,11 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     @Override
-    public CustomerEntity retrieveCustomerByEmail(String email) {
+    public CustomerEntity retrieveCustomerByCustomerUsername(String username) {
         
-        Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.email LIKE ?1")
-                .setParameter(1, email);
-        CustomerEntity customer = (CustomerEntity) query.getSingleResult(); 
+        Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.username LIKE ?1")
+                .setParameter(1, username);
+        CustomerEntity customer = (CustomerEntity) query; 
         //customer.getXX.size();
         return customer;
     }
@@ -60,9 +60,9 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     @Override
-    public CustomerEntity customerLogin(String email, String password) /*throws InvalidLoginCredentialException*/ { 
+    public CustomerEntity customerLogin(String username, String password) /*throws InvalidLoginCredentialException*/ { 
         
-        CustomerEntity customer = retrieveCustomerByEmail(email);
+        CustomerEntity customer = retrieveCustomerByCustomerUsername(username);
 
         return customer;
            
@@ -72,7 +72,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     @Override
     public CustomerEntity customerLogin(String email, String password) throws InvalidLoginCredentialException { 
         try {
-            CustomerEntity customer = retrieveCustomerByEmail(email);
+            CustomerEntity customer = retrieveCustomerByCustomerUsername(email);
             
             if (password.equals(customer.getPassword())) {
                 // association
