@@ -148,7 +148,7 @@ public class MainApp {
         String returnDate = sc.nextLine().trim(); 
         System.out.println("Enter return outlet");
         String returnOutlet = sc.nextLine().trim(); 
-        
+        /*
         int idx = 0;
         List<CarEntity> availableCars = carSessionBeanRemote.retrieveCarsByDate(pickUpDate, pickUpOutlet, returnDate, returnOutlet); 
         idx++; 
@@ -156,7 +156,7 @@ public class MainApp {
         for (CarEntity car : availableCars) {
             System.out.println(String.format("%s. %s %s", idx, car.getModel(), car.getModel().getCategory()));
         }
-        
+        */
         List<ReservationEntity> reservations = reservationSessionBeanRemote.retrieveAllReservations();
         
         // check if car is available via reservations
@@ -179,14 +179,14 @@ public class MainApp {
         String returnDate = sc.nextLine().trim(); 
         System.out.println("Enter return outlet");
         String returnOutlet = sc.nextLine().trim(); 
-        
+        /*
         int idx = 0;
         List<CarEntity> availableCars = carSessionBeanRemote.retrieveCarsByDate(pickUpDate, pickUpOutlet, returnDate, returnOutlet); 
         idx++; 
         for (CarEntity car : availableCars) {
             System.out.println(String.format("%s. %s %s", idx, car.getModel(), car.getModel().getCategory()));
         }
-        
+        */
         
         System.out.println("Do you want to reserve a car in the list? (yes/no)");
         String response = sc.nextLine().trim(); 
@@ -216,7 +216,7 @@ public class MainApp {
         if (username.length() > 0 && password.length() > 0) {
             customerSessionBeanRemote.customerLogin(username, password); 
         } else {
-            throw new InvalidLoginCredentialException("Missing login credentials");
+            // throw new InvalidLoginCredentialException("Missing login credentials");
         }
     }
     

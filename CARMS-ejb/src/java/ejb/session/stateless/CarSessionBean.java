@@ -6,10 +6,16 @@
 package ejb.session.stateless;
 
 import entity.CarEntity;
+import entity.CustomerEntity;
+import entity.OutletEntity;
+import entity.ReservationEntity;
+import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.StatusEnum;
 
 /**
  *
@@ -17,6 +23,10 @@ import javax.persistence.Query;
  */
 @Stateless
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
+
+    @EJB
+    private CustomerSessionBeanLocal customerSessionBean;
+    
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
@@ -51,6 +61,54 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         
         //dissociate
         em.remove(car);
+    }
+    
+    public void pickUpCar(String email, String reservationCode) {
+        ReservationEntity targetReservation = new ReservationEntity(); 
+        // get Customer from his email
+        CustomerEntity customer = customerSessionBean.retrieveCustomerByEmail(email);
+        
+        // association?
+        // get the reservation
+        List<ReservationEntity> reservations = customer.getReservations();
+        for (ReservationEntity res : reservations) {
+            if (reservationCode.equals(res.getReservationCode())) {
+                targetReservation = res;
+            }
+        }
+        
+        
+        
+        // update car status to rented out
+        CarEntity pickUpCar = targetReservation.getCar();
+        pickUpCar.setStatus(StatusEnum.ON_RENTAL);
+        // update car location to pick up location, bidirectional
+        pickUpCar.setCurrOutlet(targetReservation.getPickUpOutlet());
+        OutletEntity pickUpOutlet = targetReservation.getPickUpOutlet();
+        pickUpOutlet.getCars().add(pickUpCar);
+    }
+    
+    public void returnCar(String email, String reservationCode) {
+        ReservationEntity targetReservation = new ReservationEntity(); 
+        // get Customer from his email
+        CustomerEntity customer = customerSessionBean.retrieveCustomerByEmail(email);
+        
+        // association?
+        // get the reservation
+        List<ReservationEntity> reservations = customer.getReservations();
+        for (ReservationEntity res : reservations) {
+            if (reservationCode.equals(res.getReservationCode())) {
+                targetReservation = res;
+            }
+        }
+        
+        // update car status to rented out
+        CarEntity pickUpCar = targetReservation.getCar();
+        pickUpCar.setStatus(StatusEnum.ON_RENTAL);
+        // update car location to pick up location, bidirectional
+        pickUpCar.setCurrOutlet(targetReservation.getPickUpOutlet());
+        OutletEntity pickUpOutlet = targetReservation.getPickUpOutlet();
+        pickUpOutlet.getCars().add(pickUpCar);
     }
     
     

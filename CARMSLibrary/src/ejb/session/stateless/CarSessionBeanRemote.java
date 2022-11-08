@@ -13,5 +13,7 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface CarSessionBeanRemote {
-    
+
+    public void pickUpCar(String email, String reservationCode);
+    public void returnCar(String email, String reservationCode);
 }

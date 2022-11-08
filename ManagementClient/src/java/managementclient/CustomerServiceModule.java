@@ -5,13 +5,25 @@
  */
 package managementclient;
 
+import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.CustomerSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
+import entity.CarEntity;
+import entity.CustomerEntity;
+import entity.ReservationEntity;
+import java.util.List;
 import java.util.Scanner;
+import util.enumeration.StatusEnum;
 
 /**
  *
  * @author stonley
  */
 public class CustomerServiceModule {
+    
+    private CustomerSessionBeanRemote customerSessionBeanRemote; 
+    private CarSessionBeanRemote carSessionBeanRemote; 
+    ReservationSessionBeanRemote reservationSessionBeanRemote; 
     
     public CustomerServiceModule() {
 
@@ -53,7 +65,29 @@ public class CustomerServiceModule {
     private void doPickUpCar() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Customer Service :: Pick Up Car ***\n");
-
+        
+        System.out.println("Enter customer email");
+        String email = sc.nextLine().trim(); 
+        System.out.println("Enter reservation code");         
+        String reservationCode = sc.nextLine().trim();
+        
+        ReservationEntity reservation = reservationSessionBeanRemote.retrieveReservationByReservationCode(reservationCode);
+        // check if offline payment mode
+        if (!reservation.isOnlinePayment()) {
+            // make payment
+            double paymentAmount = reservation.getRentalFee(); 
+            System.out.println("Please pay: " + paymentAmount);
+            
+            double receivedAmount = sc.nextDouble(); 
+            
+            while (receivedAmount != paymentAmount) {
+                System.out.println("Wrong amount");
+                receivedAmount = sc.nextDouble();
+            }  
+        } 
+        
+        carSessionBeanRemote.pickUpCar(email, reservationCode);
+        System.out.println("Car is picked up");
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
 

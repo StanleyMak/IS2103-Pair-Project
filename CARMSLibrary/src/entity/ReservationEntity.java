@@ -46,9 +46,11 @@ public class ReservationEntity implements Serializable {
     private Long penaltyType;
     @Column(nullable = false)
     private String reservationCode; 
+    @Column(nullable = false)
+    private boolean onlinePayment;
     
     @ManyToOne
-    private CarCategoryEntity carCategory; 
+    private CarEntity car; 
     
     @ManyToOne
     private PartnerEntity partner; 
@@ -62,7 +64,7 @@ public class ReservationEntity implements Serializable {
     public ReservationEntity() {
     }
 
-    public ReservationEntity(double duration, double rentalFee, String creditCardNumber, String cvv, Date startDateTime, Date endDateTime, Long penaltyType) {
+    public ReservationEntity(double duration, double rentalFee, String creditCardNumber, String cvv, Date startDateTime, Date endDateTime, Long penaltyType, String reservationCode, boolean onlinePayment) {
         this.duration = duration;
         this.rentalFee = rentalFee;
         this.creditCardNumber = creditCardNumber;
@@ -70,14 +72,24 @@ public class ReservationEntity implements Serializable {
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.penaltyType = penaltyType;
+        this.reservationCode = reservationCode;
+        this.onlinePayment = onlinePayment;
     }
 
-    public CarCategoryEntity getCarCategory() {
-        return carCategory;
+    public boolean isOnlinePayment() {
+        return onlinePayment;
     }
 
-    public void setCarCategory(CarCategoryEntity carCategory) {
-        this.carCategory = carCategory;
+    public void setOnlinePayment(boolean onlinePayment) {
+        this.onlinePayment = onlinePayment;
+    }
+
+    public CarEntity getCar() {
+        return car;
+    }
+
+    public void setCar(CarEntity car) {
+        this.car = car;
     }
 
     public PartnerEntity getPartner() {

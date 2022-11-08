@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CustomerEntity;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +14,15 @@ import javax.ejb.Local;
  */
 @Local
 public interface CustomerSessionBeanLocal {
+    
+    public Long createNewCustomer(CustomerEntity customer);
+    
+    public CustomerEntity retrieveCustomerByID(Long customerID);
+    
+    public CustomerEntity retrieveCustomerByEmail(String email);
+    
+    public void deleteCustomer(Long customerID);
+   
+    public CustomerEntity customerLogin(String email, String password);
     
 }
