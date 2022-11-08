@@ -65,7 +65,7 @@ public class SalesManagementModule {
             System.out.println("1: Create Rental Rate");
             System.out.println("2: View All Rental Rates");
             System.out.println("3: View Rental Details");
-            System.out.println("4: Back\n");
+            System.out.println("4: Logout\n");
             response = 0;
 
             while (response < 1 || response > 4) {
@@ -80,6 +80,7 @@ public class SalesManagementModule {
                 } else if (response == 3) {
                     doViewRentalRateDetails();
                 } else if (response == 4) {
+                    doLogout();
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
@@ -117,10 +118,10 @@ public class SalesManagementModule {
             System.out.println("9: Assign Transit Driver");
             System.out.println("10: Update Transit As Completed");
             System.out.println("-------------------------------------------------------------");
-            System.out.println("11: Back\n");
+            System.out.println("11: Logout\n");
             response = 0;
 
-            while (response < 1 || response > 7) {
+            while (response < 1 || response > 11) {
                 System.out.print("> ");
 
                 response = sc.nextInt();
@@ -146,6 +147,7 @@ public class SalesManagementModule {
                 } else if (response == 10) {
                     doUpdateTransitAsCompleted();
                 } else if (response == 11) {
+                    doLogout();
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
@@ -153,9 +155,14 @@ public class SalesManagementModule {
             }
 
             if (response == 11) {
-                break;
+                return;
             }
         }
+    }
+    
+    private void doLogout() {
+        System.out.println("You have successfully logged out!\n");
+        currentEmployee = null;
     }
 
     private void doCreateRentalRate() {
@@ -167,11 +174,13 @@ public class SalesManagementModule {
         rentalRate.setRentalName(sc.nextLine().trim());
 
         // does this mean that rnetal rate points at car category??
-        System.out.println("Enter Car Category> ");
+        System.out.print("Enter Car Category> ");
         String carCategoryName = sc.nextLine().trim();
 
         System.out.print("Enter Rate Per Day (in Dollars)> ");
         rentalRate.setRatePerDay(sc.nextDouble());
+        
+        sc.nextLine();
 
         System.out.print("Enter Start Date (DD/MM/YYYY)> ");
         String startDateString = sc.nextLine();
@@ -185,7 +194,7 @@ public class SalesManagementModule {
         Date endDate = new Date(Integer.parseInt(endDateSplit[2]), Integer.parseInt(endDateSplit[1]), Integer.parseInt(endDateSplit[0]));
         rentalRate.setEndDate(endDate);
 
-        Long rentalRateID = rentalRateSessionBeanRemote.createNewRentalRate(rentalRate);
+        Long rentalRateID = rentalRateSessionBeanRemote.createNewRentalRate(rentalRate); //add category or associate category here
         System.out.println("New Rental Rate: " + rentalRate.getRentalRateID() + " successfully created!\n");
 
         System.out.println("Press Enter To Continue...");

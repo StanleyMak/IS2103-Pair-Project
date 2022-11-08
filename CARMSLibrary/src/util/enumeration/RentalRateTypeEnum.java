@@ -9,10 +9,8 @@ package util.enumeration;
  *
  * @author stonley
  */
-public enum StatusEnum {
-    AVAILABLE,
-    ON_RENTAL,
-    IN_TRANSIT,
-    REPAIR,
-    DISABLED
+public enum RentalRateTypeEnum {
+    DEFAULT,
+    PROMO,
+    PEAK
 }

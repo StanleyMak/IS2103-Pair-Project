@@ -28,25 +28,25 @@ public class ReservationEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationID;
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private double duration;
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private double rentalFee; 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String creditCardNumber; 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String cvv; 
     //@Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private Date startDateTime; 
     //@Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private Date endDateTime; 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private Long penaltyType;
     @Column(nullable = false)
     private String reservationCode; 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private boolean onlinePayment;
     
     @ManyToOne

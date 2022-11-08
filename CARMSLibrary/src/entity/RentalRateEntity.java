@@ -9,9 +9,13 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import util.enumeration.RentalRateTypeEnum;
 
 /**
  *
@@ -26,21 +30,28 @@ public class RentalRateEntity implements Serializable, Comparable<RentalRateEnti
     private Long rentalRateID;
     @Column(nullable = false, length = 64)
     private String rentalName;
+    @Enumerated(EnumType.STRING)
+    private RentalRateTypeEnum rentalRateType;
     @Column(nullable = false, length = 64)
     private double ratePerDay;
-    @Column(nullable = false, length = 64)
+    //@Column(nullable = false, length = 64)
     private Date startDate;
-    @Column(nullable = false, length = 64)
+    //@Column(nullable = false, length = 64)
     private Date endDate;
+    
+    @ManyToOne
+    private CarCategoryEntity carCategory;
 
     public RentalRateEntity() {
     }
 
-    public RentalRateEntity(String rentalName, double ratePerDay, Date startDate, Date endDate) {
+    public RentalRateEntity(String rentalName, RentalRateTypeEnum rentalRateType, CarCategoryEntity carCategory, double ratePerDay, Date startDate, Date endDate) {
         this.rentalName = rentalName;
         this.ratePerDay = ratePerDay;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.carCategory = carCategory;
+        this.rentalRateType = rentalRateType;
     }
 
     public Long getRentalRateID() {
@@ -120,6 +131,34 @@ public class RentalRateEntity implements Serializable, Comparable<RentalRateEnti
         } else {
             return 1;
         }
+    }
+
+    /**
+     * @return the carCategory
+     */
+    public CarCategoryEntity getCarCategory() {
+        return carCategory;
+    }
+
+    /**
+     * @param carCategory the carCategory to set
+     */
+    public void setCarCategory(CarCategoryEntity carCategory) {
+        this.carCategory = carCategory;
+    }
+
+    /**
+     * @return the rentalRateType
+     */
+    public RentalRateTypeEnum getRentalRateType() {
+        return rentalRateType;
+    }
+
+    /**
+     * @param rentalRateType the rentalRateType to set
+     */
+    public void setRentalRateType(RentalRateTypeEnum rentalRateType) {
+        this.rentalRateType = rentalRateType;
     }
 
 }

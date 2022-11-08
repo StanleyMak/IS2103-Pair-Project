@@ -10,6 +10,7 @@ import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.CarEntity;
 import entity.CustomerEntity;
+import entity.EmployeeEntity;
 import entity.ReservationEntity;
 import java.util.List;
 import java.util.Scanner;
@@ -23,10 +24,19 @@ public class CustomerServiceModule {
     
     private CustomerSessionBeanRemote customerSessionBeanRemote; 
     private CarSessionBeanRemote carSessionBeanRemote; 
-    ReservationSessionBeanRemote reservationSessionBeanRemote; 
+    private ReservationSessionBeanRemote reservationSessionBeanRemote; 
+    
+    private EmployeeEntity currentEmployee;
     
     public CustomerServiceModule() {
 
+    }
+    
+    public CustomerServiceModule(CustomerSessionBeanRemote customerSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, EmployeeEntity currentEmployee) {
+        this.customerSessionBeanRemote = customerSessionBeanRemote;
+        this.carSessionBeanRemote = carSessionBeanRemote;
+        this.reservationSessionBeanRemote = reservationSessionBeanRemote;
+        this.currentEmployee = currentEmployee;
     }
 
     public void menuCustomerService() {
@@ -37,7 +47,7 @@ public class CustomerServiceModule {
             System.out.println("*** CaRMS :: Customer Service ***\n");
             System.out.println("1: Pick Up Car");
             System.out.println("2: Return Car");
-            System.out.println("4: Back\n");
+            System.out.println("3: Logout\n");
             response = 0;
 
             while (response < 1 || response > 3) {
@@ -50,6 +60,7 @@ public class CustomerServiceModule {
                 } else if (response == 2) {
                     doReturnCar();
                 } else if (response == 3) {
+                    doLogout();
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
@@ -62,12 +73,17 @@ public class CustomerServiceModule {
         }
     }
 
+    private void doLogout() {
+        System.out.println("You have successfully logged out!\n");
+        this.currentEmployee = null;
+    }
+    
     private void doPickUpCar() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Customer Service :: Pick Up Car ***\n");
         
-        System.out.println("Enter customer email");
-        String email = sc.nextLine().trim(); 
+        System.out.println("Enter customer username");
+        String username = sc.nextLine().trim(); 
         System.out.println("Enter reservation code");         
         String reservationCode = sc.nextLine().trim();
         
@@ -86,7 +102,7 @@ public class CustomerServiceModule {
             }  
         } 
         
-        carSessionBeanRemote.pickUpCar(email, reservationCode);
+        carSessionBeanRemote.pickUpCar(username, reservationCode);
         System.out.println("Car is picked up");
         System.out.println("Press Enter To Continue...");
         sc.nextLine();

@@ -29,7 +29,7 @@ public class CarEntity implements Serializable {
     private Long carID;
     @Column(nullable = false, length = 64)
     private String licensePlateNumber;
-    @Column(nullable = false, length = 32)
+    //@Column(nullable = false, length = 32)
     private String colour;
     @Enumerated (EnumType.STRING)
     private StatusEnum status;
@@ -43,10 +43,11 @@ public class CarEntity implements Serializable {
     public CarEntity() {
     }
 
-    public CarEntity(String licensePlateNumber, String colour, StatusEnum status) {
+    public CarEntity(String licensePlateNumber, CarModelEntity model, StatusEnum status, OutletEntity currOutlet) {
         this.licensePlateNumber = licensePlateNumber;
-        this.colour = colour;
         this.status = status;
+        this.model = model;
+        this.currOutlet = currOutlet;
     }
 
     public String getLicensePlateNumber() {

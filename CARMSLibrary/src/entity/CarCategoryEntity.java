@@ -27,23 +27,22 @@ public class CarCategoryEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carCategoryID;
     @Column(nullable = false, length = 64)
-    private String categoryName; 
-    
+    private String categoryName;
+
     @OneToMany
     private List<RentalRateEntity> rentalRates;
-    
-    @OneToMany
-    private List<CarModelEntity> carModels; 
 
-    public CarCategoryEntity(String categoryName, List<RentalRateEntity> rentalRates) {
-        this();
-        this.categoryName = categoryName;
-        this.rentalRates = rentalRates;
-    }
+    @OneToMany
+    private List<CarModelEntity> carModels;
 
     public CarCategoryEntity() {
-       this.rentalRates = new ArrayList<>(); 
-       this.carModels = new ArrayList<>(); 
+        this.rentalRates = new ArrayList<>();
+        this.carModels = new ArrayList<>();
+    }
+
+    public CarCategoryEntity(String categoryName) {
+        this();
+        this.categoryName = categoryName;
     }
 
     public List<RentalRateEntity> getRentalRates() {
@@ -69,7 +68,7 @@ public class CarCategoryEntity implements Serializable {
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
-    
+
     public Long getCarCategoryID() {
         return carCategoryID;
     }
@@ -102,5 +101,5 @@ public class CarCategoryEntity implements Serializable {
     public String toString() {
         return "entity.CarCategoryEntity[ id=" + carCategoryID + " ]";
     }
-    
+
 }
