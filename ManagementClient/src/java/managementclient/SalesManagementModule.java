@@ -161,8 +161,17 @@ public class SalesManagementModule {
     }
     
     private void doLogout() {
-        System.out.println("You have successfully logged out!\n");
-        currentEmployee = null;
+        Scanner sc = new Scanner(System.in);
+        System.out.println("*** CaRMS Management Client :: Logout ***\n");
+        if (currentEmployee != null) {
+            currentEmployee = null; 
+            System.out.println("You have been successfully logged out!\n");
+        } else {
+            System.out.println("Nobody is logged in!");
+        }
+
+        System.out.println("Press Enter To Continue...");
+        sc.nextLine();
     }
 
     private void doCreateRentalRate() {
@@ -435,7 +444,7 @@ public class SalesManagementModule {
         System.out.println("*** CaRMS :: Sales Management (Operations) :: Update Model ***\n");
         Integer response = 0;
 
-        System.out.println("Enter Car Model Name> ");
+        System.out.print("Enter Car Model Name> ");
         String carModelName = sc.nextLine();
         CarModelEntity carModel = carModelSessionBeanRemote.retrieveCarModelByCarModelName(carModelName);
 

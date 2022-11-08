@@ -46,6 +46,7 @@ public class MainApp {
     private EmployeeEntity currentEmployee;
 
     public MainApp() {
+        this.currentEmployee = null;
     }
     
     public MainApp(CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, 

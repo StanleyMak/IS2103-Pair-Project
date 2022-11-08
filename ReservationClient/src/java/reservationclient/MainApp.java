@@ -32,7 +32,7 @@ public class MainApp {
         this.loggedInCustomer = null;
     }
 
-    public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, CustomerEntity loggedInCustomer) {
+    public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote) {
         this(); 
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.reservationSessionBeanRemote = reservationSessionBeanRemote;
