@@ -6,6 +6,9 @@
 package ejb.session.stateless;
 
 import entity.DispatchRecordEntity;
+import entity.OutletEntity;
+import java.util.Date;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -28,12 +31,12 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
         return dispatchRecord.getDispatchRecordID();
     }
     
-    public DispatchRecordEntity retrieveCarModelByDispatchRecordID(Long dispatchRecordID) {
+    public DispatchRecordEntity retrieveDisptachRecordByDispatchRecordID(Long dispatchRecordID) {
         DispatchRecordEntity dispatchRecord = em.find(DispatchRecordEntity.class, dispatchRecordID);
         return dispatchRecord;
     }
     
-    public DispatchRecordEntity retrieveCarModelByDispatchRecordName(String dispatchRecordName) {
+    public DispatchRecordEntity retrieveDispatchRecordByDispatchRecordName(String dispatchRecordName) {
         Query query = em.createQuery("SELECT c FROM CarModel c WHERE c.model = ?1")
                 .setParameter(1, dispatchRecordName);
         DispatchRecordEntity dispatchRecord = (DispatchRecordEntity) query.getSingleResult();
@@ -41,12 +44,22 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
         return dispatchRecord;
     }
     
-    private void updateDispatchRecord(DispatchRecordEntity dispatchRecord) {
-        
+    public List<DispatchRecordEntity> retrieveDispatchRecordsForCurrentDayCurrentOutlet(Date date, OutletEntity outlet) {
+        Query query = em.createQuery("SELECT d FROM DispatchRecordEntity WHERE d.outlet.address = ?1 AND d.pickUpTime = ?2")
+                .setParameter(1, outlet.getAddress())
+                .setParameter(2, date);
+        List<DispatchRecordEntity> dispatchRecords = query.getResultList();
+        return dispatchRecords;
+    }
+    
+    private void updateDispatchRecordAsCompleted(Long dispatchRecordID) {
+        DispatchRecordEntity dispatchRecord = retrieveDisptachRecordByDispatchRecordID(dispatchRecordID);
+        dispatchRecord.setIsCompleted(Boolean.TRUE);
+        em.merge(dispatchRecord);
     }
     
     private void deleteDispatchRecord(Long dispatchRecordID) {
-        DispatchRecordEntity dispatchRecord = retrieveCarModelByDispatchRecordID(dispatchRecordID);
+        DispatchRecordEntity dispatchRecord = retrieveDisptachRecordByDispatchRecordID(dispatchRecordID);
         //dissociate
         
         em.remove(dispatchRecord);

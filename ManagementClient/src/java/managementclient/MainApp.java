@@ -5,7 +5,12 @@
  */
 package managementclient;
 
+import ejb.session.stateless.CarCategorySessionBeanRemote;
+import ejb.session.stateless.CarModelSessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.DispatchRecordSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.EmployeeEntity;
 import java.util.Scanner;
 import javax.jms.ConnectionFactory;
@@ -25,6 +30,12 @@ public class MainApp {
 //    private CheckoutSessionBeanRemote checkoutBeanRemote;
 //    private EmailSessionBeanRemote emailSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
+    private CarModelSessionBeanRemote carModelSessionBeanRemote;
+    private CarSessionBeanRemote carSessionBeanRemote;
+    private DispatchRecordSessionBeanRemote dispatchRecordSessionBeanRemote;
+    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    
 
     private Queue queueCheckoutNotification;
     private ConnectionFactory queueCheckoutNotificationFactory;
@@ -36,6 +47,17 @@ public class MainApp {
 
     public MainApp() {
     }
+    
+    public MainApp(CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, 
+            DispatchRecordSessionBeanRemote dispatchRecordSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+        this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
+        this.carModelSessionBeanRemote = carModelSessionBeanRemote;
+        this.carSessionBeanRemote = carSessionBeanRemote;
+        this.dispatchRecordSessionBeanRemote = dispatchRecordSessionBeanRemote;
+        this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
+        this.employeeSessionBeanRemote = employeeSessionBeanRemote;
+    }
+
 
 //    public MainApp(Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) {
 //        this.staffEntitySessionBeanRemote = staffEntitySessionBeanRemote;
@@ -69,7 +91,7 @@ public class MainApp {
                         System.out.println("Login successful!\n");
 
                         customerServiceModule = new CustomerServiceModule();
-                        salesManagementModule = new SalesManagementModule();
+                        salesManagementModule = new SalesManagementModule(rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, dispatchRecordSessionBeanRemote, currentEmployeeEntity);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
