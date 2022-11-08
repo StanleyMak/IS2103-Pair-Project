@@ -132,14 +132,13 @@ public class MainApp {
         System.out.println("*** CaRMS Reservation Client ::  ***\n");
         CustomerEntity newCustomer = new CustomerEntity();
         System.out.print("Enter email> ");
-        newCustomer.setEmail(scanner.nextLine().trim());
+        newCustomer.setUsername(scanner.nextLine().trim());
         
         System.out.print("Enter desired password> ");
         newCustomer.setPassword(scanner.nextLine().trim());
         
-        CustomerEntity newCustomer = new CustomerEntity(); 
-        newCustomer.setUsername(email);
-        newCustomer.setPassword(password);
+        
+        
         customerSessionBeanRemote.createNewCustomer(newCustomer);
         
         System.out.println("You have successfully registered as a customer!");
