@@ -90,7 +90,6 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         
         
-        
         // update car status to rented out
         CarEntity pickUpCar = targetReservation.getCar();
         pickUpCar.setStatus(StatusEnum.ON_RENTAL);

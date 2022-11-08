@@ -81,7 +81,7 @@ public class CustomerServiceModule {
             double receivedAmount = sc.nextDouble(); 
             
             while (receivedAmount != paymentAmount) {
-                System.out.println("Wrong amount");
+                System.out.println("Wrong amount, try again!");
                 receivedAmount = sc.nextDouble();
             }  
         } 

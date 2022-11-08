@@ -24,5 +24,5 @@ public interface CustomerSessionBeanRemote {
     public void deleteCustomer(Long customerID);
    
     public CustomerEntity customerLogin(String email, String password);
-    
+
 }

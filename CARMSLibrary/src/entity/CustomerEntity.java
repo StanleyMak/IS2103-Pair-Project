@@ -27,7 +27,7 @@ public class CustomerEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerID;
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false, length = 64, unique = true)
     private String email;
     @Column(nullable = false, length = 64)
     private String password; 
@@ -42,9 +42,9 @@ public class CustomerEntity implements Serializable {
         this.reservations = new ArrayList<>(); 
     }
 
-    public CustomerEntity(String email) {
-        this(); 
+    public CustomerEntity(String email, String password) {
         this.email = email;
+        this.password = password;
     }
 
     public PartnerEntity getPartner() {

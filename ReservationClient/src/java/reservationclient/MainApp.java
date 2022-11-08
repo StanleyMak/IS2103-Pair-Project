@@ -7,13 +7,14 @@ package reservationclient;
 
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
+import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
-import entity.CarEntity;
 import entity.CustomerEntity;
+import entity.EmployeeEntity;
+import entity.OutletEntity;
 import entity.ReservationEntity;
 import java.util.List;
 import java.util.Scanner;
-import util.exception.InvalidLoginCredentialException;
 
 /**
  *
@@ -21,14 +22,25 @@ import util.exception.InvalidLoginCredentialException;
  */
 public class MainApp {
     
-     CustomerSessionBeanRemote customerSessionBeanRemote; 
-     ReservationSessionBeanRemote reservationSessionBeanRemote; 
-     CarSessionBeanRemote carSessionBeanRemote; 
-     CustomerEntity loggedInCustomer; 
+     private CustomerSessionBeanRemote customerSessionBeanRemote; 
+     private ReservationSessionBeanRemote reservationSessionBeanRemote; 
+     private CarSessionBeanRemote carSessionBeanRemote; 
+     private CustomerEntity loggedInCustomer; 
+     
     
     public MainApp() {
         this.loggedInCustomer = null;
     }
+
+    public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, CustomerEntity loggedInCustomer) {
+        this(); 
+        this.customerSessionBeanRemote = customerSessionBeanRemote;
+        this.reservationSessionBeanRemote = reservationSessionBeanRemote;
+        this.carSessionBeanRemote = carSessionBeanRemote;
+        this.loggedInCustomer = loggedInCustomer;
+    }
+    
+    
 
     public void runApp() {
         Scanner scanner = new Scanner(System.in);
@@ -118,16 +130,15 @@ public class MainApp {
     public void doRegisterAsCustomer() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client ::  ***\n");
+        CustomerEntity newCustomer = new CustomerEntity();
+        System.out.print("Enter email> ");
+        newCustomer.setEmail(scanner.nextLine().trim());
         
-        System.out.println("Enter password");
-        String email = scanner.nextLine().trim(); 
-        System.out.println("Enter desired password");
-        String password = scanner.nextLine().trim(); 
+        System.out.print("Enter desired password> ");
+        newCustomer.setPassword(scanner.nextLine().trim());
         
-        CustomerEntity newCustomer = new CustomerEntity(); 
-        newCustomer.setEmail(email);
-        newCustomer.setPassword(password);
-        customerSessionBeanRemote.createNewCustomer(newCustomer);
+        Long customerID = customerSessionBeanRemote.createNewCustomer(newCustomer);
+          
         
         System.out.println("You have successfully registered as a customer!");
         

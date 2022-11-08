@@ -21,7 +21,11 @@ import util.exception.InvalidLoginCredentialException;
 public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerSessionBeanLocal {
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
-    private EntityManager em;
+    private EntityManager em; 
+
+    public CustomerSessionBean() {
+    }
+    
     
     @Override
     public Long createNewCustomer(CustomerEntity customer) {
@@ -41,9 +45,9 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     @Override
     public CustomerEntity retrieveCustomerByEmail(String email) {
         
-        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email LIKE ?1")
+        Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.email LIKE ?1")
                 .setParameter(1, email);
-        CustomerEntity customer = (CustomerEntity) query; 
+        CustomerEntity customer = (CustomerEntity) query.getSingleResult(); 
         //customer.getXX.size();
         return customer;
     }
@@ -82,6 +86,6 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     */
-            
+  
     
 }

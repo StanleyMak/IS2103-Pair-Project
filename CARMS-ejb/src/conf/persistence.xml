@@ -5,7 +5,6 @@
     <class>entity.CarCategoryEntity</class>
     <class>entity.CarEntity</class>
     <class>entity.CarModelEntity</class>
-    <class>entity.CustomerEntity</class>
     <class>entity.DispatchRecordEntity</class>
     <class>entity.EmployeeEntity</class>
     <class>entity.OutletEntity</class>
@@ -13,6 +12,7 @@
     <class>entity.PartnerEntity</class>
     <class>entity.RentalRateEntity</class>
     <class>entity.ReservationEntity</class>
+    <class>entity.CustomerEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>
