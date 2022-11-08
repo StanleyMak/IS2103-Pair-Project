@@ -19,7 +19,7 @@ public interface CustomerSessionBeanRemote {
     
     public CustomerEntity retrieveCustomerByID(Long customerID);
     
-    public CustomerEntity retrieveCustomerByEmail(String email);
+    public CustomerEntity retrieveCustomerByCustomerUsername(String email);
     
     public void deleteCustomer(Long customerID);
    

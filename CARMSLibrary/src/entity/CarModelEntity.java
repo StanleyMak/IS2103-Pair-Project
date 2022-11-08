@@ -27,6 +27,8 @@ public class CarModelEntity implements Serializable {
     private Long carModelID;
     @Column(nullable = false, length = 64)
     private String modelName;
+    //@Column(nullable = false, length = 64)
+    private String modelMake;
     
     @ManyToOne
     private CarCategoryEntity category;
@@ -34,8 +36,10 @@ public class CarModelEntity implements Serializable {
     public CarModelEntity() {
     }
 
-    public CarModelEntity(String modelName) {
+    public CarModelEntity(String modelMake, String modelName, CarCategoryEntity category) {
         this.modelName = modelName;
+        this.modelMake = modelMake;
+        this.category = category;
     }
 
     public Long getCarModelID() {
@@ -85,6 +89,20 @@ public class CarModelEntity implements Serializable {
     @Override
     public String toString() {
         return "entity.CarModelEntity[ id=" + carModelID + " ]";
+    }
+
+    /**
+     * @return the modelMake
+     */
+    public String getModelMake() {
+        return modelMake;
+    }
+
+    /**
+     * @param modelMake the modelMake to set
+     */
+    public void setModelMake(String modelMake) {
+        this.modelMake = modelMake;
     }
     
 }

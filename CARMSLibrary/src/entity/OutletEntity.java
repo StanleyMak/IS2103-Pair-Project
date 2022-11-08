@@ -29,9 +29,9 @@ public class OutletEntity implements Serializable {
     private Long outletID;
     @Column(nullable = false, length = 64)
     private String address;
-    @Column(nullable = false, length = 64)
+    //@Column(nullable = false, length = 64)
     private Date openHour;
-    @Column(nullable = false, length = 64)
+    //@Column(nullable = false, length = 64)
     private Date closeHour;
     
     @OneToMany
@@ -42,6 +42,7 @@ public class OutletEntity implements Serializable {
     }
 
     public OutletEntity(String address, Date openHour, Date closeHour) {
+        this();
         this.address = address;
         this.openHour = openHour;
         this.closeHour = closeHour;

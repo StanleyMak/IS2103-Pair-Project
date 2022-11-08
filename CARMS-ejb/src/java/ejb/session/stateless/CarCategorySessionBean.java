@@ -38,7 +38,7 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
 
     @Override
     public CarCategoryEntity retrieveCarCategoryByCarCategoryName(String carCategoryName) {
-        Query query = em.createQuery("SELECT c FROM CarCategoryEntity c WHERE c.name = ?1")
+        Query query = em.createQuery("SELECT c FROM CarCategoryEntity c WHERE c.categoryName = ?1")
                 .setParameter(1, carCategoryName);
 
         CarCategoryEntity carCategory = (CarCategoryEntity) query.getSingleResult();

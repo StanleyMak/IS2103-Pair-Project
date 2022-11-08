@@ -12,6 +12,7 @@ package util.enumeration;
 public enum EmployeeAccessRightEnum {
     SALES_MANAGER,
     OPERATIONS_MANAGER,
-    CUSTOMER_SERVICE_EXEC
+    CUSTOMER_SERVICE_EXEC,
+    EMPLOYEE
     
 }

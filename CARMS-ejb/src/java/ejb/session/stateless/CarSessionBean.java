@@ -78,7 +78,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     public void pickUpCar(String email, String reservationCode) {
         ReservationEntity targetReservation = new ReservationEntity(); 
         // get Customer from his email
-        CustomerEntity customer = customerSessionBean.retrieveCustomerByEmail(email);
+        CustomerEntity customer = customerSessionBean.retrieveCustomerByCustomerUsername(email);
         
         // association?
         // get the reservation
@@ -103,7 +103,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     public void returnCar(String email, String reservationCode) {
         ReservationEntity targetReservation = new ReservationEntity(); 
         // get Customer from his email
-        CustomerEntity customer = customerSessionBean.retrieveCustomerByEmail(email);
+        CustomerEntity customer = customerSessionBean.retrieveCustomerByCustomerUsername(email);
         
         // association?
         // get the reservation

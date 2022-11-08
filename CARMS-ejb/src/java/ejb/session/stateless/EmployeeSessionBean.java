@@ -38,22 +38,22 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     }
     
     @Override
-    public EmployeeEntity retrieveEmployeeByEmployeeEmail(String email) {
-        Query query = em.createQuery("SELECT e FROM EmployeeEntity WHERE e.email = ?1")
-                .setParameter(1, email);
+    public EmployeeEntity retrieveEmployeeByEmployeeUsername(String username) {
+        Query query = em.createQuery("SELECT e FROM EmployeeEntity e WHERE e.username = ?1")
+                .setParameter(1, username);
         EmployeeEntity employee = (EmployeeEntity) query.getSingleResult();
         return employee;
     }
     
     @Override
-    public EmployeeEntity loginEmployee(String email, String password) { //throws InvalidLoginCredentialException {
-        EmployeeEntity employee = retrieveEmployeeByEmployeeEmail(email);
-        return employee;
-//        if (employee.getPassword().equals(password)) {
-//            return employee;
-//        } else {
-//            throw new InvalidLoginCredentialException("Email or Password Incorrect");
-//        }
+    public EmployeeEntity loginEmployee(String username, String password) throws InvalidLoginCredentialException {
+        EmployeeEntity employee = retrieveEmployeeByEmployeeUsername(username);
+        
+        if (employee.getPassword().equals(password)) {
+            return employee;
+        } else {
+            throw new InvalidLoginCredentialException("Email or Password Incorrect");
+        }
     }
 
     

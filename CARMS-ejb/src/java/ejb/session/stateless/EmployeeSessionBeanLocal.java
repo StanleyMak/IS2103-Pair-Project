@@ -21,7 +21,7 @@ public interface EmployeeSessionBeanLocal {
 
     public EmployeeEntity retrieveEmployeeByEmployeeID(Long employeeID);
 
-    public EmployeeEntity retrieveEmployeeByEmployeeEmail(String email);
+    public EmployeeEntity retrieveEmployeeByEmployeeUsername(String email);
 
     public EmployeeEntity loginEmployee(String email, String password) throws InvalidLoginCredentialException;
     

@@ -43,7 +43,7 @@ public class MainApp {
     private CustomerServiceModule customerServiceModule;
     private SalesManagementModule salesManagementModule;
 
-    private EmployeeEntity currentEmployeeEntity;
+    private EmployeeEntity currentEmployee;
 
     public MainApp() {
     }
@@ -91,8 +91,9 @@ public class MainApp {
                         System.out.println("Login successful!\n");
 
                         customerServiceModule = new CustomerServiceModule();
-                        salesManagementModule = new SalesManagementModule(rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, dispatchRecordSessionBeanRemote, currentEmployeeEntity);
+                        salesManagementModule = new SalesManagementModule(rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, dispatchRecordSessionBeanRemote, currentEmployee);
                         menuMain();
+                        
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
                     }
@@ -111,17 +112,17 @@ public class MainApp {
 
     private void doLogin() throws InvalidLoginCredentialException {
         Scanner scanner = new Scanner(System.in);
-        String email = "";
+        String username = "";
         String password = "";
 
         System.out.println("*** CaRMS Management Client :: Login ***\n");
-        System.out.print("Enter email> ");
-        email = scanner.nextLine().trim();
+        System.out.print("Enter username> ");
+        username = scanner.nextLine().trim();
         System.out.print("Enter password> ");
         password = scanner.nextLine().trim();
         
         try {
-            currentEmployeeEntity = employeeSessionBeanRemote.loginEmployee(email, password);
+            currentEmployee = employeeSessionBeanRemote.loginEmployee(username, password);
         } catch (InvalidLoginCredentialException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         }
@@ -132,11 +133,11 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
 
-        while (true) {
+        //while (true) {
             System.out.println("*** CaRMS Management Client ***\n"); //may not need, let the system auto recognise the employees access rights
-            //System.out.println("You are logged in as " + currentEmployeeEntity.getName() + " " + " with " + currentEmployeeEntity.getAccessRightEnum().toString() + " rights\n");
+            System.out.println("You are logged in as " + currentEmployee.getName() + " " + " with " + currentEmployee.getEmployeeAccessRight().toString() + " rights\n");
             
-            if (currentEmployeeEntity.getEmployeeAccessRight() == EmployeeAccessRightEnum.SALES_MANAGER) {
+            if (currentEmployee.getEmployeeAccessRight() == EmployeeAccessRightEnum.SALES_MANAGER) {
                 salesManagementModule.menuSalesManagementForSales();
 //                    try {
 //                        salesManagementModule.menuSalesManagement();
@@ -145,14 +146,15 @@ public class MainApp {
 //                    }
             }
             
-            if (currentEmployeeEntity.getEmployeeAccessRight() == EmployeeAccessRightEnum.OPERATIONS_MANAGER) {
+            if (currentEmployee.getEmployeeAccessRight() == EmployeeAccessRightEnum.OPERATIONS_MANAGER) {
                 salesManagementModule.menuSalesManagementForOperations();
             }
             
-            if (currentEmployeeEntity.getEmployeeAccessRight() == EmployeeAccessRightEnum.CUSTOMER_SERVICE_EXEC) {
+            if (currentEmployee.getEmployeeAccessRight() == EmployeeAccessRightEnum.CUSTOMER_SERVICE_EXEC) {
                 customerServiceModule.menuCustomerService();
             }
-        }
+            
+        //}
     }
 
     

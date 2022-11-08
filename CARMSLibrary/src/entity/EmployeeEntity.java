@@ -30,28 +30,36 @@ public class EmployeeEntity implements Serializable {
     private Long employeeID;
     @Column(nullable = false, length = 64)
     private String name;
-    @Column(nullable = false, length = 64)
-    private String email;
-    @Column(nullable = false, length = 64)
+    //@Column(nullable = false, length = 64)
+    private String username;
+    //@Column(nullable = false, length = 64)
     private String password; 
     @Enumerated(EnumType.STRING)
     private EmployeeAccessRightEnum employeeAccessRight;
     
-//    @OneToOne
-//    private DispatchRecordEntity dispatchRecord;
+    @OneToOne
+    private DispatchRecordEntity dispatchRecord;
     
-//    @ManyToOne
-//    private OutletEntity outlet;
+    @ManyToOne
+    private OutletEntity outlet;
 
     public EmployeeEntity() {
     }
-
-    public EmployeeEntity(String name, String email, String password) {
+    
+    public EmployeeEntity(String name, OutletEntity outlet, EmployeeAccessRightEnum employeeAccessRight) {
         this.name = name;
-        this.email = email;
-        this.password = password;
+        this.employeeAccessRight = employeeAccessRight;
+        this.outlet = outlet;
     }
 
+    public EmployeeEntity(String name, OutletEntity outlet, EmployeeAccessRightEnum employeeAccessRight, String username, String password) {
+        this.name = name;
+        this.employeeAccessRight = employeeAccessRight;
+        this.outlet = outlet;
+        this.username = username;
+        this.password = password;
+    }
+   
     public Long getEmployeeID() {
         return employeeID;
     }
@@ -68,12 +76,12 @@ public class EmployeeEntity implements Serializable {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -91,23 +99,23 @@ public class EmployeeEntity implements Serializable {
     public void setEmployeeAccessRight(EmployeeAccessRightEnum employeeAccessRight) {
         this.employeeAccessRight = employeeAccessRight;
     }
-//
-//    public DispatchRecordEntity getDispatchRecord() {
-//        return dispatchRecord;
-//    }
-//
-//    public void setDispatchRecord(DispatchRecordEntity dispatchRecord) {
-//        this.dispatchRecord = dispatchRecord;
-//    }
-//
-//    public OutletEntity getOutlet() {
-//        return outlet;
-//    }
-//
-//    public void setOutlet(OutletEntity outlet) {
-//        this.outlet = outlet;
-//    }
-//    
+
+    public DispatchRecordEntity getDispatchRecord() {
+        return dispatchRecord;
+    }
+
+    public void setDispatchRecord(DispatchRecordEntity dispatchRecord) {
+        this.dispatchRecord = dispatchRecord;
+    }
+
+    public OutletEntity getOutlet() {
+        return outlet;
+    }
+
+    public void setOutlet(OutletEntity outlet) {
+        this.outlet = outlet;
+    }
+    
     
 
     @Override

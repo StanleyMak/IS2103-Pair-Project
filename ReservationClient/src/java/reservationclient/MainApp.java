@@ -125,7 +125,7 @@ public class MainApp {
         String password = scanner.nextLine().trim(); 
         
         CustomerEntity newCustomer = new CustomerEntity(); 
-        newCustomer.setEmail(email);
+        newCustomer.setUsername(email);
         newCustomer.setPassword(password);
         customerSessionBeanRemote.createNewCustomer(newCustomer);
         

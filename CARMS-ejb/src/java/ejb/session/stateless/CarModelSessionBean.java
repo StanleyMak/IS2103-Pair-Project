@@ -49,7 +49,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     
     @Override
     public CarModelEntity retrieveCarModelByCarModelName(String carModelName) {
-        Query query = em.createQuery("SELECT c FROM CarModel c WHERE c.model = ?1")
+        Query query = em.createQuery("SELECT c FROM CarModelEntity c WHERE c.model = ?1")
                 .setParameter(1, carModelName);
         CarModelEntity carModel = (CarModelEntity) query.getSingleResult();
         //carModel.getXX().size();
@@ -58,7 +58,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     
     @Override
     public List<CarModelEntity> retrieveAllCarModels() {
-        Query query = em.createQuery("SELECT c FROM CarModel c");
+        Query query = em.createQuery("SELECT c FROM CarModelEntity c");
         List<CarModelEntity> carModels = query.getResultList();
         return carModels;
     }
