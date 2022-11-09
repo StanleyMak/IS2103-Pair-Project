@@ -51,7 +51,6 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.username LIKE ?1")
                 .setParameter(1, username);
         
-        
         //customer.getXX.size();
         // association
         
@@ -59,7 +58,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             CustomerEntity customer = (CustomerEntity) query.getSingleResult(); 
             return customer; 
         } catch (NoResultException | NonUniqueResultException ex) {
-            throw new CustomerNotFoundException("Customer usernam " + username + "does not exist!");
+            throw new CustomerNotFoundException("Customer username " + username + "does not exist!");
         }
     }
     

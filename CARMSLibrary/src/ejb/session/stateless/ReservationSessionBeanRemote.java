@@ -6,8 +6,11 @@
 package ejb.session.stateless;
 
 import entity.ReservationEntity;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CustomerNotFoundException;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -16,14 +19,16 @@ import javax.ejb.Remote;
 @Remote
 public interface ReservationSessionBeanRemote {
     
-    public Long createNewReservation(ReservationEntity reservation);
+    public Long createNewReservation(ReservationEntity reservation, Long carID, String username, String returnOutletAddress, String pickupOutletAddress) throws CustomerNotFoundException;
     
-    public ReservationEntity retrieveReservationByID(Long reservationID);
+    public ReservationEntity retrieveReservationByID(Long reservationID) throws ReservationNotFoundException;
     
-    public ReservationEntity retrieveReservationByReservationCode(String reservationCode);
+    public ReservationEntity retrieveReservationByReservationCode(String reservationCode) throws ReservationNotFoundException; 
     
-    public void deleteReservation(Long reservationID);
+    public void deleteReservation(String username, String reservationCode) throws CustomerNotFoundException, ReservationNotFoundException;
     
     public List<ReservationEntity> retrieveAllReservations();
+    
+    // public List<ReservationEntity> retrieveAvailableCars(Date pickupDateTime, Date returnDateTime, String pickUpOutlet, String returnOutlet); 
     
 }

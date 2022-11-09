@@ -10,9 +10,15 @@ import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.CustomerEntity;
 import entity.ReservationEntity;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import oracle.jrockit.jfr.parser.ParseException;
+import util.exception.CustomerNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.InvalidReservationCodeException;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -68,7 +74,8 @@ public class MainApp {
                 } else if (response == 2) {
                     doRegisterAsCustomer();
                 } else if (response == 3) {
-                    doSearchCarForVisitor();
+                    
+                    // doSearchCarForVisitor();
                 } else if (response == 4) {
                     break;
                 } else {
@@ -107,7 +114,12 @@ public class MainApp {
                 } else if (response == 2) {
                     doReserveCar();
                 } else if (response == 3) {
-                    doViewReservationDetails();
+                    try {
+                        doViewReservationDetails();
+                    } catch (InvalidReservationCodeException ex) {
+                        System.out.println("Invalid reservation details: " + ex.getMessage());
+                    }
+                    
                 } else if (response == 4) {
                     doViewAllMyReservations();
                 } else if (response == 5) {
@@ -141,36 +153,37 @@ public class MainApp {
         System.out.println("Press Enter To Continue...");
         scanner.nextLine();
     }
-
-    public void doSearchCarForVisitor() {
+/*
+    public void doSearchCarForVisitor() throws java.text.ParseException {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client ::  ***\n");
         
-        System.out.println("Enter pick up date/time");
-        String pickUpDate = sc.nextLine().trim(); 
-        System.out.println("Enter pick up outlet");
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+        
+        
+        System.out.print("Enter Start Date (DD/MM/YYYY Hours:Minutes (24hr format)> ");
+        String startDateTime = sc.nextLine();
+        Date pickupDateTime = dateTimeFormat.parse(startDateTime);
+
+        System.out.print("Enter End Date (DD/MM/YYYY Hours:Minutes (24hr format))> ");
+        String endDateTime = sc.nextLine();
+        Date returnDateTime = dateTimeFormat.parse(endDateTime);
+            
+        System.out.println("Enter pick up outlet"); // A, B, C -> check opening/closing hours
         String pickUpOutlet = sc.nextLine().trim(); 
         
-        System.out.println("Enter return date/time");
-        String returnDate = sc.nextLine().trim(); 
         System.out.println("Enter return outlet");
         String returnOutlet = sc.nextLine().trim(); 
-        /*
-        int idx = 0;
-        List<CarEntity> availableCars = carSessionBeanRemote.retrieveCarsByDate(pickUpDate, pickUpOutlet, returnDate, returnOutlet); 
-        idx++; 
         
-        for (CarEntity car : availableCars) {
-            System.out.println(String.format("%s. %s %s", idx, car.getModel(), car.getModel().getCategory()));
-        }
-        */
-        List<ReservationEntity> reservations = reservationSessionBeanRemote.retrieveAllReservations();
         
-        // check if car is available via reservations
+         retrieve all reservations, check their start/end date
+         reservationSessionBeanRemote.retrieveAvailableCars(pickupDateTime, returnDateTime, pickUpOutlet, returnOutlet);
+        
         
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }
+    */
     
     
     public void doSearchCarForCustomer() {
@@ -186,14 +199,7 @@ public class MainApp {
         String returnDate = sc.nextLine().trim(); 
         System.out.println("Enter return outlet");
         String returnOutlet = sc.nextLine().trim(); 
-        /*
-        int idx = 0;
-        List<CarEntity> availableCars = carSessionBeanRemote.retrieveCarsByDate(pickUpDate, pickUpOutlet, returnDate, returnOutlet); 
-        idx++; 
-        for (CarEntity car : availableCars) {
-            System.out.println(String.format("%s. %s %s", idx, car.getModel(), car.getModel().getCategory()));
-        }
-        */
+        
         
         System.out.println("Do you want to reserve a car in the list? (yes/no)");
         String response = sc.nextLine().trim(); 
@@ -230,31 +236,55 @@ public class MainApp {
     private void doReserveCar() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: Reserve Car ***\n");
-
+        
+        System.out.println("which car do you want to reserve?>");
+        int response = sc.nextInt(); 
+        sc.nextLine(); 
+        
+        // loop through list of cars and find the one matching to response = carID
+        
+        ReservationEntity reservation = new ReservationEntity(); 
+        
+        // setters based on doSearchCar parameters
+        
+        // reservationSessionBeanRemote.createNewReservation(reservation, Long.MIN_VALUE, username, returnOutletAddress, pickupOutletAddress);
+        
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
         
     }
     
-    private void doCancelReservation(ReservationEntity reservationEntity) {
+    private void doCancelReservation() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: Cancel Reservation ***\n");
+        System.out.println("Provide your username");
+        String username = sc.nextLine().trim(); 
+        System.out.println("Provide reservation code");
+        String reservationCode = sc.nextLine().trim(); 
         
-        reservationSessionBeanRemote.deleteReservation(reservationEntity.getReservationID());
-        System.out.println("Reservation cancelled");
+        try {
+            reservationSessionBeanRemote.deleteReservation(username, reservationCode);
+            System.out.println("Reservation cancelled successfully!\n");
+        } catch (CustomerNotFoundException | ReservationNotFoundException ex) {
+            System.out.println("Error occured while trying to cancel reservation");
+        }
+        
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
-        
     }
     
-    private void doViewReservationDetails() {
+    private void doViewReservationDetails() throws InvalidReservationCodeException {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: View Reservation Details ***\n");
         
         System.out.println("Enter your reservation code");
+        ReservationEntity reservation = new ReservationEntity(); 
         String reservationCode = sc.nextLine().trim(); 
-        
-        ReservationEntity reservation = reservationSessionBeanRemote.retrieveReservationByReservationCode(reservationCode); 
+        try {
+            reservation = reservationSessionBeanRemote.retrieveReservationByReservationCode(reservationCode); 
+        } catch (ReservationNotFoundException ex) {
+            throw new InvalidReservationCodeException("Reservation code is invalid");  
+        }
         
         // print details
         System.out.println(reservation.getReservationCode());
@@ -267,7 +297,6 @@ public class MainApp {
         
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
-        
     }
     
     private void doViewAllMyReservations() {
@@ -297,8 +326,5 @@ public class MainApp {
 
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
-        
     }
-
-    
 }
