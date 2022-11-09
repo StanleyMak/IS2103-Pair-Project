@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.OutletEntity;
 import javax.ejb.Remote;
 
 /**
@@ -13,5 +14,9 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface OutletSessionBeanRemote {
-    
+
+    public OutletEntity retrieveOutletByOutletAddress(String outletAddress);
+
+    public OutletEntity retrieveOutletByOutletID(Long outletID);
+
 }

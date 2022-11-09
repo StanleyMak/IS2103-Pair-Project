@@ -9,6 +9,7 @@ import entity.OutletEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -20,5 +21,21 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
 
-    //no need to create outlet
+    @Override
+    public OutletEntity retrieveOutletByOutletAddress(String outletAddress) {
+        Query query = em.createQuery("SELECT o FROM OutletEntity o WHERE o.address = ?1")
+                .setParameter(1, outletAddress);
+        OutletEntity outlet = (OutletEntity) query.getSingleResult();
+        outlet.getCars().size();
+        
+        return outlet;
+    }
+    
+    @Override
+    public OutletEntity retrieveOutletByOutletID(Long outletID) {
+        OutletEntity outlet = em.find(OutletEntity.class, outletID);
+        outlet.getCars().size();
+        
+        return outlet;
+    }
 }
