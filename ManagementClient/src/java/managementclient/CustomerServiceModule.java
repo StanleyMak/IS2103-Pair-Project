@@ -82,9 +82,9 @@ public class CustomerServiceModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Customer Service :: Pick Up Car ***\n");
         
-        System.out.println("Enter customer username");
+        System.out.print("Enter Customer Username> ");
         String username = sc.nextLine().trim(); 
-        System.out.println("Enter reservation code");         
+        System.out.print("Enter Reservation Code> ");         
         String reservationCode = sc.nextLine().trim();
         
         ReservationEntity reservation = reservationSessionBeanRemote.retrieveReservationByReservationCode(reservationCode);

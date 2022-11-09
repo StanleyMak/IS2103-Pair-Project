@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarEntity;
+import entity.CarModelEntity;
 import entity.CustomerEntity;
 import entity.OutletEntity;
 import entity.ReservationEntity;
@@ -25,15 +26,29 @@ import util.exception.CustomerNotFoundException;
 @Stateless
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
 
+    @EJB(name = "OutletSessionBeanLocal")
+    private OutletSessionBeanLocal outletSessionBeanLocal;
+
+    @EJB(name = "CarModelSessionBeanLocal")
+    private CarModelSessionBeanLocal carModelSessionBeanLocal;
+
     @EJB
     private CustomerSessionBeanLocal customerSessionBean;
     
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
+    
+    
 
     @Override
-    public Long createNewCar(CarEntity car) {
+    public Long createNewCar(CarEntity car, String modelName, String outletAddress) {
+        CarModelEntity carModel = carModelSessionBeanLocal.retrieveCarModelByCarModelName(modelName);
+        car.setModel(carModel);
+        
+        OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
+        car.setCurrOutlet(outlet);
+        
         em.persist(car);
         em.flush();
         
@@ -64,15 +79,35 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
     
     @Override
-    public void updateCar(CarEntity car) {
+    public List<CarEntity> retrieveAllCarsOfCarModel(String carModelName) {
+        Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.model.modelName = ?1")
+                .setParameter(1, carModelName);
+        List<CarEntity> cars = query.getResultList();
+        return cars;
+    }
+    
+    public List<CarEntity> retrieveAllCarsOfOutlet(String outletAddress) {
+        Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.currOutlet.address = ?1")
+                .setParameter(1, outletAddress);
+        List<CarEntity> cars = query.getResultList();
+        return cars;
+    }
+    
+    @Override
+    public void updateCar(CarEntity car, String modelName, String outletAddress) {
+        CarModelEntity carModel = carModelSessionBeanLocal.retrieveCarModelByCarModelName(modelName);
+        car.setModel(carModel);
+        
+        OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
+        car.setCurrOutlet(outlet);
+                
         em.merge(car);
     }
     
     @Override
     public void deleteCar(Long carID) {
         CarEntity car = retrieveCarByCarID(carID);
-        
-        //dissociate
+
         em.remove(car);
     }
     
@@ -105,7 +140,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         // update car location to pick up location, bidirectional
         pickUpCar.setCurrOutlet(targetReservation.getPickUpOutlet());
         OutletEntity pickUpOutlet = targetReservation.getPickUpOutlet();
-        pickUpOutlet.getCars().add(pickUpCar);
+        //pickUpOutlet.getCars().add(pickUpCar);
     }
     
     public void returnCar(String username, String reservationCode) {
@@ -135,7 +170,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         // update car location to pick up location, bidirectional
         pickUpCar.setCurrOutlet(targetReservation.getPickUpOutlet());
         OutletEntity pickUpOutlet = targetReservation.getPickUpOutlet();
-        pickUpOutlet.getCars().add(pickUpCar);
+        //pickUpOutlet.getCars().add(pickUpCar);
     }
     
     

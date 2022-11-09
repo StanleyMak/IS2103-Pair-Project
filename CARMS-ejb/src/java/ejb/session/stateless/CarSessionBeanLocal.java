@@ -16,7 +16,7 @@ import javax.ejb.Local;
 @Local
 public interface CarSessionBeanLocal {
 
-    public Long createNewCar(CarEntity car);
+    public Long createNewCar(CarEntity car, String modelName, String outletAddress);
 
     public CarEntity retrieveCarByCarID(Long carID);
 
@@ -24,8 +24,12 @@ public interface CarSessionBeanLocal {
 
     public List<CarEntity> retrieveAllCars();
 
-    public void updateCar(CarEntity car);
+    public void updateCar(CarEntity car, String modelName, String outletAddress);
 
     public void deleteCar(Long carID);
+
+    public List<CarEntity> retrieveAllCarsOfCarModel(String carModelName);
+
+    public List<CarEntity> retrieveAllCarsOfOutlet(String outletAddress);
     
 }

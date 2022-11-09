@@ -33,12 +33,8 @@ public class OutletEntity implements Serializable {
     private Date openHour;
     //@Column(nullable = false, length = 64)
     private Date closeHour;
-    
-    @OneToMany
-    private List<CarEntity> cars;
 
     public OutletEntity() {
-        this.cars = new ArrayList<>(); 
     }
 
     public OutletEntity(String address, Date openHour, Date closeHour) {
@@ -78,14 +74,6 @@ public class OutletEntity implements Serializable {
 
     public void setCloseHour(Date closeHour) {
         this.closeHour = closeHour;
-    }
-
-    public List<CarEntity> getCars() {
-        return cars;
-    }
-
-    public void setCars(List<CarEntity> cars) {
-        this.cars = cars;
     }
 
     @Override
