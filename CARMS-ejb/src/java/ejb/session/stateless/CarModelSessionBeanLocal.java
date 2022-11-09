@@ -24,7 +24,7 @@ public interface CarModelSessionBeanLocal {
 
     public List<CarModelEntity> retrieveAllCarModels();
 
-    public void updateCarModel(CarModelEntity carModel);
+    public void updateCarModel(CarModelEntity carModel, String categoryName);
 
     public void deleteCarModel(String carModelName);
     

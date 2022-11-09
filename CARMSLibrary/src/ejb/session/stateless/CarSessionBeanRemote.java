@@ -15,8 +15,8 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface CarSessionBeanRemote {
-    
-    public Long createNewCar(CarEntity car);
+
+    public Long createNewCar(CarEntity car, String modelName, String outletAddress);
 
     public CarEntity retrieveCarByCarID(Long carID);
 
@@ -24,11 +24,15 @@ public interface CarSessionBeanRemote {
 
     public List<CarEntity> retrieveAllCars();
 
-    public void updateCar(CarEntity car);
-    
+    public void updateCar(CarEntity car, String modelName, String outletAddress);
+
     public void deleteCar(Long carID);
-    
+
+    public List<CarEntity> retrieveAllCarsOfCarModel(String carModelName);
+
+    public List<CarEntity> retrieveAllCarsOfOutlet(String outletAddress);
 
     public void pickUpCar(String email, String reservationCode);
+
     public void returnCar(String email, String reservationCode);
 }

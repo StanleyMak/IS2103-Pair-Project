@@ -26,7 +26,6 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
         Query query = em.createQuery("SELECT o FROM OutletEntity o WHERE o.address = ?1")
                 .setParameter(1, outletAddress);
         OutletEntity outlet = (OutletEntity) query.getSingleResult();
-        outlet.getCars().size();
         
         return outlet;
     }
@@ -34,7 +33,6 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
     @Override
     public OutletEntity retrieveOutletByOutletID(Long outletID) {
         OutletEntity outlet = em.find(OutletEntity.class, outletID);
-        outlet.getCars().size();
         
         return outlet;
     }

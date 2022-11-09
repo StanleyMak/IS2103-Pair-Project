@@ -16,7 +16,7 @@ import javax.ejb.Local;
 @Local
 public interface RentalRateSessionBeanLocal {
 
-    public Long createNewRentalRate(RentalRateEntity rentalRate);
+    public Long createNewRentalRate(RentalRateEntity rentalRate, String categoryName);
 
     public List<RentalRateEntity> retrieveAllRentalRates();
 
@@ -24,7 +24,7 @@ public interface RentalRateSessionBeanLocal {
 
     public RentalRateEntity retrieveRentalRateByRentalRateName(String rentalRateName);
 
-    public void updateRentalRate(RentalRateEntity rentalRate);
+    public void updateRentalRate(RentalRateEntity rentalRate, String categoryName);
 
     public void deleteRentalRate(Long rentalRateID);
     

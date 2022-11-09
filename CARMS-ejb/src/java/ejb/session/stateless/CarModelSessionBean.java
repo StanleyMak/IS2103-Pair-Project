@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategoryEntity;
+import entity.CarEntity;
 import entity.CarModelEntity;
 import java.util.List;
 import javax.ejb.EJB;
@@ -21,6 +22,9 @@ import javax.persistence.Query;
 @Stateless
 public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelSessionBeanLocal {
 
+    @EJB(name = "CarSessionBeanLocal")
+    private CarSessionBeanLocal carSessionBeanLocal;
+
     @EJB(name = "CarCategorySessionBeanLocal")
     private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
 
@@ -32,7 +36,6 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     @Override
     public Long createNewCarModel(CarModelEntity carModel, String carCategoryName) {
         CarCategoryEntity carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
-        //carCategory.getCarModels().add(carModel); //shld it be uni where model points at category
         carModel.setCategory(carCategory);
         em.persist(carModel);
         em.flush();
@@ -64,15 +67,22 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
     
     @Override
-    public void updateCarModel(CarModelEntity carModel) {
+    public void updateCarModel(CarModelEntity carModel, String categoryName) {
+        CarCategoryEntity carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(categoryName);
+        carModel.setCategory(carCategory);
         em.merge(carModel);
     }
     
     @Override
     public void deleteCarModel(String carModelName) {
         CarModelEntity carModel = retrieveCarModelByCarModelName(carModelName);
-        //dissociate
         
+        List<CarEntity> cars = carSessionBeanLocal.retrieveAllCarsOfCarModel(carModelName);
+        
+        for (CarEntity car : cars) {
+            car.setModel(null);
+        }
+                
         em.remove(carModel);
     }
 
