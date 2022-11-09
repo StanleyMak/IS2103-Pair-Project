@@ -16,6 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.StatusEnum;
+import util.exception.CustomerNotFoundException;
 
 /**
  *
@@ -75,10 +76,18 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         em.remove(car);
     }
     
-    public void pickUpCar(String email, String reservationCode) {
+    public void pickUpCar(String username, String reservationCode) {
         ReservationEntity targetReservation = new ReservationEntity(); 
         // get Customer from his email
-        CustomerEntity customer = customerSessionBean.retrieveCustomerByCustomerUsername(email);
+        
+        CustomerEntity customer = new CustomerEntity(); 
+        
+        try {
+            customer = customerSessionBean.retrieveCustomerByCustomerUsername(username);
+        } catch (CustomerNotFoundException ex) {
+            System.out.println("Customer does not exist");
+        }
+        
         
         // association?
         // get the reservation
@@ -99,10 +108,17 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         pickUpOutlet.getCars().add(pickUpCar);
     }
     
-    public void returnCar(String email, String reservationCode) {
+    public void returnCar(String username, String reservationCode) {
         ReservationEntity targetReservation = new ReservationEntity(); 
-        // get Customer from his email
-        CustomerEntity customer = customerSessionBean.retrieveCustomerByCustomerUsername(email);
+        
+        // get Customer from his username
+        CustomerEntity customer = new CustomerEntity(); 
+        try {
+            customer = customerSessionBean.retrieveCustomerByCustomerUsername(username);
+        } catch (CustomerNotFoundException ex) {
+            System.out.println("Customer not found");
+        }
+        
         
         // association?
         // get the reservation

@@ -8,8 +8,11 @@ package ejb.session.stateless;
 import entity.CustomerEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.CustomerNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 
 
@@ -43,13 +46,21 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     @Override
-    public CustomerEntity retrieveCustomerByCustomerUsername(String username) {
+    public CustomerEntity retrieveCustomerByCustomerUsername(String username) throws CustomerNotFoundException {
         
         Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.username LIKE ?1")
                 .setParameter(1, username);
-        CustomerEntity customer = (CustomerEntity) query; 
+        
+        
         //customer.getXX.size();
-        return customer;
+        // association
+        
+        try {
+            CustomerEntity customer = (CustomerEntity) query.getSingleResult(); 
+            return customer; 
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new CustomerNotFoundException("Customer usernam " + username + "does not exist!");
+        }
     }
     
     @Override
@@ -59,16 +70,6 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         em.remove(customer);
     }
     
-    @Override
-    public CustomerEntity customerLogin(String username, String password) /*throws InvalidLoginCredentialException*/ { 
-        
-        CustomerEntity customer = retrieveCustomerByCustomerUsername(username);
-
-        return customer;
-           
-    }
-    
-    /*
     @Override
     public CustomerEntity customerLogin(String email, String password) throws InvalidLoginCredentialException { 
         try {
@@ -85,7 +86,5 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         }   
     }
     
-    */
-  
     
 }

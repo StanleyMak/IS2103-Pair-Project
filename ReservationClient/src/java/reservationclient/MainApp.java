@@ -7,14 +7,12 @@ package reservationclient;
 
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
-import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.CustomerEntity;
-import entity.EmployeeEntity;
-import entity.OutletEntity;
 import entity.ReservationEntity;
 import java.util.List;
 import java.util.Scanner;
+import util.exception.InvalidLoginCredentialException;
 
 /**
  *
@@ -60,15 +58,13 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    doLogin();
-
-//                    try {
-//                        doLogin();
-//                        System.out.println("Login successful!\n");
-//                        menuMain();
-//                    } catch (InvalidLoginCredentialException ex) {
-//                        System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
-//                    }
+                    try {
+                        doLogin();
+                        System.out.println("Login successful!\n");
+                        menuMain();
+                    } catch (InvalidLoginCredentialException ex) {
+                        System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
+                    }
                 } else if (response == 2) {
                     doRegisterAsCustomer();
                 } else if (response == 3) {
@@ -132,10 +128,10 @@ public class MainApp {
         System.out.println("*** CaRMS Reservation Client ::  ***\n");
         CustomerEntity newCustomer = new CustomerEntity();
         
-        System.out.print("Enter email> ");
+        System.out.print("Enter username> ");
         newCustomer.setUsername(scanner.nextLine().trim());
         
-        System.out.print("Enter desired password> ");
+        System.out.print("Enter password> ");
         newCustomer.setPassword(scanner.nextLine().trim());
         
         Long customerID = customerSessionBeanRemote.createNewCustomer(newCustomer);
@@ -213,7 +209,7 @@ public class MainApp {
     }
     
     
-    private void doLogin() { //throws InvalidLoginCredentialException {
+    private void doLogin() throws InvalidLoginCredentialException {
         Scanner scanner = new Scanner(System.in);
         String username = "";
         String password = "";
@@ -227,7 +223,7 @@ public class MainApp {
         if (username.length() > 0 && password.length() > 0) {
             customerSessionBeanRemote.customerLogin(username, password); 
         } else {
-            // throw new InvalidLoginCredentialException("Missing login credentials");
+             throw new InvalidLoginCredentialException("Missing login credentials");
         }
     }
     
