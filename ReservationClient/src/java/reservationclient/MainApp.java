@@ -41,7 +41,6 @@ public class MainApp {
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.reservationSessionBeanRemote = reservationSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
-        this.loggedInCustomer = loggedInCustomer;
     }
     
     

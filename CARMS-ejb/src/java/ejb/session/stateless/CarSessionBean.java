@@ -29,7 +29,7 @@ import util.exception.ReservationNotFoundException;
 @Stateless
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
 
-    @EJB
+    @EJB(name = "ReservationSessionBeanLocal")
     private ReservationSessionBeanLocal reservationSessionBean;
 
     @EJB(name = "OutletSessionBeanLocal")
@@ -38,7 +38,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @EJB(name = "CarModelSessionBeanLocal")
     private CarModelSessionBeanLocal carModelSessionBeanLocal;
 
-    @EJB
+    @EJB(name = "CustomerSessionBeanLocal")
     private CustomerSessionBeanLocal customerSessionBean;
     
     
