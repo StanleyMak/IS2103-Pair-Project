@@ -107,7 +107,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     public void deleteReservation(String email, String reservationCode) throws CustomerNotFoundException, ReservationNotFoundException {
         CustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
         ReservationEntity reservationToDelete = retrieveReservationByReservationCode(reservationCode);
-        customer.setReservations(null);
+        customer.getReservations().remove(reservationToDelete);
         
         em.remove(reservationToDelete);
     }
