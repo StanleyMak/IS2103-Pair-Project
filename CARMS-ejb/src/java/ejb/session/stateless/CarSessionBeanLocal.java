@@ -36,4 +36,6 @@ public interface CarSessionBeanLocal {
     public void pickUpCar(ReservationEntity reservation);
     
     public void returnCar(String reservationCode);
+    
+    public void doSearchCar(); 
 }
