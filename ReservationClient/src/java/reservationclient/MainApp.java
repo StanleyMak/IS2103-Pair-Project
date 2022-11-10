@@ -12,10 +12,10 @@ import entity.CustomerEntity;
 import entity.OwnCustomerEntity;
 import entity.ReservationEntity;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
-import oracle.jrockit.jfr.parser.ParseException;
 import util.exception.CustomerNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.InvalidReservationCodeException;
@@ -98,7 +98,7 @@ public class MainApp {
             System.out.println("1: Search Car");
             System.out.println("2: Reserve Car");
             System.out.println("--------------------------");
-            System.out.println("3: Cancel Reservation");
+            System.out.println("3: View Reservation Details");
             System.out.println("4: View All My Reservation");
             System.out.println("--------------------------");
             System.out.println("5: Customer Logout");
@@ -119,10 +119,10 @@ public class MainApp {
                     } catch (InvalidReservationCodeException ex) {
                         System.out.println("Invalid reservation details: " + ex.getMessage());
                     }
-                    
                 } else if (response == 4) {
                     doViewAllMyReservations();
                 } else if (response == 5) {
+                    doLogout();
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
@@ -153,7 +153,7 @@ public class MainApp {
         System.out.println("Press Enter To Continue...");
         scanner.nextLine();
     }
-/*
+
     public void doSearchCarForVisitor() throws java.text.ParseException {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client ::  ***\n");
@@ -174,16 +174,21 @@ public class MainApp {
         
         System.out.println("Enter return outlet");
         String returnOutlet = sc.nextLine().trim(); 
+         
         
+         // reservation start date after pickup date, end date before return date
+         // reservation start date before pickup date, end date after return date
+         
+         // disabled (under servicing/repair)
+         
         
-         retrieve all reservations, check their start/end date
-         reservationSessionBeanRemote.retrieveAvailableCars(pickupDateTime, returnDateTime, pickUpOutlet, returnOutlet);
-        
-        
+         
+         
+         
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }
-    */
+    
     
     
     public void doSearchCarForCustomer() {
@@ -278,7 +283,7 @@ public class MainApp {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: View Reservation Details ***\n");
         
-        System.out.println("Enter your reservation code");
+        System.out.println("Enter your reservation code: ");
         ReservationEntity reservation = new ReservationEntity(); 
         String reservationCode = sc.nextLine().trim(); 
         try {

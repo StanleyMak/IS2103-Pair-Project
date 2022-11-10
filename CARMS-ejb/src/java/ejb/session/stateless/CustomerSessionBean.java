@@ -52,11 +52,9 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         Query query = em.createQuery("SELECT c FROM OwnCustomerEntity c WHERE c.username LIKE ?1")
                 .setParameter(1, username);
         
-        //customer.getXX.size();
-        // association
-        
         try {
-            OwnCustomerEntity customer = (OwnCustomerEntity) query.getSingleResult(); 
+            CustomerEntity customer = (CustomerEntity) query.getSingleResult(); 
+            customer.getReservations().size();
             return customer; 
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new CustomerNotFoundException("Customer username " + username + "does not exist!");
@@ -76,7 +74,6 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             OwnCustomerEntity customer = retrieveOwnCustomerByOwnCustomerUsername(username);
             
             if (password.equals(customer.getPassword())) {
-                // association
                 return customer; 
             } else {
                 throw new InvalidLoginCredentialException("Invalid email or password"); 
