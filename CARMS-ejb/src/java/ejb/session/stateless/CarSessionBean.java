@@ -20,6 +20,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.StatusEnum;
+import util.exception.CarModelNotFoundException;
+import util.exception.CustomerNotFoundException;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -45,17 +47,21 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     private EntityManager em;
 
     @Override
-    public Long createNewCar(CarEntity car, String modelName, String outletAddress) {
-        CarModelEntity carModel = carModelSessionBeanLocal.retrieveCarModelByCarModelName(modelName);
-        car.setModel(carModel);
+    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException {
+        try {
+            CarModelEntity carModel = carModelSessionBeanLocal.retrieveCarModelByCarModelName(modelName);
+            car.setModel(carModel);
 
-        OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
-        car.setCurrOutlet(outlet);
+            OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
+            car.setCurrOutlet(outlet);
 
-        em.persist(car);
-        em.flush();
+            em.persist(car);
+            em.flush();
 
-        return car.getCarID();
+            return car.getCarID();
+        } catch (CarModelNotFoundException e) {
+            throw new CarModelNotFoundException("Car Model Name " + modelName + " does not exist!\n");
+        }
     }
 
     @Override
@@ -97,14 +103,18 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public void updateCar(CarEntity car, String modelName, String outletAddress) {
-        CarModelEntity carModel = carModelSessionBeanLocal.retrieveCarModelByCarModelName(modelName);
-        car.setModel(carModel);
+    public void updateCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException {
+        try {
+            CarModelEntity carModel = carModelSessionBeanLocal.retrieveCarModelByCarModelName(modelName);
+            car.setModel(carModel);
 
-        OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
-        car.setCurrOutlet(outlet);
+            OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
+            car.setCurrOutlet(outlet);
 
-        em.merge(car);
+            em.merge(car);
+        } catch (CarModelNotFoundException e) {
+            throw new CarModelNotFoundException("Car Model Name " + modelName + " does not exist!\n");
+        }
     }
 
     @Override
@@ -183,4 +193,3 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
          return availableCars; 
     }
 }
-

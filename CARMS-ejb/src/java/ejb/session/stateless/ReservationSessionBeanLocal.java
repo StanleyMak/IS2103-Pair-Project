@@ -30,5 +30,7 @@ public interface ReservationSessionBeanLocal {
     // public List<ReservationEntity> retrieveAvailableCars(Date pickupDateTime, Date returnDateTime, String pickUpOutlet, String returnOutlet); 
     
     public List<ReservationEntity> retrieveAllReservations();
+
+    public ReservationEntity retrieveReservationFromCarID(Long carID);
     
 }

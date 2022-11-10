@@ -13,6 +13,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.CarCategoryNotFoundException;
 
 /**
  *
@@ -29,13 +30,17 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     
     
     @Override
-    public Long createNewRentalRate(RentalRateEntity rentalRate, String categoryName) {
-        CarCategoryEntity carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(categoryName);
-        rentalRate.setCarCategory(carCategory);
-        em.persist(rentalRate);
-        em.flush();
-        
-        return rentalRate.getRentalRateID();
+    public Long createNewRentalRate(RentalRateEntity rentalRate, String categoryName) throws CarCategoryNotFoundException {
+        try {
+            CarCategoryEntity carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(categoryName);
+            rentalRate.setCarCategory(carCategory);
+            em.persist(rentalRate);
+            em.flush();
+            
+            return rentalRate.getRentalRateID();
+        } catch (CarCategoryNotFoundException e) {
+            throw new CarCategoryNotFoundException("Car Category Name " + categoryName + "does not exist!\n");
+        }
     }
     
     @Override
@@ -60,11 +65,22 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         return rentalRate;
     }
     
+    public List<RentalRateEntity> retrieveRentalRatesOfCarCategory(String carCategoryName) {
+        Query query = em.createQuery("SELECT r FROM RentalRateEntity r WHERE r.carCategory.categoryName = ?1")
+                .setParameter(1, carCategoryName);
+        List<RentalRateEntity> rentalRates = query.getResultList();
+        return rentalRates;
+    }
+    
     @Override
-    public void updateRentalRate(RentalRateEntity rentalRate, String categoryName) {
-        CarCategoryEntity carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(categoryName);
-        rentalRate.setCarCategory(carCategory);
-        em.merge(rentalRate);
+    public void updateRentalRate(RentalRateEntity rentalRate, String categoryName) throws CarCategoryNotFoundException {
+        try {
+            CarCategoryEntity carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(categoryName);
+            rentalRate.setCarCategory(carCategory);
+            em.merge(rentalRate);
+        } catch (CarCategoryNotFoundException e) {
+            throw new CarCategoryNotFoundException("Car Category Name " + categoryName + "does not exist!\n");
+        }
         
     }
     

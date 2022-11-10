@@ -11,10 +11,8 @@ import entity.CarModelEntity;
 import entity.EmployeeEntity;
 import entity.OutletEntity;
 import entity.RentalRateEntity;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
@@ -37,7 +35,7 @@ public class DataInitSessionBean {
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
-
+    
     @PostConstruct
     public void postConstruct() {
         if (em.find(EmployeeEntity.class, 1l) == null) {
@@ -203,7 +201,7 @@ public class DataInitSessionBean {
             rate = new RentalRateEntity("SUV and Minivan - Default", RentalRateTypeEnum.DEFAULT, suvMinivan, 400, null, null);
             em.persist(rate);
             em.flush();
-
+            
             /*Initialising Partner*/
             //Partner partner = new Partner("Holiday.com");
             

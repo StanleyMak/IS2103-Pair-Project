@@ -7,6 +7,11 @@ package ejb.session.stateless;
 
 import entity.CarCategoryEntity;
 import javax.ejb.Local;
+import util.exception.CarCategoryNameExistsException;
+import util.exception.CarCategoryNotFoundException;
+import util.exception.DeleteCarCategoryException;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -15,12 +20,13 @@ import javax.ejb.Local;
 @Local
 public interface CarCategorySessionBeanLocal {
 
-    public Long createNewCarCategory(CarCategoryEntity carCategory);
+    public Long createNewCarCategory(CarCategoryEntity carCategory) throws CarCategoryNameExistsException, UnknownPersistenceException, InputDataValidationException;
 
-    public CarCategoryEntity retrieveCarCategoryByCarCategoryID(Long carCategoryID);
+    public CarCategoryEntity retrieveCarCategoryByCarCategoryID(Long carCategoryID) throws CarCategoryNotFoundException;
+
+    public CarCategoryEntity retrieveCarCategoryByCarCategoryName(String carCategoryName) throws CarCategoryNotFoundException;
+
+    public void deleteCarCategory(Long carCategoryID) throws CarCategoryNotFoundException, DeleteCarCategoryException;
     
-    public CarCategoryEntity retrieveCarCategoryByCarCategoryName(String carCategoryName);
-
-    public void deleteCarCategory(Long carCategoryID);
     
 }

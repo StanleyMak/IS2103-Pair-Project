@@ -118,6 +118,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         return reservations;
     }
     
+    @Override
+    public ReservationEntity retrieveReservationFromCarID(Long carID) {
+        Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE r.car.carID = ?1")
+                .setParameter(1, carID); 
+        ReservationEntity reservation = (ReservationEntity) query.getSingleResult(); 
+        return reservation; 
+    }
+    
     /*
     @Override
     public List<ReservationEntity> retrieveAvailableCars(Date pickupDateTime, Date returnDateTime, String pickupOutletAddress, String returnOutletAddress) {

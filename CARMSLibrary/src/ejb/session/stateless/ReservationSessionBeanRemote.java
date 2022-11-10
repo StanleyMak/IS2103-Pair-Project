@@ -5,6 +5,8 @@
  */
 package ejb.session.stateless;
 
+import entity.CarEntity;
+import entity.OutletEntity;
 import entity.ReservationEntity;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +31,6 @@ public interface ReservationSessionBeanRemote {
     
     public List<ReservationEntity> retrieveAllReservations();
     
-    // public List<ReservationEntity> retrieveAvailableCars(Date pickupDateTime, Date returnDateTime, String pickUpOutlet, String returnOutlet); 
+    public ReservationEntity retrieveReservationFromCarID(Long carID);
     
 }

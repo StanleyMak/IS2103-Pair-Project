@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.RentalRateEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CarCategoryNotFoundException;
 
 /**
  *
@@ -15,8 +16,8 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface RentalRateSessionBeanRemote {
-    
-    public Long createNewRentalRate(RentalRateEntity rentalRate, String categoryName);
+
+    public Long createNewRentalRate(RentalRateEntity rentalRate, String categoryName) throws CarCategoryNotFoundException;
 
     public List<RentalRateEntity> retrieveAllRentalRates();
 
@@ -24,8 +25,10 @@ public interface RentalRateSessionBeanRemote {
 
     public RentalRateEntity retrieveRentalRateByRentalRateName(String rentalRateName);
 
-    public void updateRentalRate(RentalRateEntity rentalRate, String categoryName);
+    public void updateRentalRate(RentalRateEntity rentalRate, String categoryName) throws CarCategoryNotFoundException;
 
     public void deleteRentalRate(Long rentalRateID);
-    
+
+    public List<RentalRateEntity> retrieveRentalRatesOfCarCategory(String carCategoryName);
+
 }

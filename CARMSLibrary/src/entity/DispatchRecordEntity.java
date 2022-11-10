@@ -34,6 +34,9 @@ public class DispatchRecordEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dispatchRecordID;
     
+    @Column(nullable = false, unique = true)
+    private String dispatchRecordName;
+    
     //@Column(nullable = false)
     private Boolean isCompleted;
     
@@ -131,6 +134,20 @@ public class DispatchRecordEntity implements Serializable {
     @Override
     public String toString() {
         return "entity.DispatchRecordEntity[ id=" + dispatchRecordID + " ]";
+    }
+
+    /**
+     * @return the dispatchRecordName
+     */
+    public String getDispatchRecordName() {
+        return dispatchRecordName;
+    }
+
+    /**
+     * @param dispatchRecordName the dispatchRecordName to set
+     */
+    public void setDispatchRecordName(String dispatchRecordName) {
+        this.dispatchRecordName = dispatchRecordName;
     }
     
 }

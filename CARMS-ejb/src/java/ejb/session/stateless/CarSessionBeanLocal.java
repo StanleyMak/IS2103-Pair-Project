@@ -11,6 +11,7 @@ import entity.ReservationEntity;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.CarModelNotFoundException;
 
 /**
  *
@@ -19,7 +20,7 @@ import javax.ejb.Local;
 @Local
 public interface CarSessionBeanLocal {
 
-    public Long createNewCar(CarEntity car, String modelName, String outletAddress);
+    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException;
 
     public CarEntity retrieveCarByCarID(Long carID);
 
@@ -27,7 +28,7 @@ public interface CarSessionBeanLocal {
 
     public List<CarEntity> retrieveAllCars();
 
-    public void updateCar(CarEntity car, String modelName, String outletAddress);
+    public void updateCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException;
 
     public void deleteCar(Long carID);
 
