@@ -121,11 +121,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
     
     @Override
-    public ReservationEntity retrieveReservationFromCarID(Long carID) {
+    public List<ReservationEntity> retrieveReservationsOfCarID(Long carID) {
         Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE r.car.carID = ?1")
                 .setParameter(1, carID); 
-        ReservationEntity reservation = (ReservationEntity) query.getSingleResult(); 
-        return reservation; 
+        List<ReservationEntity> reservations = query.getResultList(); 
+        return reservations; 
     }
     
     /*

@@ -31,6 +31,6 @@ public interface ReservationSessionBeanRemote {
     
     public List<ReservationEntity> retrieveAllReservations();
     
-    public ReservationEntity retrieveReservationFromCarID(Long carID);
+    public List<ReservationEntity> retrieveReservationsOfCarID(Long carID);
     
 }
