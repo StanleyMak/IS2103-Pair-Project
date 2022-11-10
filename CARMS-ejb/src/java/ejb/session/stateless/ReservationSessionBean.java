@@ -76,7 +76,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     
     @Override
     public ReservationEntity retrieveReservationByReservationCode(String reservationCode) throws ReservationNotFoundException {
-        Query query = em.createQuery("SELECT rc FROM ReservationEntity rc WHERE rc.resverationCode LIKE ?1")
+        Query query = em.createQuery("SELECT rc FROM ReservationEntity rc WHERE rc.reservationCode = ?1")
                 .setParameter(1, reservationCode); 
         
         try {
