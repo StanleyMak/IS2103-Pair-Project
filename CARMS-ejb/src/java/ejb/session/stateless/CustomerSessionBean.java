@@ -53,7 +53,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
                 .setParameter(1, username);
         
         try {
-            CustomerEntity customer = (CustomerEntity) query.getSingleResult(); 
+            OwnCustomerEntity customer = (OwnCustomerEntity) query.getSingleResult(); 
             customer.getReservations().size();
             return customer; 
         } catch (NoResultException | NonUniqueResultException ex) {
