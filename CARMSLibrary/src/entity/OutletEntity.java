@@ -27,11 +27,15 @@ public class OutletEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletID;
-    @Column(nullable = false, length = 64)
+    
+    //@NotNull
+    @Column(nullable = false)
     private String address;
-    //@Column(nullable = false, length = 64)
+    
+    //@Column(nullable = false)
     private Date openHour;
-    //@Column(nullable = false, length = 64)
+    
+    //@Column(nullable = false)
     private Date closeHour;
 
     public OutletEntity() {

@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -26,40 +27,18 @@ public class CarCategoryEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carCategoryID;
+    
+    //@NotNull
     @Column(nullable = false, length = 64)
     private String categoryName;
 
-    @OneToMany
-    private List<RentalRateEntity> rentalRates;
-
-//    @OneToMany
-//    private List<CarModelEntity> carModels;
-
     public CarCategoryEntity() {
-        this.rentalRates = new ArrayList<>();
-        //this.carModels = new ArrayList<>();
     }
 
     public CarCategoryEntity(String categoryName) {
         this();
         this.categoryName = categoryName;
     }
-
-    public List<RentalRateEntity> getRentalRates() {
-        return rentalRates;
-    }
-
-    public void setRentalRates(List<RentalRateEntity> rentalRates) {
-        this.rentalRates = rentalRates;
-    }
-
-//    public List<CarModelEntity> getCarModels() {
-//        return carModels;
-//    }
-//
-//    public void setCarModels(List<CarModelEntity> carModels) {
-//        this.carModels = carModels;
-//    }
 
     public String getCategoryName() {
         return categoryName;

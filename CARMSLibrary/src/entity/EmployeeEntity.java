@@ -13,8 +13,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 import util.enumeration.EmployeeAccessRightEnum;
 
 /**
@@ -28,19 +30,27 @@ public class EmployeeEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeID;
-    @Column(nullable = false, length = 64)
+    
+    @Column(nullable = false)
     private String name;
-    //@Column(nullable = false, length = 64)
+    
+    @Column(nullable = false)
     private String username;
-    //@Column(nullable = false, length = 64)
+    
+    @Column(nullable = false)
     private String password; 
+   
+    //@NotNull
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private EmployeeAccessRightEnum employeeAccessRight;
     
     @OneToOne
     private DispatchRecordEntity dispatchRecord;
     
-    @ManyToOne
+    //@NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private OutletEntity outlet;
 
     public EmployeeEntity() {

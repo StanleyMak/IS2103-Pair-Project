@@ -27,11 +27,11 @@ public class CustomerEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerID;
-    @Column(nullable = false, length = 64)
-    private String username;
-    @Column(nullable = false, length = 64)
-    private String password; 
     
+    //@NotNull
+    @Column(nullable = false, length = 64)
+    private String email;
+        
     @ManyToOne
     private PartnerEntity partner; 
     
@@ -46,14 +46,6 @@ public class CustomerEntity implements Serializable {
         return partner;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public void setPartner(PartnerEntity partner) {
         this.partner = partner;
     }
@@ -66,12 +58,12 @@ public class CustomerEntity implements Serializable {
         this.reservations = reservations;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
     
 

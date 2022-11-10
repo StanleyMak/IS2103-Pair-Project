@@ -13,6 +13,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import util.enumeration.StatusEnum;
 
@@ -27,17 +28,28 @@ public class CarEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carID;
+    
+    //@NotNull
     @Column(nullable = false, length = 64)
     private String licensePlateNumber;
+    
+    //@NotNull
     //@Column(nullable = false, length = 32)
     private String colour;
+    
+    //@NotNull
+    @Column(nullable = false)
     @Enumerated (EnumType.STRING)
     private StatusEnum status;
     
-    @ManyToOne
+    //@NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private CarModelEntity model;
     
-    @ManyToOne
+    //@NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private OutletEntity currOutlet;
 
     public CarEntity() {

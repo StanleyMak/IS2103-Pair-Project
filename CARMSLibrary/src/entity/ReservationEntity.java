@@ -12,10 +12,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -28,50 +31,66 @@ public class ReservationEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationID;
-    //@Column(nullable = false)
+    
+    //@NotNull
+    @Column(nullable = false)
+    private String reservationCode;
+    
     private double duration;
+    
     //@Column(nullable = false)
     private double rentalFee; 
-    //@Column(nullable = false)
+    
+    //@Column(nullable = false, length = 16)
+    //@Size(min = 16, max = 16)
     private String creditCardNumber; 
-    //@Column(nullable = false)
+    
+    //@Column(nullable = false, length = 3)
+    //@Size(min = 3, max = 3)
     private String cvv; 
+    
     //@Temporal(TemporalType.TIMESTAMP)
-    //@Column(nullable = false)
-    private Date startDateTime; 
-    //@Temporal(TemporalType.TIMESTAMP)
-    //@Column(nullable = false)
-    private Date endDateTime; 
-    //@Column(nullable = false)
-    private Long penaltyType;
+    //@NotNull
     @Column(nullable = false)
-    private String reservationCode; 
+    private Date startDateTime; 
+    
+    //@Temporal(TemporalType.TIMESTAMP)
+    //@NotNull
+    @Column(nullable = false)
+    private Date endDateTime; 
+    
+    @Column(nullable = false)
     //@Column(nullable = false)
     private boolean onlinePayment;
     
-    @ManyToOne
+    //@NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private CarEntity car; 
     
     @ManyToOne
     private PartnerEntity partner; 
     
-    @OneToOne
+    //@NotNull
+    @OneToOne(optional = false)
+    @JoinColumn(nullable = false)
     private OutletEntity pickUpOutlet;
     
-    @OneToOne
+    //@NotNull
+    @OneToOne(optional = false)
+    @JoinColumn(nullable = false)
     private OutletEntity returnOutlet;
 
     public ReservationEntity() {
     }
 
-    public ReservationEntity(double duration, double rentalFee, String creditCardNumber, String cvv, Date startDateTime, Date endDateTime, Long penaltyType, String reservationCode, boolean onlinePayment) {
+    public ReservationEntity(double duration, double rentalFee, String creditCardNumber, String cvv, Date startDateTime, Date endDateTime, String reservationCode, boolean onlinePayment) {
         this.duration = duration;
         this.rentalFee = rentalFee;
         this.creditCardNumber = creditCardNumber;
         this.cvv = cvv;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
-        this.penaltyType = penaltyType;
         this.reservationCode = reservationCode;
         this.onlinePayment = onlinePayment;
     }
@@ -170,14 +189,6 @@ public class ReservationEntity implements Serializable {
 
     public void setReturnOutlet(OutletEntity returnOutlet) {
         this.returnOutlet = returnOutlet;
-    }
-
-    public Long getPenaltyType() {
-        return penaltyType;
-    }
-
-    public void setPenaltyType(Long penaltyType) {
-        this.penaltyType = penaltyType;
     }
     
     public Long getReservationID() {

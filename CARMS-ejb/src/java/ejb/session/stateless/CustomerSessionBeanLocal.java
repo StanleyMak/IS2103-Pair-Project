@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CustomerEntity;
+import entity.OwnCustomerEntity;
 import javax.ejb.Local;
 import util.exception.CustomerNotFoundException;
 import util.exception.InvalidLoginCredentialException;
@@ -16,15 +17,15 @@ import util.exception.InvalidLoginCredentialException;
  */
 @Local
 public interface CustomerSessionBeanLocal {
-    
+
     public Long createNewCustomer(CustomerEntity customer);
-    
+
     public CustomerEntity retrieveCustomerByID(Long customerID);
-    
+
+    public OwnCustomerEntity retrieveOwnCustomerByOwnCustomerUsername(String username) throws CustomerNotFoundException;
+
     public void deleteCustomer(Long customerID);
-    
-    public CustomerEntity retrieveCustomerByCustomerUsername(String username) throws CustomerNotFoundException;
-   
-    public CustomerEntity customerLogin(String email, String password) throws InvalidLoginCredentialException;
+
+    public OwnCustomerEntity customerLogin(String username, String password) throws InvalidLoginCredentialException;
     
 }

@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
@@ -25,12 +26,17 @@ public class CarModelEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carModelID;
+    
+    //@NotNull
     @Column(nullable = false, length = 64)
     private String modelName;
-    //@Column(nullable = false, length = 64)
+    
+    //@NotNull
+    @Column(nullable = false, length = 64)
     private String modelMake;
     
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private CarCategoryEntity category;
 
     public CarModelEntity() {

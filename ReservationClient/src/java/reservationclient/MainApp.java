@@ -141,7 +141,7 @@ public class MainApp {
         OwnCustomerEntity newCustomer = new OwnCustomerEntity();
         
         System.out.print("Enter username> ");
-        newCustomer.setEmail(scanner.nextLine().trim());
+        newCustomer.setUsername(scanner.nextLine().trim());
         
         System.out.print("Enter password> ");
         newCustomer.setPassword(scanner.nextLine().trim());
@@ -227,7 +227,8 @@ public class MainApp {
         password = scanner.nextLine().trim();
         
         if (username.length() > 0 && password.length() > 0) {
-            customerSessionBeanRemote.customerLogin(username, password); 
+            OwnCustomerEntity customer = customerSessionBeanRemote.customerLogin(username, password);
+            this.loggedInCustomer = customer;
         } else {
              throw new InvalidLoginCredentialException("Missing login credentials");
         }

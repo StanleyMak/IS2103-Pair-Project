@@ -16,44 +16,56 @@ import javax.persistence.Id;
  * @author hanyang
  */
 @Entity
-public class OwnCustomerEntity implements Serializable {
+public class OwnCustomerEntity extends CustomerEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ownCustomerID;
 
-    public Long getOwnCustomerID() {
-        return ownCustomerID;
+    private String username;
+    private String password;
+
+    public OwnCustomerEntity() {
     }
-
-    public void setOwnCustomerID(Long ownCustomerID) {
-        this.ownCustomerID = ownCustomerID;
+    
+    @Override
+    public Long getCustomerID() {
+        return super.getCustomerID(); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (ownCustomerID != null ? ownCustomerID.hashCode() : 0);
-        return hash;
+    public void setCustomerID(Long customerID) {
+        super.setCustomerID(customerID);
+    }
+    
+    @Override
+    public String getEmail() {
+        return super.getEmail();
+    }
+    
+    @Override
+    public void setEmail(String email) {
+        super.setEmail(email);
     }
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the ownCustomerID fields are not set
-        if (!(object instanceof OwnCustomerEntity)) {
-            return false;
-        }
-        OwnCustomerEntity other = (OwnCustomerEntity) object;
-        if ((this.ownCustomerID == null && other.ownCustomerID != null) || (this.ownCustomerID != null && !this.ownCustomerID.equals(other.ownCustomerID))) {
-            return false;
-        }
-        return true;
+    public String getPassword() {
+        return password;
     }
 
-    @Override
-    public String toString() {
-        return "entity.OwnCustomerEntity[ id=" + ownCustomerID + " ]";
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * @return the username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * @param username the username to set
+     */
+    public void setUsername(String username) {
+        this.username = username;
     }
     
 }

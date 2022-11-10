@@ -46,7 +46,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         // missing partner
         
         CarEntity car = carSessionBean.retrieveCarByCarID(carID);
-        CustomerEntity customer = customerSessionBean.retrieveCustomerByCustomerUsername(username);
+        CustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerUsername(username);
         OutletEntity pickupOutlet = outletSessionBean.retrieveOutletByOutletAddress(pickupOutletAddress);
         OutletEntity returnOutlet = outletSessionBean.retrieveOutletByOutletAddress(returnOutletAddress);
         
@@ -103,7 +103,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     
     @Override
     public void deleteReservation(String username, String reservationCode) throws CustomerNotFoundException, ReservationNotFoundException {
-        CustomerEntity customer = customerSessionBean.retrieveCustomerByCustomerUsername(username);
+        CustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerUsername(username);
         ReservationEntity reservationToDelete = retrieveReservationByReservationCode(reservationCode);
         customer.setReservations(null);
         

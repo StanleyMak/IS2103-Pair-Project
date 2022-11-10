@@ -33,13 +33,16 @@ public class DispatchRecordEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dispatchRecordID;
-    //@Column(nullable = false, length = 64)
+    
+    //@Column(nullable = false)
     private Boolean isCompleted;
+    
     //@Temporal(TemporalType.TIMESTAMP)
-    //@Column(nullable = false, length = 64)
+    //@Column(nullable = false)
     private Date pickUpTime;
+    
     //@Temporal(TemporalType.TIMESTAMP)
-    //@Column(nullable = false, length = 64)
+    //@Column(nullable = false)
     private Date returnTime;
     
 //    @ManyToOne
