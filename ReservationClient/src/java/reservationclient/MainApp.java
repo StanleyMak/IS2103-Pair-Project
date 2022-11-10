@@ -186,7 +186,7 @@ public class MainApp {
         LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
         LocalTime pickupTime = pickupDateTimeLocal.toLocalTime();
 
-        System.out.println("Enter pick up outlet address"); // A, B, C -> check opening/closing hours
+        System.out.print("Enter Pick Up Outlet> "); // A, B, C -> check opening/closing hours
         String pickupOutletAddress = sc.nextLine().trim();
         OutletEntity pickupOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(pickupOutletAddress);
         LocalTime outletOpeningHours = LocalDateTime.ofInstant(pickupOutlet.getOpenHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
@@ -195,13 +195,13 @@ public class MainApp {
             System.out.println("Invalid pick up time, outlet opens at: " + outletOpeningHours);
         }
 
-        System.out.print("Enter End Date (DD/MM/YYYY Hours:Minutes (24hr format))> ");
+        System.out.print("Enter End Date (DD/MM/YYYY hh:mm (24hr format))> ");
         String endDateTime = sc.nextLine();
         Date returnDateTime = dateTimeFormat.parse(endDateTime);
         LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
         LocalTime returnTime = returnDateTimeLocal.toLocalTime();
 
-        System.out.println("Enter return outlet");
+        System.out.print("Enter Return Outlet Address> ");
         String returnOutletAddress = sc.nextLine().trim();
         OutletEntity returnOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(returnOutletAddress);
         LocalTime outletClosingHours = LocalDateTime.ofInstant(returnOutlet.getOpenHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
@@ -318,7 +318,7 @@ public class MainApp {
 
         System.out.println("Reservation Record:");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("%-5s%-5s%-20s%-20s%-20s%-28s%-28s%-5s\n", "ID", "Code", "Rental Fee ($)", "Start Date", "End Date", "Pick Up Outlet", "Return Outlet", "Online Payment?");
+        System.out.printf("%-5s%-10s%-20s%-28s%-28s%-20s%-20s%-5s\n", "ID", "Code", "Rental Fee ($)", "Start Date/Time", "End Date/Time", "Pick Up Outlet", "Return Outlet", "Online Payment?");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         String onlinePayment = "";
         if (reservation.isOnlinePayment()) {
@@ -326,7 +326,7 @@ public class MainApp {
         } else {
             onlinePayment = "NO";
         }
-        System.out.printf("%-5s%-5s%-20s%-20s%-20s%-28s%-28s%-5s\n", reservation.getReservationID(), reservation.getReservationCode(), reservation.getRentalFee(), dateTimeFormat.format(reservation.getStartDateTime()), dateTimeFormat.format(reservation.getEndDateTime()), reservation.getPickUpOutlet().getAddress(), reservation.getReturnOutlet().getAddress(), onlinePayment);
+        System.out.printf("%-5s%-10s%-20s%-28s%-28s%-20s%-20s%-5s\n", reservation.getReservationID(), reservation.getReservationCode(), reservation.getRentalFee(), dateTimeFormat.format(reservation.getStartDateTime()), dateTimeFormat.format(reservation.getEndDateTime()), reservation.getPickUpOutlet().getAddress(), reservation.getReturnOutlet().getAddress(), onlinePayment);
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.println();
 
@@ -340,9 +340,9 @@ public class MainApp {
 
         List<ReservationEntity> reservations = loggedInCustomer.getReservations();
 
-        System.out.println("Rental Rate Records:");
+        System.out.println("Reservation Records:");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("%-5s%-5s%-5s%-20s%-20s%-20s%-28s%-28s%-5s\n", "No.", "ID", "Code", "Rental Fee ($)", "Start Date", "End Date", "Pick Up Outlet", "Return Outlet", "Online Payment?");
+        System.out.printf("%-5s%-5s%-10s%-20s%-28s%-28s%-20s%-20s%-5s\n", "No.", "ID", "Code", "Rental Fee ($)", "Start Date/Time", "End Date/Time", "Pick Up Outlet", "Return Outlet", "Online Payment?");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         int i = 1;
         for (ReservationEntity reservation : reservations) {
@@ -352,7 +352,7 @@ public class MainApp {
             } else {
                 onlinePayment = "NO";
             }
-            System.out.printf("%-5s%-5s%-20s%-20s%-20s%-28s%-28s%-5s\n", i, reservation.getReservationID(), reservation.getReservationCode(), reservation.getRentalFee(), dateTimeFormat.format(reservation.getStartDateTime()), dateTimeFormat.format(reservation.getEndDateTime()), reservation.getPickUpOutlet().getAddress(), reservation.getReturnOutlet().getAddress(), onlinePayment);
+            System.out.printf("%-5s%-5s%-10s%-20s%-28s%-28s%-20s%-20s%-5s\n", i, reservation.getReservationID(), reservation.getReservationCode(), reservation.getRentalFee(), dateTimeFormat.format(reservation.getStartDateTime()), dateTimeFormat.format(reservation.getEndDateTime()), reservation.getPickUpOutlet().getAddress(), reservation.getReturnOutlet().getAddress(), onlinePayment);
             i++;
         }
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
