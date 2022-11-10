@@ -9,6 +9,7 @@ import entity.CarEntity;
 import entity.ReservationEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CarModelNotFoundException;
 
 /**
  *
@@ -17,7 +18,7 @@ import javax.ejb.Remote;
 @Remote
 public interface CarSessionBeanRemote {
 
-    public Long createNewCar(CarEntity car, String modelName, String outletAddress);
+    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException;
 
     public CarEntity retrieveCarByCarID(Long carID);
 
@@ -25,7 +26,7 @@ public interface CarSessionBeanRemote {
 
     public List<CarEntity> retrieveAllCars();
 
-    public void updateCar(CarEntity car, String modelName, String outletAddress);
+    public void updateCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException;
 
     public void deleteCar(Long carID);
 

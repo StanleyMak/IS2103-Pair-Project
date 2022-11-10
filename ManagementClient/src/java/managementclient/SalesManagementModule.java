@@ -27,6 +27,10 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import util.enumeration.RentalRateTypeEnum;
 import util.enumeration.StatusEnum;
+import util.exception.CarCategoryNotFoundException;
+import util.exception.CarModelNameExistsException;
+import util.exception.CarModelNotFoundException;
+import util.exception.DeleteCarModelException;
 
 /**
  *
@@ -242,8 +246,12 @@ public class SalesManagementModule {
                 rentalRate.setEndDate(null);
             }
 
-            Long rentalRateID = rentalRateSessionBeanRemote.createNewRentalRate(rentalRate, carCategoryName); //add category or associate category here
-            System.out.println("New Rental Rate: " + rentalRateID + " successfully created!\n");
+            try {
+                Long rentalRateID = rentalRateSessionBeanRemote.createNewRentalRate(rentalRate, carCategoryName); //add category or associate category here
+                System.out.println("New Rental Rate: " + rentalRateID + " successfully created!\n");
+            } catch (CarCategoryNotFoundException e) {
+                System.out.println("Error: " + e.getMessage() + "!\n");
+            }
 
         } catch (ParseException e) {
             System.out.println("Invalid Date/Time Format! Please Try Again!\n");
@@ -539,10 +547,14 @@ public class SalesManagementModule {
             }
         }
 
-        if (carCategoryName.equals("")) {
-            rentalRateSessionBeanRemote.updateRentalRate(rentalRate, rentalRate.getCarCategory().getCategoryName());
-        } else {
-            rentalRateSessionBeanRemote.updateRentalRate(rentalRate, carCategoryName);
+        try {
+            if (carCategoryName.equals("")) {
+                rentalRateSessionBeanRemote.updateRentalRate(rentalRate, rentalRate.getCarCategory().getCategoryName());
+            } else {
+                rentalRateSessionBeanRemote.updateRentalRate(rentalRate, carCategoryName);
+            }
+        } catch (CarCategoryNotFoundException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
         }
 
         System.out.println("Rental Rate: " + rentalRate.getRentalRateID() + " successfully updated!\n");
@@ -581,8 +593,12 @@ public class SalesManagementModule {
         System.out.print("Enter Car Category> ");
         String carCategoryName = sc.nextLine().trim();
 
-        Long carModelID = carModelSessionBeanRemote.createNewCarModel(carModel, carCategoryName);
-        System.out.println("New Car Model: " + carModelID + " successfully created!\n");
+        try {
+            Long carModelID = carModelSessionBeanRemote.createNewCarModel(carModel, carCategoryName);
+            System.out.println("New Car Model: " + carModelID + " successfully created!\n");
+        } catch (CarModelNameExistsException | CarCategoryNotFoundException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
+        }
 
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -616,8 +632,12 @@ public class SalesManagementModule {
 
         System.out.print("Enter Car Model Name> ");
         String carModelName = sc.nextLine();
-        CarModelEntity carModel = carModelSessionBeanRemote.retrieveCarModelByCarModelName(carModelName);
-
+        CarModelEntity carModel = null;
+        try {
+            carModel = carModelSessionBeanRemote.retrieveCarModelByCarModelName(carModelName);
+        } catch (CarModelNotFoundException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
+        }
         String carCategoryName = "";
         while (true) {
             System.out.println("Update Car Category?");
@@ -697,11 +717,15 @@ public class SalesManagementModule {
             }
         }
 
-        if (carCategoryName.equals("")) {
-            carModelSessionBeanRemote.updateCarModel(carModel, carModel.getCategory().getCategoryName());
-        } else {
-            carModelSessionBeanRemote.updateCarModel(carModel, carCategoryName);
-        }
+        try {
+            if (carCategoryName.equals("")) {
+                carModelSessionBeanRemote.updateCarModel(carModel, carModel.getCategory().getCategoryName());
+            } else {
+                carModelSessionBeanRemote.updateCarModel(carModel, carCategoryName);
+            }
+        } catch (CarModelNotFoundException | CarCategoryNotFoundException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
+        } 
 
         System.out.println("Car Model: " + carModel.getModelName() + " successfully updated!\n");
 
@@ -716,8 +740,12 @@ public class SalesManagementModule {
         System.out.print("Enter Car Model Name> ");
         String carModelName = sc.nextLine();
 
-        carModelSessionBeanRemote.deleteCarModel(carModelName);
-
+        try {
+            carModelSessionBeanRemote.deleteCarModel(carModelName);
+        } catch (CarModelNotFoundException | DeleteCarModelException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
+        } 
+        
         System.out.println("Car Model: " + carModelName + " successfully deleted!\n");
 
         System.out.println("Press Enter To Continue...");
@@ -744,8 +772,12 @@ public class SalesManagementModule {
 
         car.setStatus(StatusEnum.AVAILABLE);
 
-        Long carID = carSessionBeanRemote.createNewCar(car, carModelName, outletAddress);
-        System.out.println("New Car: " + carID + " succcessfully created!\n");
+        try {
+            Long carID = carSessionBeanRemote.createNewCar(car, carModelName, outletAddress);
+            System.out.println("New Car: " + carID + " succcessfully created!\n");
+        } catch (CarModelNotFoundException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
+        }
 
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -964,8 +996,11 @@ public class SalesManagementModule {
             outletAddress = car.getCurrOutlet().getAddress();
         }
 
-        carSessionBeanRemote.updateCar(car, carModelName, outletAddress);
-
+        try {
+            carSessionBeanRemote.updateCar(car, carModelName, outletAddress);
+        } catch (CarModelNotFoundException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
+        }
         System.out.println("Car: " + car.getLicensePlateNumber() + " successfully updated!\n");
 
         System.out.println("Press Enter To Continue...");

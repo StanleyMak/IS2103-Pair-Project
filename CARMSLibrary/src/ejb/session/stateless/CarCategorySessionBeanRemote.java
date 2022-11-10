@@ -7,6 +7,11 @@ package ejb.session.stateless;
 
 import entity.CarCategoryEntity;
 import javax.ejb.Remote;
+import util.exception.CarCategoryNameExistsException;
+import util.exception.CarCategoryNotFoundException;
+import util.exception.DeleteCarCategoryException;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -14,13 +19,13 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface CarCategorySessionBeanRemote {
-    
-    public Long createNewCarCategory(CarCategoryEntity carCategory);
 
-    public CarCategoryEntity retrieveCarCategoryByCarCategoryID(Long carCategoryID);
-    
-    public CarCategoryEntity retrieveCarCategoryByCarCategoryName(String carCategoryName);
+    public Long createNewCarCategory(CarCategoryEntity carCategory) throws CarCategoryNameExistsException, UnknownPersistenceException, InputDataValidationException;
 
-    public void deleteCarCategory(Long carCategoryID);
-    
+    public CarCategoryEntity retrieveCarCategoryByCarCategoryID(Long carCategoryID) throws CarCategoryNotFoundException;
+
+    public CarCategoryEntity retrieveCarCategoryByCarCategoryName(String carCategoryName) throws CarCategoryNotFoundException;
+
+    public void deleteCarCategory(Long carCategoryID) throws CarCategoryNotFoundException, DeleteCarCategoryException;
+
 }
