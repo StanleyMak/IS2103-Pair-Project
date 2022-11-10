@@ -36,8 +36,6 @@ public class ReservationEntity implements Serializable {
     @Column(nullable = false)
     private String reservationCode;
     
-    private double duration;
-    
     //@Column(nullable = false)
     private double rentalFee; 
     
@@ -84,8 +82,7 @@ public class ReservationEntity implements Serializable {
     public ReservationEntity() {
     }
 
-    public ReservationEntity(double duration, double rentalFee, String creditCardNumber, String cvv, Date startDateTime, Date endDateTime, String reservationCode, boolean onlinePayment) {
-        this.duration = duration;
+    public ReservationEntity(double rentalFee, String creditCardNumber, String cvv, Date startDateTime, Date endDateTime, String reservationCode, boolean onlinePayment) {
         this.rentalFee = rentalFee;
         this.creditCardNumber = creditCardNumber;
         this.cvv = cvv;
@@ -117,14 +114,6 @@ public class ReservationEntity implements Serializable {
 
     public void setPartner(PartnerEntity partner) {
         this.partner = partner;
-    }
-
-    public double getDuration() {
-        return duration;
-    }
-
-    public void setDuration(double duration) {
-        this.duration = duration;
     }
 
     public String getReservationCode() {
