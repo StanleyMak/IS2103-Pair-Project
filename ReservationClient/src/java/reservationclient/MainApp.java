@@ -315,7 +315,6 @@ public class MainApp {
         
         // print details
         System.out.println(reservation.getReservationCode());
-        System.out.println(reservation.getDuration());
         System.out.println(reservation.getRentalFee());
         System.out.println(reservation.getStartDateTime());
         System.out.println(reservation.getEndDateTime());
