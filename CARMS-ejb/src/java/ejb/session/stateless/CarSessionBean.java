@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategoryEntity;
 import entity.CarEntity;
 import entity.CarModelEntity;
 import entity.OutletEntity;
@@ -99,6 +100,15 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.currOutlet.address = ?1")
                 .setParameter(1, outletAddress);
         List<CarEntity> cars = query.getResultList();
+        return cars;
+    }
+    
+    public List<CarEntity> retrieveAllCarsOfCarCategory(String carCategoryName) {
+        List<CarEntity> cars = new ArrayList<>();
+        List<CarModelEntity> carModels = carModelSessionBeanLocal.retrieveCarModelsOfCarCategory(carCategoryName);
+        for (CarModelEntity carModel : carModels) {
+            cars.addAll(retrieveAllCarsOfCarModel(carModel.getModelName()));
+        }
         return cars;
     }
 
