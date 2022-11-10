@@ -7,20 +7,19 @@ package ejb.session.stateless;
 
 import entity.CarEntity;
 import entity.CarModelEntity;
-import entity.CustomerEntity;
 import entity.OutletEntity;
 import entity.ReservationEntity;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.StatusEnum;
-import util.exception.CustomerNotFoundException;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -140,24 +139,48 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         returnCar.setCurrOutlet(reservation.getReturnOutlet());
         OutletEntity pickUpOutlet = reservation.getPickUpOutlet();
     }
+    
+    
 
     @Override
-    public void doSearchCar() {
-        List<ReservationEntity> reservations = reservationSessionBean.retrieveAllReservations();
-        List<ReservationEntity> availableResverations = new ArrayList<>();
-        /*
-         for (ReservationEntity res : reservations) {
-             // IF NOT SERVICING, NOT DISABLED
-             // IF REQUESTED OUTLET IS = RETURN OUTLET
-             if (returnDateTime.compareTo(res.getStartDateTime()) < 0) {
-                 if (res.getEndDateTime().compareTo(pickupDateTime) < 0) {
-                     
+    public List<CarEntity> doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet) {
+        List<CarEntity> cars = retrieveAllCars(); 
+        List<CarEntity> availableCars = new ArrayList<>();
+        
+        // available cars = cars that do not have any reservation recrods at specified date
+        
+         for (CarEntity car : cars) {
+             // check if car location is the same as customer's pick up location
+             if (car.getCurrOutlet().getAddress().equals(pickupOutlet.getAddress())) {
+                 ReservationEntity carReservation = reservationSessionBean.retrieveReservationFromCarID(car.getCarID());
+                 if (carReservation.getStartDateTime().compareTo(returnDateTime) >= 0 &&
+                         carReservation.getEndDateTime().compareTo(pickupDateTime) <= 0) {
+                     if (car.getStatus() == StatusEnum.AVAILABLE) {
+                         availableCars.add(car);
+                     }
                  }
+             } else {
+                 ReservationEntity carReservation = reservationSessionBean.retrieveReservationFromCarID(car.getCarID());
+                 LocalDateTime startDateTime = LocalDateTime.ofInstant(carReservation.getStartDateTime().toInstant(), ZoneId.systemDefault());
+                 LocalDateTime endDateTime = LocalDateTime.ofInstant(carReservation.getEndDateTime().toInstant(), ZoneId.systemDefault());
+                 // factor in transit duration (2 hours)
+                 endDateTime = endDateTime.plusHours(2); 
+                 startDateTime = startDateTime.minusHours(2);
+                 
+                 LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
+                 LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
+                 
+                 if (startDateTime.compareTo(returnDateTimeLocal) >= 0 &&
+                         endDateTime.compareTo(pickupDateTimeLocal) <= 0) {
+                     
+                     if (car.getStatus() == StatusEnum.AVAILABLE) {
+                        availableCars.add(car);
+                     }
+                 } 
              }
-         */
-        // ELSE (REQUEST OUTLET != RETURN OUTLET)
-        // CHECK reservation + transit time (2 hors) ends before pickupdate
-        // CHECK reservation starts after return date + 2hours
+         }
+         
+         return availableCars; 
     }
 }
 
