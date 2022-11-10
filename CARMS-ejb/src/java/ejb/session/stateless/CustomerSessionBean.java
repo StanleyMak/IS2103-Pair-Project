@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CustomerEntity;
+import entity.OwnCustomerEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -46,16 +47,16 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     @Override
-    public CustomerEntity retrieveCustomerByCustomerUsername(String username) throws CustomerNotFoundException {
+    public OwnCustomerEntity retrieveOwnCustomerByOwnCustomerUsername(String username) throws CustomerNotFoundException {
         
-        Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.username LIKE ?1")
+        Query query = em.createQuery("SELECT c FROM OwnCustomerEntity c WHERE c.username LIKE ?1")
                 .setParameter(1, username);
         
         //customer.getXX.size();
         // association
         
         try {
-            CustomerEntity customer = (CustomerEntity) query.getSingleResult(); 
+            OwnCustomerEntity customer = (OwnCustomerEntity) query.getSingleResult(); 
             return customer; 
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new CustomerNotFoundException("Customer username " + username + "does not exist!");
@@ -70,9 +71,9 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     @Override
-    public CustomerEntity customerLogin(String email, String password) throws InvalidLoginCredentialException { 
+    public OwnCustomerEntity customerLogin(String username, String password) throws InvalidLoginCredentialException { 
         try {
-            CustomerEntity customer = retrieveCustomerByCustomerUsername(email);
+            OwnCustomerEntity customer = retrieveOwnCustomerByOwnCustomerUsername(username);
             
             if (password.equals(customer.getPassword())) {
                 // association
