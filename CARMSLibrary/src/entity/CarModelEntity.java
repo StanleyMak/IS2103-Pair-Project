@@ -28,15 +28,16 @@ public class CarModelEntity implements Serializable {
     private Long carModelID;
     
     //@NotNull
-    @Column(nullable = false, length = 64)
+    //@Column(nullable = false, length = 64)
     private String modelName;
     
     //@NotNull
-    @Column(nullable = false, length = 64)
+    //@Column(nullable = false, length = 64)
     private String modelMake;
     
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    //@ManyToOne(optional = false)
+    //@JoinColumn(nullable = false)
+    @ManyToOne
     private CarCategoryEntity category;
 
     public CarModelEntity() {

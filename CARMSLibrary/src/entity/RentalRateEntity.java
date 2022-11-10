@@ -31,7 +31,7 @@ public class RentalRateEntity implements Serializable, Comparable<RentalRateEnti
     private Long rentalRateID;
     
     //@NotNull
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String rentalName;
     
     //@NotNull
@@ -39,7 +39,7 @@ public class RentalRateEntity implements Serializable, Comparable<RentalRateEnti
     private RentalRateTypeEnum rentalRateType;
     
     //@NotNull
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private double ratePerDay;
     
     //@Column(nullable = false, length = 64)
@@ -47,8 +47,9 @@ public class RentalRateEntity implements Serializable, Comparable<RentalRateEnti
     //@Column(nullable = false, length = 64)
     private Date endDate;
     
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    //@ManyToOne(optional = false)
+    //@JoinColumn(nullable = false)
+    @ManyToOne
     private CarCategoryEntity carCategory;
 
     public RentalRateEntity() {

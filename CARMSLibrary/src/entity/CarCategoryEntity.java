@@ -29,7 +29,7 @@ public class CarCategoryEntity implements Serializable {
     private Long carCategoryID;
     
     //@NotNull
-    @Column(nullable = false, length = 64)
+    //@Column(nullable = false, length = 64)
     private String categoryName;
 
     public CarCategoryEntity() {

@@ -30,7 +30,7 @@ public class CarEntity implements Serializable {
     private Long carID;
     
     //@NotNull
-    @Column(nullable = false, length = 64)
+    //@Column(nullable = false, length = 64)
     private String licensePlateNumber;
     
     //@NotNull
@@ -43,13 +43,15 @@ public class CarEntity implements Serializable {
     private StatusEnum status;
     
     //@NotNull
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    //@ManyToOne(optional = false)
+    //@JoinColumn(nullable = false)
+    @ManyToOne
     private CarModelEntity model;
     
     //@NotNull
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    //@ManyToOne(optional = false)
+    //@JoinColumn(nullable = false)
+    @ManyToOne
     private OutletEntity currOutlet;
 
     public CarEntity() {

@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.CustomerEntity;
 import entity.OwnCustomerEntity;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -16,7 +17,6 @@ import javax.persistence.Query;
 import util.exception.CustomerNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 
-
 /**
  *
  * @author hanyang
@@ -25,63 +25,72 @@ import util.exception.InvalidLoginCredentialException;
 public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerSessionBeanLocal {
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
-    private EntityManager em; 
+    private EntityManager em;
 
     public CustomerSessionBean() {
     }
-    
-    
+
     @Override
     public Long createNewCustomer(CustomerEntity customer) {
-        em.persist(customer); 
+        em.persist(customer);
         em.flush();
-        
-        return customer.getCustomerID(); 
+
+        return customer.getCustomerID();
     }
-    
+
     @Override
     public CustomerEntity retrieveCustomerByID(Long customerID) {
         CustomerEntity customer = em.find(CustomerEntity.class, customerID);
         //customer.getXX.size();
         return customer;
     }
-    
-    @Override
-    public OwnCustomerEntity retrieveOwnCustomerByOwnCustomerUsername(String username) throws CustomerNotFoundException {
-        
-        Query query = em.createQuery("SELECT c FROM OwnCustomerEntity c WHERE c.username LIKE ?1")
-                .setParameter(1, username);
-        
+
+    public CustomerEntity retrieveCustomerByCustomerEmail(String email) throws CustomerNotFoundException {
+        Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.email = ?1")
+                .setParameter(1, email);
+
         try {
-            OwnCustomerEntity customer = (OwnCustomerEntity) query.getSingleResult(); 
+            CustomerEntity customer = (CustomerEntity) query.getSingleResult();
             customer.getReservations().size();
-            return customer; 
+            return customer;
         } catch (NoResultException | NonUniqueResultException ex) {
-            throw new CustomerNotFoundException("Customer username " + username + "does not exist!");
+            throw new CustomerNotFoundException("Customer email " + email + "does not exist!");
         }
     }
     
+    public OwnCustomerEntity retrieveOwnCustomerByOwnCustomerEmail(String email) throws CustomerNotFoundException {
+        Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.email = ?1")
+                .setParameter(1, email);
+
+        try {
+            OwnCustomerEntity customer = (OwnCustomerEntity) query.getSingleResult();
+            customer.getReservations().size();
+            return customer;
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new CustomerNotFoundException("Customer email " + email + "does not exist!");
+        }
+    }
+
     @Override
     public void deleteCustomer(Long customerID) {
         CustomerEntity customer = retrieveCustomerByID(customerID);
         //dissociate
         em.remove(customer);
     }
-    
+
     @Override
-    public OwnCustomerEntity customerLogin(String username, String password) throws InvalidLoginCredentialException { 
+    public OwnCustomerEntity customerLogin(String email, String password) throws InvalidLoginCredentialException {
         try {
-            OwnCustomerEntity customer = retrieveOwnCustomerByOwnCustomerUsername(username);
-            
+            OwnCustomerEntity customer = retrieveOwnCustomerByOwnCustomerEmail(email);
+
             if (password.equals(customer.getPassword())) {
-                return customer; 
+                return customer;
             } else {
-                throw new InvalidLoginCredentialException("Invalid email or password"); 
+                throw new InvalidLoginCredentialException("Invalid email or password");
             }
         } catch (CustomerNotFoundException ex) {
             throw new InvalidLoginCredentialException("Invalid email or password");
-        }   
+        }
     }
-    
-    
+
 }

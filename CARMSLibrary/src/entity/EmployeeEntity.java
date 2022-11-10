@@ -31,13 +31,13 @@ public class EmployeeEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeID;
     
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String name;
     
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String username;
     
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String password; 
    
     //@NotNull
@@ -49,8 +49,9 @@ public class EmployeeEntity implements Serializable {
     private DispatchRecordEntity dispatchRecord;
     
     //@NotNull
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    //@ManyToOne(optional = false)
+    //@JoinColumn(nullable = false)
+    @ManyToOne
     private OutletEntity outlet;
 
     public EmployeeEntity() {

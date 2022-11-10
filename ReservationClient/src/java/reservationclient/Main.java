@@ -7,6 +7,7 @@ package reservationclient;
 
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
+import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import javax.ejb.EJB;
 
@@ -16,6 +17,9 @@ import javax.ejb.EJB;
  */
 public class Main {
 
+    @EJB(name = "OutletSessionBeanRemote")
+    private static OutletSessionBeanRemote outletSessionBeanRemote;
+
     @EJB(name = "CarSessionBeanRemote")
     private static CarSessionBeanRemote carSessionBeanRemote;
 
@@ -24,9 +28,13 @@ public class Main {
 
     @EJB(name = "CustomerSessionBeanRemote")
     private static CustomerSessionBeanRemote customerSessionBeanRemote;
+    
+    
+    
+    
 
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(customerSessionBeanRemote, reservationSessionBeanRemote, carSessionBeanRemote);
+        MainApp mainApp = new MainApp(customerSessionBeanRemote, reservationSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote);
         mainApp.runApp();
     }
     

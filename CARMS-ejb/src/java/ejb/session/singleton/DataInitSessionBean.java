@@ -5,15 +5,22 @@
  */
 package ejb.session.singleton;
 
+import ejb.session.stateless.CarSessionBeanLocal;
+import ejb.session.stateless.CustomerSessionBeanLocal;
+import ejb.session.stateless.ReservationSessionBeanLocal;
 import entity.CarCategoryEntity;
 import entity.CarEntity;
 import entity.CarModelEntity;
+import entity.CustomerEntity;
 import entity.EmployeeEntity;
 import entity.OutletEntity;
+import entity.OwnCustomerEntity;
 import entity.RentalRateEntity;
+import entity.ReservationEntity;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
 import javax.ejb.Startup;
@@ -22,6 +29,8 @@ import javax.persistence.PersistenceContext;
 import util.enumeration.EmployeeAccessRightEnum;
 import util.enumeration.RentalRateTypeEnum;
 import util.enumeration.StatusEnum;
+import util.exception.CarModelNotFoundException;
+import util.exception.CustomerNotFoundException;
 
 /**
  *
@@ -33,8 +42,19 @@ import util.enumeration.StatusEnum;
 
 public class DataInitSessionBean {
 
+    @EJB(name = "CarSessionBeanLocal")
+    private CarSessionBeanLocal carSessionBeanLocal;
+
+    @EJB(name = "CustomerSessionBeanLocal")
+    private CustomerSessionBeanLocal customerSessionBeanLocal;
+
+    @EJB(name = "ReservationSessionBeanLocal")
+    private ReservationSessionBeanLocal reservationSessionBeanLocal;
+
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
+    
+    
     
     @PostConstruct
     public void postConstruct() {
@@ -136,41 +156,47 @@ public class DataInitSessionBean {
             em.flush();
 
             /*Initialising Car*/
-            CarEntity car = new CarEntity("SS00A1TC", toyotaCorolla, StatusEnum.AVAILABLE, outletA);
-            em.persist(car);
+            CarEntity car1 = null;
+            try {
+                car1 = new CarEntity("SS00A1TC", toyotaCorolla, StatusEnum.AVAILABLE, outletA);
+                carSessionBeanLocal.createNewCar(car1, car1.getModel().getModelName(), car1.getCurrOutlet().getAddress());
+            } catch (CarModelNotFoundException carModelNotFoundException) {
+                System.out.println("hi");
+            }
+//            em.persist(car1);
+//            em.flush();
+            CarEntity car2 = new CarEntity("SS00A2TC", toyotaCorolla, StatusEnum.AVAILABLE, outletA);
+            em.persist(car2);
             em.flush();
-            car = new CarEntity("SS00A2TC", toyotaCorolla, StatusEnum.AVAILABLE, outletA);
-            em.persist(car);
+            CarEntity car3 = new CarEntity("SS00A3TC", toyotaCorolla, StatusEnum.AVAILABLE, outletA);
+            em.persist(car3);
             em.flush();
-            car = new CarEntity("SS00A3TC", toyotaCorolla, StatusEnum.AVAILABLE, outletA);
-            em.persist(car);
+            CarEntity car4 = new CarEntity("SS00B1HC", hondaCivic, StatusEnum.AVAILABLE, outletB);
+            em.persist(car4);
             em.flush();
-            car = new CarEntity("SS00B1HC", hondaCivic, StatusEnum.AVAILABLE, outletB);
-            em.persist(car);
+            CarEntity car5 = new CarEntity("SS00B2HC", hondaCivic, StatusEnum.AVAILABLE, outletB);
+            em.persist(car5);
             em.flush();
-            car = new CarEntity("SS00B2HC", hondaCivic, StatusEnum.AVAILABLE, outletB);
-            em.persist(car);
+            CarEntity car6 = new CarEntity("SS00B3HC", hondaCivic, StatusEnum.AVAILABLE, outletB);
+            em.persist(car6);
             em.flush();
-            car = new CarEntity("SS00B3HC", hondaCivic, StatusEnum.AVAILABLE, outletB);
-            em.persist(car);
+            CarEntity car7 = new CarEntity("SS00C1NS", nissanSunny, StatusEnum.AVAILABLE, outletC);
+            em.persist(car7);
             em.flush();
-            car = new CarEntity("SS00C1NS", nissanSunny, StatusEnum.AVAILABLE, outletC);
-            em.persist(car);
+            CarEntity car8 = new CarEntity("SS00C2NS", nissanSunny, StatusEnum.AVAILABLE, outletC);
+            em.persist(car8);
             em.flush();
-            car = new CarEntity("SS00C2NS", nissanSunny, StatusEnum.AVAILABLE, outletC);
-            em.persist(car);
+            CarEntity car9 = new CarEntity("SS00C3NS", nissanSunny, StatusEnum.REPAIR, outletC);
+            em.persist(car9);
             em.flush();
-            car = new CarEntity("SS00C3NS", nissanSunny, StatusEnum.REPAIR, outletC);
-            em.persist(car);
+            CarEntity car10 = new CarEntity("LS00A4ME", mercedesEClass, StatusEnum.AVAILABLE, outletA);
+            em.persist(car10);
             em.flush();
-            car = new CarEntity("LS00A4ME", mercedesEClass, StatusEnum.AVAILABLE, outletA);
-            em.persist(car);
+            CarEntity car11 = new CarEntity("LS00B4B5", bmw5Series, StatusEnum.AVAILABLE, outletB);
+            em.persist(car11);
             em.flush();
-            car = new CarEntity("LS00B4B5", bmw5Series, StatusEnum.AVAILABLE, outletB);
-            em.persist(car);
-            em.flush();
-            car = new CarEntity("LS00C4A6", audiA6, StatusEnum.AVAILABLE, outletC);
-            em.persist(car);
+            CarEntity car12 = new CarEntity("LS00C4A6", audiA6, StatusEnum.AVAILABLE, outletC);
+            em.persist(car12);
             em.flush();
 
             /*Initialising Rental*/
@@ -202,7 +228,36 @@ public class DataInitSessionBean {
             em.persist(rate);
             em.flush();
             
-            /*Initialising Partner*/
+            OwnCustomerEntity customer = new OwnCustomerEntity("hans", "stan");
+            customerSessionBeanLocal.createNewCustomer(customer);
+            
+            try {
+                OwnCustomerEntity test = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail("hans");
+                System.out.println(test.getCustomerID() + " " + test.getEmail() + " " + test.getPassword());
+            } catch (CustomerNotFoundException e) {
+                System.out.println("lol");
+            }
+            
+            try {
+                ReservationEntity res = new ReservationEntity();
+                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("06/12/2022 00:00"), dateTimeFormat.parse("07/12/2022 00:00"), "1", true);
+                reservationSessionBeanLocal.createNewReservation(res, car1.getCarID(), "hans", "Outlet A", "Outlet A");
+                
+                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("08/12/2022 00:00"), "2", true);
+                reservationSessionBeanLocal.createNewReservation(res, car2.getCarID(), "hans", "Outlet A", "Outlet B");
+                
+                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("09/12/2022 00:00"), "2", true);
+                reservationSessionBeanLocal.createNewReservation(res, car3.getCarID(), "hans", "Outlet B", "Outlet C");
+                
+                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("09/12/2022 12:00"), dateTimeFormat.parse("07/12/2022 00:00"), "2", true);
+                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
+            
+                
+            } catch (ParseException | CustomerNotFoundException e) {
+                System.out.println("Error: " + e.getMessage() + "!\n");
+            } 
+//            
+//          /*Initialising Partner*/
             //Partner partner = new Partner("Holiday.com");
             
         } catch (ParseException e) {

@@ -33,7 +33,7 @@ public class ReservationEntity implements Serializable {
     private Long reservationID;
     
     //@NotNull
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String reservationCode;
     
     //@Column(nullable = false)
@@ -49,34 +49,36 @@ public class ReservationEntity implements Serializable {
     
     //@Temporal(TemporalType.TIMESTAMP)
     //@NotNull
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private Date startDateTime; 
     
     //@Temporal(TemporalType.TIMESTAMP)
     //@NotNull
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private Date endDateTime; 
     
-    @Column(nullable = false)
+    //@Column(nullable = false)
     //@Column(nullable = false)
     private boolean onlinePayment;
     
     //@NotNull
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @ManyToOne(/*optional = false*/)
+    //@JoinColumn(nullable = false)
     private CarEntity car; 
     
     @ManyToOne
     private PartnerEntity partner; 
     
     //@NotNull
-    @OneToOne(optional = false)
-    @JoinColumn(nullable = false)
+    //@OneToOne(optional = false)
+    //@JoinColumn(nullable = false)
+    @OneToOne
     private OutletEntity pickUpOutlet;
     
     //@NotNull
-    @OneToOne(optional = false)
-    @JoinColumn(nullable = false)
+    //@OneToOne(optional = false)
+    //@JoinColumn(nullable = false)
+    @OneToOne
     private OutletEntity returnOutlet;
 
     public ReservationEntity() {

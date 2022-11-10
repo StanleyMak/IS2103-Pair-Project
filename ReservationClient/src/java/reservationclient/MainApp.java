@@ -13,6 +13,7 @@ import entity.CarEntity;
 import entity.OutletEntity;
 import entity.OwnCustomerEntity;
 import entity.ReservationEntity;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -20,6 +21,8 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import util.exception.CustomerNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.InvalidReservationCodeException;
@@ -43,11 +46,12 @@ public class MainApp {
         this.loggedInCustomer = null;
     }
 
-    public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote) {
+    public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote) {
         this(); 
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.reservationSessionBeanRemote = reservationSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
+        this.outletSessionBeanRemote = outletSessionBeanRemote;
     }
     
     
@@ -81,7 +85,11 @@ public class MainApp {
                     doRegisterAsCustomer();
                 } else if (response == 3) {
                     
-                    // doSearchCarForVisitor();
+                    try {
+                        doSearchCarForVisitor();
+                    } catch (ParseException ex) {
+                        System.out.println("Parse error");
+                    }
                 } else if (response == 4) {
                     break;
                 } else {
@@ -116,7 +124,11 @@ public class MainApp {
                 response = sc.nextInt();
 
                 if (response == 1) {
-                    doSearchCarForCustomer();
+                    try {
+                        doSearchCarForVisitor();
+                    } catch (ParseException ex) {
+                        System.out.println("parse error");
+                    }
                 } else if (response == 2) {
                     doReserveCar();
                 } else if (response == 3) {
@@ -149,8 +161,8 @@ public class MainApp {
         System.out.println("*** CaRMS Reservation Client ::  ***\n");
         OwnCustomerEntity newCustomer = new OwnCustomerEntity();
         
-        System.out.print("Enter username> ");
-        newCustomer.setUsername(scanner.nextLine().trim());
+        System.out.print("Enter Email> ");
+        newCustomer.setEmail(scanner.nextLine().trim());
         
         System.out.print("Enter password> ");
         newCustomer.setPassword(scanner.nextLine().trim());
@@ -177,8 +189,8 @@ public class MainApp {
         LocalTime pickupTime = pickupDateTimeLocal.toLocalTime();
         
         System.out.println("Enter pick up outlet address"); // A, B, C -> check opening/closing hours
-        String pickupOutletAddress = sc.nextLine().trim(); 
-        OutletEntity pickupOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(pickupOutletAddress); 
+        String pickupOutletAddress = sc.nextLine().trim();
+        OutletEntity pickupOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(pickupOutletAddress);  
         LocalTime outletOpeningHours = LocalDateTime.ofInstant(pickupOutlet.getOpenHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
         
         if (pickupTime.isBefore(outletOpeningHours)) {
@@ -243,17 +255,17 @@ public class MainApp {
     
     private void doLogin() throws InvalidLoginCredentialException {
         Scanner scanner = new Scanner(System.in);
-        String username = "";
+        String email = "";
         String password = "";
 
         System.out.println("*** CaRMS Reservation Client :: Login ***\n");
-        System.out.print("Enter username> ");
-        username = scanner.nextLine().trim();
-        System.out.print("Enter password> ");
+        System.out.print("Enter Email> ");
+        email = scanner.nextLine().trim();
+        System.out.print("Enter Password> ");
         password = scanner.nextLine().trim();
         
-        if (username.length() > 0 && password.length() > 0) {
-            OwnCustomerEntity customer = customerSessionBeanRemote.customerLogin(username, password);
+        if (email.length() > 0 && password.length() > 0) {
+            OwnCustomerEntity customer = customerSessionBeanRemote.customerLogin(email, password);
             this.loggedInCustomer = customer;
         } else {
              throw new InvalidLoginCredentialException("Missing login credentials");
@@ -274,7 +286,7 @@ public class MainApp {
         
         // setters based on doSearchCar parameters
         
-        // reservationSessionBeanRemote.createNewReservation(reservation, Long.MIN_VALUE, username, returnOutletAddress, pickupOutletAddress);
+        // reservationSessionBeanRemote.createNewReservation(reservation, Long.MIN_VALUE, email, returnOutletAddress, pickupOutletAddress);
         
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -284,13 +296,13 @@ public class MainApp {
     private void doCancelReservation() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: Cancel Reservation ***\n");
-        System.out.println("Provide your username");
-        String username = sc.nextLine().trim(); 
-        System.out.println("Provide reservation code");
+        System.out.print("Provide your email> ");
+        String email = sc.nextLine().trim(); 
+        System.out.print("Provide reservation code> ");
         String reservationCode = sc.nextLine().trim(); 
         
         try {
-            reservationSessionBeanRemote.deleteReservation(username, reservationCode);
+            reservationSessionBeanRemote.deleteReservation(email, reservationCode);
             System.out.println("Reservation cancelled successfully!\n");
         } catch (CustomerNotFoundException | ReservationNotFoundException ex) {
             System.out.println("Error occured while trying to cancel reservation");

@@ -22,10 +22,12 @@ public interface CustomerSessionBeanRemote {
 
     public CustomerEntity retrieveCustomerByID(Long customerID);
 
-    public OwnCustomerEntity retrieveOwnCustomerByOwnCustomerUsername(String username) throws CustomerNotFoundException;
-
     public void deleteCustomer(Long customerID);
 
-    public OwnCustomerEntity customerLogin(String username, String password) throws InvalidLoginCredentialException;
+    public OwnCustomerEntity customerLogin(String email, String password) throws InvalidLoginCredentialException;
+    
+    public CustomerEntity retrieveCustomerByCustomerEmail(String email) throws CustomerNotFoundException;
+
+    public OwnCustomerEntity retrieveOwnCustomerByOwnCustomerEmail(String email) throws CustomerNotFoundException;
 
 }

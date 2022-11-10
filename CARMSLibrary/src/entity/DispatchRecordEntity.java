@@ -34,7 +34,7 @@ public class DispatchRecordEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dispatchRecordID;
     
-    @Column(nullable = false, unique = true)
+    //@Column(nullable = false, unique = true)
     private String dispatchRecordName;
     
     //@Column(nullable = false)

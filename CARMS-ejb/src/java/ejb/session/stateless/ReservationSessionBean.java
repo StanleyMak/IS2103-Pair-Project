@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.CarEntity;
 import entity.CustomerEntity;
 import entity.OutletEntity;
+import entity.OwnCustomerEntity;
 import entity.ReservationEntity;
 import java.util.List;
 import javax.ejb.EJB;
@@ -41,12 +42,12 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     private EntityManager em;
     
     @Override
-    public Long createNewReservation(ReservationEntity reservation, Long carID, String username, String returnOutletAddress, String pickupOutletAddress) throws CustomerNotFoundException {
-        em.persist(reservation);
+    public Long createNewReservation(ReservationEntity reservation, Long carID, String email, String returnOutletAddress, String pickupOutletAddress) throws CustomerNotFoundException {
+        
         // missing partner
         
         CarEntity car = carSessionBean.retrieveCarByCarID(carID);
-        CustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerUsername(username);
+        OwnCustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
         OutletEntity pickupOutlet = outletSessionBean.retrieveOutletByOutletAddress(pickupOutletAddress);
         OutletEntity returnOutlet = outletSessionBean.retrieveOutletByOutletAddress(returnOutletAddress);
         
@@ -55,6 +56,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         reservation.setPickUpOutlet(pickupOutlet);
         customer.getReservations().add(reservation);
         
+        em.persist(reservation);
         em.flush(); 
         
         return reservation.getReservationID();
@@ -102,8 +104,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 */
     
     @Override
-    public void deleteReservation(String username, String reservationCode) throws CustomerNotFoundException, ReservationNotFoundException {
-        CustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerUsername(username);
+    public void deleteReservation(String email, String reservationCode) throws CustomerNotFoundException, ReservationNotFoundException {
+        CustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
         ReservationEntity reservationToDelete = retrieveReservationByReservationCode(reservationCode);
         customer.setReservations(null);
         

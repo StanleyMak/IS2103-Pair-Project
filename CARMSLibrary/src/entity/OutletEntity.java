@@ -29,7 +29,7 @@ public class OutletEntity implements Serializable {
     private Long outletID;
     
     //@NotNull
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String address;
     
     //@Column(nullable = false)

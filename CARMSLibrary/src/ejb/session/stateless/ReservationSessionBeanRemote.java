@@ -27,7 +27,7 @@ public interface ReservationSessionBeanRemote {
     
     public ReservationEntity retrieveReservationByReservationCode(String reservationCode) throws ReservationNotFoundException; 
     
-    public void deleteReservation(String username, String reservationCode) throws CustomerNotFoundException, ReservationNotFoundException;
+    public void deleteReservation(String email, String reservationCode) throws CustomerNotFoundException, ReservationNotFoundException;
     
     public List<ReservationEntity> retrieveAllReservations();
     
