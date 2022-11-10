@@ -213,7 +213,7 @@ public class MainApp {
         List<CarEntity> availableCars = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
 
         for (CarEntity car : availableCars) {
-            System.out.print(car.getModel().getCategory() + "   " + car.getModel().getModelName() + "  " + car.getModel().getModelMake() + "  ");
+            System.out.print(car.getModel().getCategory().getCategoryName() + "   " + car.getModel().getModelName() + "  " + car.getModel().getModelMake() + "  ");
         }
 
         System.out.println("Press Enter To Continue...");
