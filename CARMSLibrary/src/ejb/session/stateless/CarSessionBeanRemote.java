@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarEntity;
+import entity.ReservationEntity;
 import java.util.List;
 import javax.ejb.Remote;
 
@@ -32,7 +33,7 @@ public interface CarSessionBeanRemote {
 
     public List<CarEntity> retrieveAllCarsOfOutlet(String outletAddress);
 
-    public void pickUpCar(String email, String reservationCode);
+    public void pickUpCar(ReservationEntity reservation);
 
-    public void returnCar(String email, String reservationCode);
+    public void returnCar(String reservationCode);
 }
