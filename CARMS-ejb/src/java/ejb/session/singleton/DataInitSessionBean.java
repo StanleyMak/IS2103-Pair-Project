@@ -239,19 +239,24 @@ public class DataInitSessionBean {
             }
             
             try {
+                //OwnCustomerEntity me = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail("hans");
+       
+                        
                 ReservationEntity res = new ReservationEntity();
                 res = new ReservationEntity(0, "", "", dateTimeFormat.parse("06/12/2022 00:00"), dateTimeFormat.parse("07/12/2022 00:00"), "1", true);
                 reservationSessionBeanLocal.createNewReservation(res, car1.getCarID(), "hans", "Outlet A", "Outlet A");
+                //me.getReservations().add(res);
                 
                 res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("08/12/2022 00:00"), "2", true);
                 reservationSessionBeanLocal.createNewReservation(res, car2.getCarID(), "hans", "Outlet A", "Outlet B");
                 
-                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("09/12/2022 00:00"), "2", true);
+                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("09/12/2022 00:00"), "3", true);
                 reservationSessionBeanLocal.createNewReservation(res, car3.getCarID(), "hans", "Outlet B", "Outlet C");
                 
-                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("09/12/2022 12:00"), dateTimeFormat.parse("07/12/2022 00:00"), "2", true);
+                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("09/12/2022 12:00"), dateTimeFormat.parse("07/12/2022 00:00"), "4", true);
                 reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
             
+                
                 
             } catch (ParseException | CustomerNotFoundException e) {
                 System.out.println("Error: " + e.getMessage() + "!\n");

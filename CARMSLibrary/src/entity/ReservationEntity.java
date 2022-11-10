@@ -7,6 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -80,6 +82,12 @@ public class ReservationEntity implements Serializable {
     //@JoinColumn(nullable = false)
     @OneToOne
     private OutletEntity returnOutlet;
+    
+    @OneToOne
+    private CarCategoryEntity carCategory;
+    
+    @OneToOne
+    private CarModelEntity carModel;
 
     public ReservationEntity() {
     }
@@ -213,6 +221,22 @@ public class ReservationEntity implements Serializable {
     @Override
     public String toString() {
         return "entity.ReservationEntity[ id=" + reservationID + " ]";
+    }
+
+    public CarCategoryEntity getCarCategory() {
+        return carCategory;
+    }
+
+    public void setCarCategory(CarCategoryEntity carCategory) {
+        this.carCategory = carCategory;
+    }
+
+    public CarModelEntity getCarModel() {
+        return carModel;
+    }
+
+    public void setCarModel(CarModelEntity carModel) {
+        this.carModel = carModel;
     }
 
     

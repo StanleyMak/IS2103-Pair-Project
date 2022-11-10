@@ -5,8 +5,13 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategoryEntity;
+import entity.CarEntity;
+import entity.CarModelEntity;
+import entity.OutletEntity;
 import entity.ReservationEntity;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
@@ -39,6 +44,15 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
         List<ReservationEntity> reservations = reservationSessionBeanLocal.retrieveAllReservations(); 
         
         for (ReservationEntity reservation : reservations) {
+            CarModelEntity carModel = reservation.getCarModel();
+            CarCategoryEntity carCategory = reservation.getCarCategory();
+            List<CarEntity> cars = new ArrayList<>();
+            if (carModel == null) {
+                //cars = carSessionBeanLocal.retrieveAllCarsOfCarCategory(carCategory.getCategoryName());
+            } else {
+                cars = carSessionBeanLocal.retrieveAllCarsOfCarModel(carModel.getModelName());
+            }
+            OutletEntity pickupOutlet = reservation.getPickUpOutlet();
             if (true) {
                 System.out.println("********** Car <LicensePlateNumber> at Outlet <OutletAddress> allocated to <customerName> for pickup on <reservationStartDate>!");
                 System.out.println("********** Car <LicensePlateNumber> at Outlet <OutletAddress> requires transit dispatch!");
