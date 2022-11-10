@@ -9,6 +9,7 @@ import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.CustomerEntity;
+import entity.OwnCustomerEntity;
 import entity.ReservationEntity;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,7 +30,7 @@ public class MainApp {
      private CustomerSessionBeanRemote customerSessionBeanRemote; 
      private ReservationSessionBeanRemote reservationSessionBeanRemote; 
      private CarSessionBeanRemote carSessionBeanRemote; 
-     private CustomerEntity loggedInCustomer; 
+     private OwnCustomerEntity loggedInCustomer; 
      
     
     public MainApp() {
@@ -137,10 +138,10 @@ public class MainApp {
     public void doRegisterAsCustomer() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client ::  ***\n");
-        CustomerEntity newCustomer = new CustomerEntity();
+        OwnCustomerEntity newCustomer = new OwnCustomerEntity();
         
         System.out.print("Enter username> ");
-        newCustomer.setUsername(scanner.nextLine().trim());
+        newCustomer.setEmail(scanner.nextLine().trim());
         
         System.out.print("Enter password> ");
         newCustomer.setPassword(scanner.nextLine().trim());
