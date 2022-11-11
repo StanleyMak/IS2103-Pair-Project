@@ -249,35 +249,35 @@ public class DataInitSessionBean {
        
                         
                 ReservationEntity res = new ReservationEntity();
-                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("06/12/2022 00:00"), dateTimeFormat.parse("07/12/2022 00:00"), "1", true);
+                res = new ReservationEntity(0, "", dateTimeFormat.parse("06/12/2022 00:00"), dateTimeFormat.parse("07/12/2022 00:00"), "1", true);
                 reservationSessionBeanLocal.createNewReservation(res, car1.getCarID(), "hans", "Outlet A", "Outlet A");
                 //me.getReservations().add(res);
                 
-                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("08/12/2022 00:00"), "2", true);
+                res = new ReservationEntity(0, "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("08/12/2022 00:00"), "2", true);
                 reservationSessionBeanLocal.createNewReservation(res, car2.getCarID(), "hans", "Outlet A", "Outlet B");
                 
-                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("09/12/2022 00:00"), "3", true);
+                res = new ReservationEntity(0, "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("09/12/2022 00:00"), "3", true);
                 reservationSessionBeanLocal.createNewReservation(res, car3.getCarID(), "hans", "Outlet B", "Outlet C");
                 
-                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("09/12/2022 12:00"), dateTimeFormat.parse("07/12/2022 00:00"), "4", true);
+                res = new ReservationEntity(0, "", dateTimeFormat.parse("09/12/2022 12:00"), dateTimeFormat.parse("07/12/2022 00:00"), "4", true);
                 reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
 
-                res = new ReservationEntity(10, "", "1", dateTimeFormat.parse("06/12/2022 14:00"), dateTimeFormat.parse("10/12/2022 12:00"), "1", true); // outlet B
+                res = new ReservationEntity(10, "1", dateTimeFormat.parse("06/12/2022 14:00"), dateTimeFormat.parse("10/12/2022 12:00"), "1", true); // outlet B
                 reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
                 
-                res = new ReservationEntity(10, "", "2", dateTimeFormat.parse("06/12/2022 08:00"), dateTimeFormat.parse("08/12/2022 23:00"), "2", true); // outlet C
+                res = new ReservationEntity(10, "2", dateTimeFormat.parse("06/12/2022 08:00"), dateTimeFormat.parse("08/12/2022 23:00"), "2", true); // outlet C
                 reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet C");
                 
-                res = new ReservationEntity(20, "", "1", dateTimeFormat.parse("05/12/2022 10:00"), dateTimeFormat.parse("06/12/2022 10:00"), "3", true); // outlet A // car 1
+                res = new ReservationEntity(20, "1", dateTimeFormat.parse("05/12/2022 10:00"), dateTimeFormat.parse("06/12/2022 10:00"), "3", true); // outlet A // car 1
                 reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
                 
-                res = new ReservationEntity(20, "", "1", dateTimeFormat.parse("06/12/2022 14:00"), dateTimeFormat.parse("07/12/2022 08:00"), "4", true); // outlet A // car 2
+                res = new ReservationEntity(20, "1", dateTimeFormat.parse("06/12/2022 14:00"), dateTimeFormat.parse("07/12/2022 08:00"), "4", true); // outlet A // car 2
                 reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
                 
-                res = new ReservationEntity(30, "", "1", dateTimeFormat.parse("07/12/2022 10:00"), dateTimeFormat.parse("09/12/2022 10:00"), "5", true); // outlet A // car 3
+                res = new ReservationEntity(30, "1", dateTimeFormat.parse("07/12/2022 10:00"), dateTimeFormat.parse("09/12/2022 10:00"), "5", true); // outlet A // car 3
                 reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
                 
-                res = new ReservationEntity(40, "", "1", dateTimeFormat.parse("12/12/2022 10:00"), dateTimeFormat.parse("13/12/2022 10:00"), "6", true); 
+                res = new ReservationEntity(40, "1", dateTimeFormat.parse("12/12/2022 10:00"), dateTimeFormat.parse("13/12/2022 10:00"), "6", true); 
                 reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
             
             } catch (ParseException | CustomerNotFoundException e) {
