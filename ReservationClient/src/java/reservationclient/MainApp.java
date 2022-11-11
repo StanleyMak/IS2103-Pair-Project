@@ -212,6 +212,7 @@ public class MainApp {
 
         for (CarEntity car : availableCars) {
             System.out.println(car.getModel().getCategory().getCategoryName() + "| " + car.getModel().getModelName() + "| " + car.getModel().getModelMake() + "| ");
+//            System.out.printf("%-5s%-28s%-28s%-20s%-20s%-5s\n", car.getModel().getCategory().getCategoryName(), car.getModel().getModelName(), reservation.getRentalFee(), car.getModel().getModelMake())
         }
 
         System.out.println("Press Enter To Continue...");
