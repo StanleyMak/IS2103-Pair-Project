@@ -28,9 +28,12 @@ import javax.validation.ValidatorFactory;
 import util.enumeration.RentalRateTypeEnum;
 import util.enumeration.StatusEnum;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.CarModelDisabledException;
 import util.exception.CarModelNameExistsException;
 import util.exception.CarModelNotFoundException;
+import util.exception.DeleteCarException;
 import util.exception.DeleteCarModelException;
+import util.exception.DeleteRentalRateException;
 
 /**
  *
@@ -230,18 +233,18 @@ public class SalesManagementModule {
         sc.nextLine();
 
         try {
-            System.out.print("Enter Start Date (DD/MM/YYYY)> ");
+            System.out.print("Enter Start Date (DD/MM/YYYY hh:mm)> ");
             String startDate = sc.nextLine();
             if (!startDate.equals("null")) {
-                rentalRate.setStartDate(dateFormat.parse(startDate));
+                rentalRate.setStartDate(dateTimeFormat.parse(startDate));
             } else {
                 rentalRate.setStartDate(null);
             }
 
-            System.out.print("Enter End Date (DD/MM/YYYY)> ");
+            System.out.print("Enter End Date (DD/MM/YYYY hh:mm)> ");
             String endDate = sc.nextLine();
             if (!endDate.equals("null")) {
-                rentalRate.setEndDate(dateFormat.parse(endDate));
+                rentalRate.setEndDate(dateTimeFormat.parse(endDate));
             } else {
                 rentalRate.setEndDate(null);
             }
@@ -273,7 +276,7 @@ public class SalesManagementModule {
         int i = 1;
         for (RentalRateEntity rentalRate : rentalRates) {
             if (rentalRate.getStartDate() != null && rentalRate.getEndDate() != null) {
-                System.out.printf("%-5s%-5s%-40s%-18s%-20s%-20s%-28s%-28s\n", i, rentalRate.getRentalRateID(), rentalRate.getRentalName(), rentalRate.getRentalRateType().toString(), rentalRate.getCarCategory().getCategoryName(), rentalRate.getRatePerDay(), dateFormat.format(rentalRate.getStartDate()), dateFormat.format(rentalRate.getEndDate()));
+                System.out.printf("%-5s%-5s%-40s%-18s%-20s%-20s%-28s%-28s\n", i, rentalRate.getRentalRateID(), rentalRate.getRentalName(), rentalRate.getRentalRateType().toString(), rentalRate.getCarCategory().getCategoryName(), rentalRate.getRatePerDay(), dateTimeFormat.format(rentalRate.getStartDate()), dateTimeFormat.format(rentalRate.getEndDate()));
             } else {
                 System.out.printf("%-5s%-5s%-40s%-18s%-20s%-20s%-28s%-28s\n", i, rentalRate.getRentalRateID(), rentalRate.getRentalName(), rentalRate.getRentalRateType().toString(), rentalRate.getCarCategory().getCategoryName(), rentalRate.getRatePerDay(), "null", "null");
             }
@@ -298,7 +301,7 @@ public class SalesManagementModule {
         System.out.printf("%-5s%-40s%-18s%-20s%-20s%-28s%-28s\n", "ID", "Name", "Type", "Car Category", "Rate per Day ($)", "Validity Period (Start)", "Validity Period (End)");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         if (rentalRate.getStartDate() != null && rentalRate.getEndDate() != null) {
-            System.out.printf("%-5s%-40s%-18s%-20s%-20s%-28s%-28s\n", rentalRate.getRentalRateID(), rentalRate.getRentalName(), rentalRate.getRentalRateType().toString(), rentalRate.getCarCategory().getCategoryName(), rentalRate.getRatePerDay(), dateFormat.format(rentalRate.getStartDate()), dateFormat.format(rentalRate.getEndDate()));
+            System.out.printf("%-5s%-40s%-18s%-20s%-20s%-28s%-28s\n", rentalRate.getRentalRateID(), rentalRate.getRentalName(), rentalRate.getRentalRateType().toString(), rentalRate.getCarCategory().getCategoryName(), rentalRate.getRatePerDay(), dateTimeFormat.format(rentalRate.getStartDate()), dateTimeFormat.format(rentalRate.getEndDate()));
         } else {
             System.out.printf("%-5s%-40s%-18s%-20s%-20s%-28s%-28s\n", rentalRate.getRentalRateID(), rentalRate.getRentalName(), rentalRate.getRentalRateType().toString(), rentalRate.getCarCategory().getCategoryName(), rentalRate.getRatePerDay(), "null", "null");
         }
@@ -491,7 +494,7 @@ public class SalesManagementModule {
 
                     try {
                         if (!startDate.equals("null")) {
-                            rentalRate.setStartDate(dateFormat.parse(startDate));
+                            rentalRate.setStartDate(dateFormat.parse(startDate));//change to dateTime format
                         } else {
                             rentalRate.setStartDate(null);
                         }
@@ -559,8 +562,8 @@ public class SalesManagementModule {
 
         System.out.println("Rental Rate: " + rentalRate.getRentalRateID() + " successfully updated!\n");
 
-        System.out.println("Press Enter To Continue...");
-        sc.nextLine();
+//        System.out.println("Press Enter To Continue...");
+//        sc.nextLine();
 
     }
 
@@ -570,9 +573,12 @@ public class SalesManagementModule {
 
         String rentalRateName = rentalRate.getRentalName();
 
-        rentalRateSessionBeanRemote.deleteRentalRate(rentalRate.getRentalRateID());
-
-        System.out.println("Rental Rate: " + rentalRateName + " successfully deleted!\n");
+        try {
+            rentalRateSessionBeanRemote.deleteRentalRate(rentalRate.getRentalRateID());
+            System.out.println("Rental Rate: " + rentalRateName + " successfully deleted!\n");
+        } catch (DeleteRentalRateException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
+        }
 
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -592,6 +598,8 @@ public class SalesManagementModule {
 
         System.out.print("Enter Car Category> ");
         String carCategoryName = sc.nextLine().trim();
+        
+        carModel.setIsDisabled(Boolean.FALSE);
 
         try {
             Long carModelID = carModelSessionBeanRemote.createNewCarModel(carModel, carCategoryName);
@@ -637,6 +645,7 @@ public class SalesManagementModule {
             carModel = carModelSessionBeanRemote.retrieveCarModelByCarModelName(carModelName);
         } catch (CarModelNotFoundException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
+            return;
         }
         String carCategoryName = "";
         while (true) {
@@ -742,11 +751,10 @@ public class SalesManagementModule {
 
         try {
             carModelSessionBeanRemote.deleteCarModel(carModelName);
+            System.out.println("Car Model: " + carModelName + " successfully deleted!\n");
         } catch (CarModelNotFoundException | DeleteCarModelException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         } 
-        
-        System.out.println("Car Model: " + carModelName + " successfully deleted!\n");
 
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -775,7 +783,7 @@ public class SalesManagementModule {
         try {
             Long carID = carSessionBeanRemote.createNewCar(car, carModelName, outletAddress);
             System.out.println("New Car: " + carID + " succcessfully created!\n");
-        } catch (CarModelNotFoundException e) {
+        } catch (CarModelNotFoundException | CarModelDisabledException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         }
 
@@ -1043,9 +1051,12 @@ public class SalesManagementModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: Delete Car ***\n");
 
-        carSessionBeanRemote.deleteCar(car.getCarID());
-        System.out.println("Car: " + car.getLicensePlateNumber() + " successfully deleted!\n");
-
+        try {
+            carSessionBeanRemote.deleteCar(car.getCarID());
+            System.out.println("Car: " + car.getLicensePlateNumber() + " successfully deleted!\n");
+        } catch (DeleteCarException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
+        }
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }
