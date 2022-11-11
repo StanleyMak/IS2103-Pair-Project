@@ -184,18 +184,22 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             // add cars with no reservations
             if (carReservations.isEmpty() && (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR))) {
                 availableCars.add(car);
-                continue; 
+                continue;
             }
-            
+
             if (car.getCurrOutlet().getAddress().equals(pickupOutlet.getAddress())) {
                 boolean potential = true;
                 for (ReservationEntity res : carReservations) {
-                    
-                    if (pickupDateTime.compareTo(res.getEndDateTime()) < 0) {
-                        potential = false; 
-                        break; 
-                    } else if (returnDateTime.compareTo(res.getStartDateTime()) > 0) {
-                        potential = false; 
+
+//                    if (pickupDateTime.compareTo(res.getEndDateTime()) < 0) {
+//                        potential = false; 
+//                        break; 
+//                    } else if (returnDateTime.compareTo(res.getStartDateTime()) > 0) {
+//                        potential = false; 
+//                        break;
+//                    }
+                    if (pickupDateTime.compareTo(res.getEndDateTime()) < 0 && returnDateTime.compareTo(res.getStartDateTime()) > 0) {
+                        potential = false;
                         break;
                     }
                 }
@@ -217,15 +221,23 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                     LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
                     LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
                     // need to check
-                    if (startDateTime.compareTo(returnDateTimeLocal) <= 0
-                            || endDateTime.compareTo(pickupDateTimeLocal) >= 0) {
+
+                    if (pickupDateTimeLocal.compareTo(endDateTime) < 0 && returnDateTimeLocal.compareTo(startDateTime) > 0) {
                         potential = false;
                         break;
                     }
+                }
 
+//                    if (startDateTime.compareTo(returnDateTimeLocal) <= 0
+//                            || endDateTime.compareTo(pickupDateTimeLocal) >= 0) {
+//                        potential = false;
+//                        break;
+//                    }
+                if (potential) {
                     if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
                         availableCars.add(car);
                     }
+
                 }
             }
         }
@@ -243,17 +255,19 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         reservation.setCar(car);
     }
-    
-        @Override
-    public List<CarEntity> retrieveCarsFilteredByCarCategory(String carCategoryName) {
+
+    @Override
+    public List<CarEntity> retrieveCarsFilteredByCarCategory(String carCategoryName
+    ) {
         Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.model.category.categoryName = ?1")
                 .setParameter(1, carCategoryName);
         List<CarEntity> cars = query.getResultList();
         return cars;
     }
-    
+
     @Override
-    public List<CarEntity> retrieveCarsFilteredByCarMakeAndModel(String carModelMake, String carModelName) {
+    public List<CarEntity> retrieveCarsFilteredByCarMakeAndModel(String carModelMake, String carModelName
+    ) {
         Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.model.modelMake = ?1 AND c.model.modelName = ?2")
                 .setParameter(1, carModelMake)
                 .setParameter(2, carModelName);

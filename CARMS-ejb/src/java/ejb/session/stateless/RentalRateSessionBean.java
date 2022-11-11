@@ -115,6 +115,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
             total += retrieveCheapestRentalRateFeeForCurrentDay(currDate);
             currDate.plusDays(1);
         }
+        //take into account of extra time thereafter
 //        for (Date currDate.compareTo(startDateTime) == 0; currDate.compareTo(endDateTime) <= 0; currDate++) {
 //            total += retrieveCheapestRentalRateFeeForCurrentDay(currDate);
 //        }
