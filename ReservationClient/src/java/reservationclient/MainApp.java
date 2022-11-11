@@ -212,7 +212,7 @@ public class MainApp {
         List<CarEntity> availableCars = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
 
         for (CarEntity car : availableCars) {
-            System.out.println(car.getModel().getCategory().getCategoryName() + "| " + car.getModel().getModelName() + "| " + car.getModel().getModelMake() + "| " + car.getLicensePlateNumber());
+            System.out.println(car.getModel().getCategory().getCategoryName() + "| " + car.getModel().getModelName() + "| " + car.getModel().getModelMake() + "| " + car.getLicensePlateNumber() + "| " + car.getCarID());
 //            System.out.printf("%-5s%-28s%-28s%-20s%-20s%-5s\n", car.getModel().getCategory().getCategoryName(), car.getModel().getModelName(), reservation.getRentalFee(), car.getModel().getModelMake())
         }
 
