@@ -29,9 +29,6 @@ public class Main {
     @EJB(name = "CustomerSessionBeanRemote")
     private static CustomerSessionBeanRemote customerSessionBeanRemote;
     
-    
-    
-    
 
     public static void main(String[] args) {
         MainApp mainApp = new MainApp(customerSessionBeanRemote, reservationSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote);

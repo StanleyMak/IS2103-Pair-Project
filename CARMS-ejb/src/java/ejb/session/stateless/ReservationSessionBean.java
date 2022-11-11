@@ -12,6 +12,7 @@ import entity.OwnCustomerEntity;
 import entity.RentalRateEntity;
 import entity.ReservationEntity;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -153,6 +154,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     }
     
+    //review date = ?1
+    public List<ReservationEntity> retrieveReservationsForCurrentDay() {
+        Date currDay = new Date();
+        Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE r.startDateTime = ?1")
+                .setParameter(1, currDay);
+        List<ReservationEntity> reservations = query.getResultList();
+        return reservations;
+    }
     /*
     @Override
     public List<ReservationEntity> retrieveAvailableCars(Date pickupDateTime, Date returnDateTime, String pickupOutletAddress, String returnOutletAddress) {

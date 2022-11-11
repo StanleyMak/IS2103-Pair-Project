@@ -47,10 +47,6 @@ public class ReservationEntity implements Serializable {
     //@Size(min = 16, max = 16)
     private String creditCardNumber; 
     
-    //@Column(nullable = false, length = 3)
-    //@Size(min = 3, max = 3)
-    private String cvv; 
-    
     //@Temporal(TemporalType.TIMESTAMP)
     //@NotNull
     //@Column(nullable = false)
@@ -99,11 +95,10 @@ public class ReservationEntity implements Serializable {
         this.rentalRates = new ArrayList<>();
     }
 
-    public ReservationEntity(double rentalFee, String creditCardNumber, String cvv, Date startDateTime, Date endDateTime, String reservationCode, boolean onlinePayment) {
+    public ReservationEntity(double rentalFee, String creditCardNumber, Date startDateTime, Date endDateTime, String reservationCode, boolean onlinePayment) {
         this();
         this.rentalFee = rentalFee;
         this.creditCardNumber = creditCardNumber;
-        this.cvv = cvv;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.reservationCode = reservationCode;
@@ -156,14 +151,6 @@ public class ReservationEntity implements Serializable {
 
     public void setCreditCardNumber(String creditCardNumber) {
         this.creditCardNumber = creditCardNumber;
-    }
-
-    public String getCvv() {
-        return cvv;
-    }
-
-    public void setCvv(String cvv) {
-        this.cvv = cvv;
     }
 
     public Date getStartDateTime() {

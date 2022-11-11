@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarEntity;
 import entity.CarModelEntity;
 import java.util.List;
 import javax.ejb.Local;

@@ -13,7 +13,9 @@ import entity.CarEntity;
 import entity.CarModelEntity;
 import entity.EmployeeEntity;
 import entity.OutletEntity;
+import entity.OwnCustomerEntity;
 import entity.RentalRateEntity;
+import entity.ReservationEntity;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,6 +31,7 @@ import util.enumeration.RentalRateTypeEnum;
 import util.enumeration.StatusEnum;
 import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
+import util.exception.CustomerNotFoundException;
 
 /**
  *
@@ -228,41 +231,60 @@ public class DataInitSessionBean {
             em.persist(rate);
             em.flush();
             
-//            OwnCustomerEntity customer = new OwnCustomerEntity("hans", "stan");
-//            customerSessionBeanLocal.createNewCustomer(customer);
-//            
-//            try {
-//                OwnCustomerEntity test = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail("hans");
-//                System.out.println(test.getCustomerID() + " " + test.getEmail() + " " + test.getPassword());
-//            } catch (CustomerNotFoundException e) {
-//                System.out.println("lol");
-//            }
-//            
-//            try {
-//                //OwnCustomerEntity me = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail("hans");
-//       
-//                        
-//                ReservationEntity res = new ReservationEntity();
-//                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("06/12/2022 00:00"), dateTimeFormat.parse("07/12/2022 00:00"), "1", true);
-//                reservationSessionBeanLocal.createNewReservation(res, car1.getCarID(), "hans", "Outlet A", "Outlet A");
-//                //me.getReservations().add(res);
-//                
-//                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("08/12/2022 00:00"), "2", true);
-//                reservationSessionBeanLocal.createNewReservation(res, car2.getCarID(), "hans", "Outlet A", "Outlet B");
-//                
-//                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("09/12/2022 00:00"), "3", true);
-//                reservationSessionBeanLocal.createNewReservation(res, car3.getCarID(), "hans", "Outlet B", "Outlet C");
-//                
-//                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("09/12/2022 12:00"), dateTimeFormat.parse("07/12/2022 00:00"), "4", true);
-//                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
-//            
-//                
-//                
-//            } catch (ParseException | CustomerNotFoundException e) {
-//                System.out.println("Error: " + e.getMessage() + "!\n");
-//            } 
-//            
-//          /*Initialising Partner*/
+            
+            
+            
+            OwnCustomerEntity customer = new OwnCustomerEntity("hans", "stan");
+            customerSessionBeanLocal.createNewCustomer(customer);
+            
+            try {
+                OwnCustomerEntity test = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail("hans");
+                System.out.println(test.getCustomerID() + " " + test.getEmail() + " " + test.getPassword());
+            } catch (CustomerNotFoundException e) {
+                System.out.println("lol");
+            }
+            
+            try {
+                OwnCustomerEntity me = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail("hans");
+       
+                        
+                ReservationEntity res = new ReservationEntity();
+                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("06/12/2022 00:00"), dateTimeFormat.parse("07/12/2022 00:00"), "1", true);
+                reservationSessionBeanLocal.createNewReservation(res, car1.getCarID(), "hans", "Outlet A", "Outlet A");
+                //me.getReservations().add(res);
+                
+                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("08/12/2022 00:00"), "2", true);
+                reservationSessionBeanLocal.createNewReservation(res, car2.getCarID(), "hans", "Outlet A", "Outlet B");
+                
+                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("09/12/2022 00:00"), "3", true);
+                reservationSessionBeanLocal.createNewReservation(res, car3.getCarID(), "hans", "Outlet B", "Outlet C");
+                
+                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("09/12/2022 12:00"), dateTimeFormat.parse("07/12/2022 00:00"), "4", true);
+                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
+
+                res = new ReservationEntity(10, "", "1", dateTimeFormat.parse("06/12/2022 14:00"), dateTimeFormat.parse("10/12/2022 12:00"), "1", true); // outlet B
+                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
+                
+                res = new ReservationEntity(10, "", "2", dateTimeFormat.parse("06/12/2022 08:00"), dateTimeFormat.parse("08/12/2022 23:00"), "2", true); // outlet C
+                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet C");
+                
+                res = new ReservationEntity(20, "", "1", dateTimeFormat.parse("05/12/2022 10:00"), dateTimeFormat.parse("06/12/2022 10:00"), "3", true); // outlet A // car 1
+                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
+                
+                res = new ReservationEntity(20, "", "1", dateTimeFormat.parse("06/12/2022 14:00"), dateTimeFormat.parse("07/12/2022 08:00"), "4", true); // outlet A // car 2
+                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
+                
+                res = new ReservationEntity(30, "", "1", dateTimeFormat.parse("07/12/2022 10:00"), dateTimeFormat.parse("09/12/2022 10:00"), "5", true); // outlet A // car 3
+                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
+                
+                res = new ReservationEntity(40, "", "1", dateTimeFormat.parse("12/12/2022 10:00"), dateTimeFormat.parse("13/12/2022 10:00"), "6", true); 
+                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
+            
+            } catch (ParseException | CustomerNotFoundException e) {
+                System.out.println("Error: " + e.getMessage() + "!\n");
+            } 
+            
+          /*Initialising Partner*/
             //Partner partner = new Partner("Holiday.com");
             
         } catch (ParseException e) {

@@ -14,6 +14,7 @@ import javax.ejb.Local;
 import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
 import util.exception.DeleteCarException;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -45,4 +46,10 @@ public interface CarSessionBeanLocal {
     public List<CarEntity> doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet);
 
     public List<CarEntity> retrieveAllCarsOfCarCategory(String carCategoryName);
+
+    public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException;
+    
+    public List<CarEntity> retrieveCarsFilteredByCarCategory(String carCategoryName);
+
+    public List<CarEntity> retrieveCarsFilteredByCarMakeAndModel(String carModelMake, String carModelName);
 }

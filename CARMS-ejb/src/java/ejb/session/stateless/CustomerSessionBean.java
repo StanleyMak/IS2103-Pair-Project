@@ -7,6 +7,8 @@ package ejb.session.stateless;
 
 import entity.CustomerEntity;
 import entity.OwnCustomerEntity;
+import entity.ReservationEntity;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -91,6 +93,35 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         } catch (CustomerNotFoundException ex) {
             throw new InvalidLoginCredentialException("Invalid email or password");
         }
+    }
+    
+    @Override
+    public List<CustomerEntity> retrieveAllCustomers() {
+        Query query = em.createQuery("SELECT c FROM CustomerEntity c");
+        List<CustomerEntity> customers = query.getResultList();
+        return customers;
+    }
+    
+    private Boolean containsReservationID(CustomerEntity customer, Long reservationID) {
+        List<ReservationEntity> reservations = customer.getReservations();
+        for (ReservationEntity reservation : reservations) {
+            if (reservation.getReservationID()== reservationID) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    //review return type
+    @Override
+    public CustomerEntity retrieveCustomerOfReservationID(Long reservationID) {
+        List<CustomerEntity> customers = retrieveAllCustomers(); 
+        for (CustomerEntity customer : customers) {
+            if (containsReservationID(customer, reservationID)) {
+                return customer;
+            }
+        }
+        return new CustomerEntity();
     }
 
 }

@@ -200,7 +200,7 @@ public class SalesManagementModule {
         System.out.print("Enter Car Category> ");
         String carCategoryName = sc.nextLine().trim();
 
-        System.out.println("Enter Rental Rate Type> ");
+        System.out.println("Select Rental Rate Type: ");
         Integer response = 0;
 
         while (true) {
@@ -614,17 +614,17 @@ public class SalesManagementModule {
 
     private void doViewAllModels() {
         Scanner sc = new Scanner(System.in);
-        System.out.println("*** CaRMS :: Sales Management (Operations) :: View All Models ***\n"); // display disabled status!!!!!!!!!!!!!!!
+        System.out.println("*** CaRMS :: Sales Management (Operations) :: View All Models ***\n");
 
         List<CarModelEntity> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
 
         System.out.println("Car Model Records:");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("%-5s%-5s%-40s%-15s%-15s\n", "No.", "ID", "Car Category", "Make", "Model");
+        System.out.printf("%-5s%-5s%-40s%-15s%-15s%-10s\n", "No.", "ID", "Car Category", "Make", "Model", "Disabled");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         int i = 1;
         for (CarModelEntity carModel : carModels) {
-            System.out.printf("%-5s%-5s%-40s%-15s%-15s\n", i, carModel.getCarModelID(), carModel.getCategory().getCategoryName(), carModel.getModelMake(), carModel.getModelName());
+            System.out.printf("%-5s%-5s%-40s%-15s%-15s%-10s\n", i, carModel.getCarModelID(), carModel.getCategory().getCategoryName(), carModel.getModelMake(), carModel.getModelName(), carModel.getIsDisabled());
             i++;
         }
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -798,11 +798,11 @@ public class SalesManagementModule {
 
         System.out.println("Car Records:");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("%-5s%-40s%-15s%-30s%-15s%-15s%-15s\n", "ID", "License Plate Number", "Colour", "Category", "Make", "Model", "Status"/*, "Outlet"*/);
+        System.out.printf("%-5s%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", "ID", "License Plate Number", "Colour", "Category", "Make", "Model", "Status", "Outlet Address");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         int i = 1;
         for (CarEntity car : cars) {
-            System.out.printf("%-5s%-40s%-15s%-30s%-15s%-15s%-15s\n", car.getCarID(), car.getLicensePlateNumber(), car.getColour(), car.getModel().getCategory().getCategoryName(), car.getModel().getModelMake(), car.getModel().getModelName(), car.getStatus().toString()/*, car.getOutlet().getOutletAddress()*/);
+            System.out.printf("%-5s%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", car.getCarID(), car.getLicensePlateNumber(), car.getColour(), car.getModel().getCategory().getCategoryName(), car.getModel().getModelMake(), car.getModel().getModelName(), car.getStatus().toString(), car.getCurrOutlet().getAddress());
             i++;
         }
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -820,9 +820,9 @@ public class SalesManagementModule {
 
         System.out.println("Car Record:");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("%-5s%-40s%-15s%-30s%-15s%-15s%-15s\n", "ID", "License Plate Number", "Colour", "Category", "Make", "Model", "Status"/*, "Outlet"*/);
+        System.out.printf("%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", "ID", "License Plate Number", "Colour", "Category", "Make", "Model", "Status", "Outlet Address");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("%-5s%-40s%-15s%-30s%-15s%-15s%-15s\n", car.getCarID(), car.getLicensePlateNumber(), car.getColour(), car.getModel().getCategory().getCategoryName(), car.getModel().getModelMake(), car.getModel().getModelName(), car.getStatus().toString()/*, car.getOutlet().getOutletAddress()*/);
+        System.out.printf("%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", car.getCarID(), car.getLicensePlateNumber(), car.getColour(), car.getModel().getCategory().getCategoryName(), car.getModel().getModelMake(), car.getModel().getModelName(), car.getStatus().toString(), car.getCurrOutlet().getAddress());
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.println();
 

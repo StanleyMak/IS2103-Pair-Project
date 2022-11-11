@@ -7,6 +7,8 @@ package ejb.session.stateless;
 
 import entity.CarCategoryEntity;
 import entity.RentalRateEntity;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -104,5 +106,26 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
             rentalRate.setIsDisabled(Boolean.TRUE);
             throw new DeleteRentalRateException("Rental Rate ID " + rentalRateID + " is associated with existing reservation(s) and cannot be deleted!");
         }
+    }
+    
+    public double computeCheapestRentalRateFee(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        double total = 0;
+        LocalDateTime currDate = startDateTime;
+        while (currDate.compareTo(endDateTime) <= 0) {
+            total += retrieveCheapestRentalRateFeeForCurrentDay(currDate);
+            currDate.plusDays(1);
+        }
+//        for (Date currDate.compareTo(startDateTime) == 0; currDate.compareTo(endDateTime) <= 0; currDate++) {
+//            total += retrieveCheapestRentalRateFeeForCurrentDay(currDate);
+//        }
+        return total;
+    }
+    
+    //check if returns double or returns rentalRate
+    public double retrieveCheapestRentalRateFeeForCurrentDay(LocalDateTime today) {
+        Query query = em.createQuery("SELECT MIN(r.ratePerDay) FROM RentalRateEntity r WHERE r.startDate <= ?1 AND r.endDate >= ?1")
+                .setParameter(1, today);
+        double rentalRateFee = (double) query.getSingleResult();
+        return rentalRateFee;
     }
 }

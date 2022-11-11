@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.CustomerEntity;
 import entity.OwnCustomerEntity;
+import java.util.List;
 import javax.ejb.Local;
 import util.exception.CustomerNotFoundException;
 import util.exception.InvalidLoginCredentialException;
@@ -29,5 +30,9 @@ public interface CustomerSessionBeanLocal {
     public CustomerEntity retrieveCustomerByCustomerEmail(String email) throws CustomerNotFoundException;
 
     public OwnCustomerEntity retrieveOwnCustomerByOwnCustomerEmail(String email) throws CustomerNotFoundException;
+
+    public List<CustomerEntity> retrieveAllCustomers();
+
+    public CustomerEntity retrieveCustomerOfReservationID(Long reservationID);
     
 }
