@@ -34,7 +34,7 @@ import util.exception.ReservationNotFoundException;
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
 
     @EJB(name = "ReservationSessionBeanLocal")
-    private ReservationSessionBeanLocal reservationSessionBean;
+    private ReservationSessionBeanLocal reservationSessionBeanLocal;
 
     @EJB(name = "OutletSessionBeanLocal")
     private OutletSessionBeanLocal outletSessionBeanLocal;
@@ -43,7 +43,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     private CarModelSessionBeanLocal carModelSessionBeanLocal;
 
     @EJB(name = "CustomerSessionBeanLocal")
-    private CustomerSessionBeanLocal customerSessionBean;
+    private CustomerSessionBeanLocal customerSessionBeanLocal;
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
@@ -137,7 +137,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     public void deleteCar(Long carID) throws DeleteCarException {
         CarEntity car = retrieveCarByCarID(carID);
 
-        if (reservationSessionBean.retrieveReservationsOfCarID(carID).isEmpty()) {
+        if (reservationSessionBeanLocal.retrieveReservationsOfCarID(carID).isEmpty()) {
             em.remove(car);
         } else {
             car.setStatus(StatusEnum.DISABLED);
@@ -160,7 +160,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     public void returnCar(String reservationCode) {
         ReservationEntity reservation = new ReservationEntity();
         try {
-            reservation = reservationSessionBean.retrieveReservationByReservationCode(reservationCode);
+            reservation = reservationSessionBeanLocal.retrieveReservationByReservationCode(reservationCode);
         } catch (ReservationNotFoundException ex) {
             System.out.println("Reservation does not exist " + ex.getMessage());
         }
@@ -178,7 +178,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
         // available cars = cars that do not have any reservation recrods at specified date
         for (CarEntity car : cars) {
-            List<ReservationEntity> carReservations = reservationSessionBean.retrieveReservationsOfCarID(car.getCarID());
+            List<ReservationEntity> carReservations = reservationSessionBeanLocal.retrieveReservationsOfCarID(car.getCarID());
             if (car.getCurrOutlet().getAddress().equals(pickupOutlet.getAddress())) {
                 boolean potential = true;
                 for (ReservationEntity res : carReservations) {
@@ -221,6 +221,35 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             }
         }
         return availableCars;
+    }
+
+    @Override
+    public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException {
+        CarEntity car = retrieveCarByCarID(carID);
+        ReservationEntity reservation = null;
+        try {
+            reservation = reservationSessionBeanLocal.retrieveReservationByID(reservationID);
+        } catch (ReservationNotFoundException e) {
+            throw new ReservationNotFoundException("Reservation " + reservationID + " not found");
+        }
+        reservation.setCar(car);
+    }
+    
+        @Override
+    public List<CarEntity> retrieveCarsFilteredByCarCategory(String carCategoryName) {
+        Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.model.category.categoryName = ?1")
+                .setParameter(1, carCategoryName);
+        List<CarEntity> cars = query.getResultList();
+        return cars;
+    }
+    
+    @Override
+    public List<CarEntity> retrieveCarsFilteredByCarMakeAndModel(String carModelMake, String carModelName) {
+        Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.model.modelMake = ?1 AND c.model.modelName = ?2")
+                .setParameter(1, carModelMake)
+                .setParameter(2, carModelName);
+        List<CarEntity> cars = query.getResultList();
+        return cars;
     }
 
 }
