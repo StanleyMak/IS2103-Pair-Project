@@ -489,12 +489,12 @@ public class SalesManagementModule {
                 sc.nextLine();
 
                 if (response == 1) {
-                    System.out.print("Enter Start Date (DD/MM/YYYY)> ");
+                    System.out.print("Enter Start Date (DD/MM/YYYY hh:mm)> ");
                     String startDate = sc.nextLine().trim();
 
                     try {
                         if (!startDate.equals("null")) {
-                            rentalRate.setStartDate(dateFormat.parse(startDate));//change to dateTime format
+                            rentalRate.setStartDate(dateTimeFormat.parse(startDate));
                         } else {
                             rentalRate.setStartDate(null);
                         }
@@ -526,12 +526,12 @@ public class SalesManagementModule {
                 sc.nextLine();
 
                 if (response == 1) {
-                    System.out.print("Enter End Date (DD/MM/YYYY)> ");
+                    System.out.print("Enter End Date (DD/MM/YYYY hh:mm)> ");
                     String endDate = sc.nextLine().trim();
 
                     try {
                         if (!endDate.equals("null")) {
-                            rentalRate.setEndDate(dateFormat.parse(endDate));
+                            rentalRate.setEndDate(dateTimeFormat.parse(endDate));
                         } else {
                             rentalRate.setEndDate(null);
                         }
