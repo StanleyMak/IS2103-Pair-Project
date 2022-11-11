@@ -35,15 +35,19 @@ public class CarModelEntity implements Serializable {
     //@Column(nullable = false, length = 64)
     private String modelMake;
     
+    private Boolean isDisabled;
+    
     //@ManyToOne(optional = false)
     //@JoinColumn(nullable = false)
     @ManyToOne
     private CarCategoryEntity category;
 
     public CarModelEntity() {
+        this.isDisabled = false;
     }
 
     public CarModelEntity(String modelMake, String modelName, CarCategoryEntity category) {
+        this();
         this.modelName = modelName;
         this.modelMake = modelMake;
         this.category = category;
@@ -110,6 +114,14 @@ public class CarModelEntity implements Serializable {
      */
     public void setModelMake(String modelMake) {
         this.modelMake = modelMake;
+    }
+
+    public Boolean getIsDisabled() {
+        return isDisabled;
+    }
+
+    public void setIsDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
     }
     
 }

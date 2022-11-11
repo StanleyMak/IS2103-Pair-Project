@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -14,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -88,11 +90,17 @@ public class ReservationEntity implements Serializable {
     
     @OneToOne
     private CarModelEntity carModel;
+    
+    @ManyToMany
+    private List<RentalRateEntity> rentalRates;
+    
 
     public ReservationEntity() {
+        this.rentalRates = new ArrayList<>();
     }
 
     public ReservationEntity(double rentalFee, String creditCardNumber, String cvv, Date startDateTime, Date endDateTime, String reservationCode, boolean onlinePayment) {
+        this();
         this.rentalFee = rentalFee;
         this.creditCardNumber = creditCardNumber;
         this.cvv = cvv;
@@ -237,6 +245,14 @@ public class ReservationEntity implements Serializable {
 
     public void setCarModel(CarModelEntity carModel) {
         this.carModel = carModel;
+    }
+
+    public List<RentalRateEntity> getRentalRates() {
+        return rentalRates;
+    }
+
+    public void setRentalRates(List<RentalRateEntity> rentalRates) {
+        this.rentalRates = rentalRates;
     }
 
     

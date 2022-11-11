@@ -9,7 +9,9 @@ import entity.CarEntity;
 import entity.CustomerEntity;
 import entity.OutletEntity;
 import entity.OwnCustomerEntity;
+import entity.RentalRateEntity;
 import entity.ReservationEntity;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -43,7 +45,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     
     @Override
     public Long createNewReservation(ReservationEntity reservation, Long carID, String email, String returnOutletAddress, String pickupOutletAddress) throws CustomerNotFoundException {
-        
+        //AUTO ASSIGN THE CHEAPEST RENTAL RATE PER DAY!!!!!!!!!!!!!!
         // missing partner
         
         CarEntity car = carSessionBean.retrieveCarByCarID(carID);
@@ -126,6 +128,29 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 .setParameter(1, carID); 
         List<ReservationEntity> reservations = query.getResultList(); 
         return reservations; 
+    }
+    
+    private Boolean containsRentalRateID(ReservationEntity res, Long rentalRateID) {
+        List<RentalRateEntity> rentalRates = res.getRentalRates();
+        for (RentalRateEntity rentalRate : rentalRates) {
+            if (rentalRate.getRentalRateID() == rentalRateID) {
+                return true;
+            }
+        }
+        return false;
+    }
+            
+    @Override
+    public List<ReservationEntity> retrieveReservationsOfRentalRateID(Long rentalRateID) {
+        List<ReservationEntity> correctReservations = new ArrayList<>();
+        List<ReservationEntity> reservations = retrieveAllReservations(); 
+        for (ReservationEntity res : reservations) {
+            if (containsRentalRateID(res, rentalRateID)) {
+                correctReservations.add(res);
+            }
+        }
+        return correctReservations;
+
     }
     
     /*

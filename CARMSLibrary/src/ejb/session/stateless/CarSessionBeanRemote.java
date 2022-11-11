@@ -11,7 +11,9 @@ import entity.ReservationEntity;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
+import util.exception.DeleteCarException;
 
 /**
  *
@@ -20,7 +22,7 @@ import util.exception.CarModelNotFoundException;
 @Remote
 public interface CarSessionBeanRemote {
 
-    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException;
+    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException, CarModelDisabledException;
 
     public CarEntity retrieveCarByCarID(Long carID);
 
@@ -30,7 +32,7 @@ public interface CarSessionBeanRemote {
 
     public void updateCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException;
 
-    public void deleteCar(Long carID);
+    public void deleteCar(Long carID) throws DeleteCarException;
 
     public List<CarEntity> retrieveAllCarsOfCarModel(String carModelName);
 
@@ -41,4 +43,7 @@ public interface CarSessionBeanRemote {
     public void returnCar(String reservationCode);
     
     public List<CarEntity> doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet);
+    
+    public List<CarEntity> retrieveAllCarsOfCarCategory(String carCategoryName);
+    
 }

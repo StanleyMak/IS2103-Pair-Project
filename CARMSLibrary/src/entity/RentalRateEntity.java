@@ -47,15 +47,19 @@ public class RentalRateEntity implements Serializable, Comparable<RentalRateEnti
     //@Column(nullable = false, length = 64)
     private Date endDate;
     
+    private Boolean isDisabled;
+    
     //@ManyToOne(optional = false)
     //@JoinColumn(nullable = false)
     @ManyToOne
     private CarCategoryEntity carCategory;
 
     public RentalRateEntity() {
+        this.isDisabled = false;
     }
 
     public RentalRateEntity(String rentalName, RentalRateTypeEnum rentalRateType, CarCategoryEntity carCategory, double ratePerDay, Date startDate, Date endDate) {
+        this();
         this.rentalName = rentalName;
         this.ratePerDay = ratePerDay;
         this.startDate = startDate;
@@ -169,6 +173,14 @@ public class RentalRateEntity implements Serializable, Comparable<RentalRateEnti
      */
     public void setRentalRateType(RentalRateTypeEnum rentalRateType) {
         this.rentalRateType = rentalRateType;
+    }
+
+    public Boolean getIsDisabled() {
+        return isDisabled;
+    }
+
+    public void setIsDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
     }
 
 }

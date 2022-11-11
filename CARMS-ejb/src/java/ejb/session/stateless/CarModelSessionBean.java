@@ -12,6 +12,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.CarCategoryNotFoundException;
@@ -39,6 +40,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     @Override
     public Long createNewCarModel(CarModelEntity carModel, String carCategoryName) throws CarModelNameExistsException, CarCategoryNotFoundException {
 
+        // ONLY CREATE WITH MODELS THAT ARE NOT DISABLED
         CarCategoryEntity carCategory = null;
         try {
             carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
@@ -48,7 +50,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
 
         try {
             CarModelEntity thisCarModel = retrieveCarModelByCarModelName(carModel.getModelName());
-            throw new CarModelNotFoundException("Car Model Not Found");
+            throw new CarModelNameExistsException("Car Model Name: " + carModel.getModelName() + " already exists");
         } catch (CarModelNotFoundException e) {
             carModel.setCategory(carCategory);
             em.persist(carModel);
@@ -75,11 +77,12 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     public CarModelEntity retrieveCarModelByCarModelName(String carModelName) throws CarModelNotFoundException {
         Query query = em.createQuery("SELECT c FROM CarModelEntity c WHERE c.modelName = ?1")
                 .setParameter(1, carModelName);
-        if (query != null) {
-            CarModelEntity carModel = (CarModelEntity) query.getSingleResult();
+        CarModelEntity carModel = null;
+        try {
+            carModel = (CarModelEntity) query.getSingleResult(); // no result exception
             //carModel.getXX().size();
             return carModel;
-        } else {
+        } catch (NoResultException e) {
             throw new CarModelNotFoundException("Car Model Name " + carModelName + " does not exist!");
         }
 
@@ -114,6 +117,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         }
 
     }
+   
 
     @Override
     public void deleteCarModel(String carModelName) throws CarModelNotFoundException, DeleteCarModelException {
@@ -123,6 +127,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         if (carSessionBeanLocal.retrieveAllCarsOfCarModel(carModelName).isEmpty()) {
             em.remove(carModel);
         } else {
+            carModel.setIsDisabled(Boolean.TRUE);
             throw new DeleteCarModelException("Car Model Name " + carModelName + " is associated with existing car(s) and cannot be deleted!");
         }
     }
