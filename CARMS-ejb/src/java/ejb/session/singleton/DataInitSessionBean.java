@@ -65,8 +65,8 @@ public class DataInitSessionBean {
 
     private void initialiseData() {
         
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
         try {
             /*Initialising Outlets*/
