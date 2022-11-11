@@ -11,14 +11,12 @@ import ejb.session.stateless.ReservationSessionBeanLocal;
 import entity.CarCategoryEntity;
 import entity.CarEntity;
 import entity.CarModelEntity;
-import entity.CustomerEntity;
 import entity.EmployeeEntity;
 import entity.OutletEntity;
-import entity.OwnCustomerEntity;
 import entity.RentalRateEntity;
-import entity.ReservationEntity;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -31,7 +29,6 @@ import util.enumeration.RentalRateTypeEnum;
 import util.enumeration.StatusEnum;
 import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
-import util.exception.CustomerNotFoundException;
 
 /**
  *
@@ -71,7 +68,7 @@ public class DataInitSessionBean {
 
         try {
             /*Initialising Outlets*/
-            OutletEntity outletA = new OutletEntity("Outlet A", null, null);
+            OutletEntity outletA = new OutletEntity("Outlet A", null, null);//24 hours
             em.persist(outletA);
             em.flush();
             
@@ -79,7 +76,9 @@ public class DataInitSessionBean {
             em.persist(outletB);
             em.flush();
             
-            OutletEntity outletC = new OutletEntity("Outlet C", timeFormat.parse("10:00"), timeFormat.parse("22:00"));
+            Date openingHours = timeFormat.parse("08:00");
+            Date closingHours = timeFormat.parse("22:00");
+            OutletEntity outletC = new OutletEntity("Outlet C", openingHours, closingHours);
             em.persist(outletC);
             em.flush();
 

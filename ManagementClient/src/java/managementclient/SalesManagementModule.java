@@ -614,7 +614,7 @@ public class SalesManagementModule {
 
     private void doViewAllModels() {
         Scanner sc = new Scanner(System.in);
-        System.out.println("*** CaRMS :: Sales Management (Operations) :: View All Models ***\n");
+        System.out.println("*** CaRMS :: Sales Management (Operations) :: View All Models ***\n"); // display disabled status!!!!!!!!!!!!!!!
 
         List<CarModelEntity> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
 
@@ -738,8 +738,6 @@ public class SalesManagementModule {
 
         System.out.println("Car Model: " + carModel.getModelName() + " successfully updated!\n");
 
-        System.out.println("Press Enter To Continue...");
-        sc.nextLine();
     }
 
     private void doDeleteModel() {

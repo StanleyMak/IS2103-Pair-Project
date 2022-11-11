@@ -177,7 +177,7 @@ public class MainApp {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: Search Car (Visitor) ***\n");
 
-        System.out.print("Enter Start Date (DD/MM/YYYY Hours:Minutes (24hr format)> ");
+        System.out.print("Enter Start Date (DD/MM/YYYY hh:mm) (24hr format)> ");
         String startDateTime = sc.nextLine();
         // converting input time to HH:mm format
         Date pickupDateTime = dateTimeFormat.parse(startDateTime);
@@ -190,10 +190,10 @@ public class MainApp {
         LocalTime outletOpeningHours = LocalDateTime.ofInstant(pickupOutlet.getOpenHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
 
         if (pickupTime.isBefore(outletOpeningHours)) {
-            System.out.println("Invalid pick up time, outlet opens at: " + outletOpeningHours);
+            System.out.println("Invalid Pick Up Time! Outlet opens at: " + outletOpeningHours);
         }
 
-        System.out.print("Enter End Date (DD/MM/YYYY HH:mm (24hr format))> ");
+        System.out.print("Enter End Date (DD/MM/YYYY hh:mm (24hr format))> ");
         String endDateTime = sc.nextLine();
         Date returnDateTime = dateTimeFormat.parse(endDateTime);
         LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
@@ -212,7 +212,7 @@ public class MainApp {
         List<CarEntity> availableCars = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
 
         for (CarEntity car : availableCars) {
-            System.out.println(car.getModel().getCategory().getCategoryName() + "| " + car.getModel().getModelName() + "| " + car.getModel().getModelMake() + "| ");
+            System.out.println(car.getModel().getCategory().getCategoryName() + "| " + car.getModel().getModelName() + "| " + car.getModel().getModelMake() + "| " + car.getLicensePlateNumber());
 //            System.out.printf("%-5s%-28s%-28s%-20s%-20s%-5s\n", car.getModel().getCategory().getCategoryName(), car.getModel().getModelName(), reservation.getRentalFee(), car.getModel().getModelMake())
         }
 

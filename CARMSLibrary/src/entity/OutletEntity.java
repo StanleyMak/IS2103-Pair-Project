@@ -6,6 +6,8 @@
 package entity;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +17,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -24,6 +28,8 @@ import javax.persistence.OneToMany;
 public class OutletEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletID;
@@ -33,9 +39,11 @@ public class OutletEntity implements Serializable {
     private String address;
     
     //@Column(nullable = false)
+    @Temporal(TemporalType.TIME)
     private Date openHour;
     
     //@Column(nullable = false)
+    @Temporal(TemporalType.TIME)
     private Date closeHour;
 
     public OutletEntity() {
@@ -44,8 +52,21 @@ public class OutletEntity implements Serializable {
     public OutletEntity(String address, Date openHour, Date closeHour) {
         this();
         this.address = address;
-        this.openHour = openHour;
-        this.closeHour = closeHour;
+        try {
+            if (openHour == null) {
+                this.openHour = timeFormat.parse("00:00");
+            } else {
+                this.openHour = openHour;
+            }
+            if (closeHour == null) {
+                this.closeHour = timeFormat.parse("23:59");
+            } else {
+                this.closeHour = closeHour;
+            }
+        } catch (ParseException e) {
+            System.out.println("Invalid Time Format!");
+        }
+        
     }
     
     public Long getOutletID() {
