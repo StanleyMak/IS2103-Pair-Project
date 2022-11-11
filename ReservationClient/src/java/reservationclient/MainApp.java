@@ -41,9 +41,9 @@ public class MainApp {
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private OwnCustomerEntity loggedInCustomer;
 
-    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    private SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
     public MainApp() {
         this.loggedInCustomer = null;
@@ -155,8 +155,6 @@ public class MainApp {
     }
 
     public void doRegisterAsCustomer() {
-        // hanyang test data
-
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client ::  ***\n");
         OwnCustomerEntity newCustomer = new OwnCustomerEntity();
@@ -181,7 +179,7 @@ public class MainApp {
 
         System.out.print("Enter Start Date (DD/MM/YYYY Hours:Minutes (24hr format)> ");
         String startDateTime = sc.nextLine();
-        // converting input time to hh:mm format
+        // converting input time to HH:mm format
         Date pickupDateTime = dateTimeFormat.parse(startDateTime);
         LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
         LocalTime pickupTime = pickupDateTimeLocal.toLocalTime();
@@ -195,7 +193,7 @@ public class MainApp {
             System.out.println("Invalid pick up time, outlet opens at: " + outletOpeningHours);
         }
 
-        System.out.print("Enter End Date (DD/MM/YYYY hh:mm (24hr format))> ");
+        System.out.print("Enter End Date (DD/MM/YYYY HH:mm (24hr format))> ");
         String endDateTime = sc.nextLine();
         Date returnDateTime = dateTimeFormat.parse(endDateTime);
         LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
@@ -214,7 +212,7 @@ public class MainApp {
         List<CarEntity> availableCars = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
 
         for (CarEntity car : availableCars) {
-            System.out.print(car.getModel().getCategory().getCategoryName() + "   " + car.getModel().getModelName() + "  " + car.getModel().getModelMake() + "  ");
+            System.out.println(car.getModel().getCategory().getCategoryName() + "| " + car.getModel().getModelName() + "| " + car.getModel().getModelMake() + "| ");
         }
 
         System.out.println("Press Enter To Continue...");

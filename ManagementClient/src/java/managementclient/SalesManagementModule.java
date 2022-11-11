@@ -51,9 +51,9 @@ public class SalesManagementModule {
 
     private EmployeeEntity currentEmployee;
 
-    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    private SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
     public SalesManagementModule() {
 //        this.validatorFactory = Validation.buildDefaultValidatorFactory();
