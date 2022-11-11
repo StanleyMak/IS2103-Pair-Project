@@ -210,6 +210,7 @@ public class MainApp {
             System.out.println("Invalid return time, outlet closes at: " + outletClosingHours);
         }
 
+        //return list of abled cars
         List<CarEntity> availableCars = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
 
         for (CarEntity car : availableCars) {
