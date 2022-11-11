@@ -176,21 +176,32 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         List<CarEntity> cars = retrieveAllCars();
         List<CarEntity> availableCars = new ArrayList<>();
 
-        // available cars = cars that do not have any reservation recrods at specified date
+        // available cars = cars that do not have any reservation recrods at specified date + cars with no reservations
         for (CarEntity car : cars) {
             List<ReservationEntity> carReservations = reservationSessionBeanLocal.retrieveReservationsOfCarID(car.getCarID());
+            // add cars with no reservations
+            if (carReservations.isEmpty() && (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR))) {
+                availableCars.add(car);
+                continue; 
+            }
+            
             if (car.getCurrOutlet().getAddress().equals(pickupOutlet.getAddress())) {
                 boolean potential = true;
                 for (ReservationEntity res : carReservations) {
-                    if (res.getStartDateTime().compareTo(returnDateTime) <= 0
-                            || res.getEndDateTime().compareTo(pickupDateTime) >= 0) {
-                        potential = false;
+                    
+                    if (pickupDateTime.compareTo(res.getEndDateTime()) < 0) {
+                        potential = false; 
+                        break; 
+                    } else if (returnDateTime.compareTo(res.getStartDateTime()) > 0) {
+                        potential = false; 
                         break;
                     }
                 }
 
                 if (potential) {
-                    availableCars.add(car);
+                    if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
+                        availableCars.add(car);
+                    }
                 }
             } else {
                 boolean potential = true;
@@ -203,18 +214,14 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
                     LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
                     LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
-
-                    if (startDateTime.compareTo(returnDateTimeLocal) <= 0) {
-                        carReservations.remove(res);
-                    }
-
+                    // need to check
                     if (startDateTime.compareTo(returnDateTimeLocal) <= 0
                             || endDateTime.compareTo(pickupDateTimeLocal) >= 0) {
                         potential = false;
                         break;
                     }
 
-                    if (potential) {
+                    if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
                         availableCars.add(car);
                     }
                 }
