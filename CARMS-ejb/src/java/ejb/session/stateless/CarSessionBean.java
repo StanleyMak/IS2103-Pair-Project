@@ -178,7 +178,9 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
         // available cars = cars that do not have any reservation recrods at specified date + cars with no reservations
         for (CarEntity car : cars) {
+
             List<ReservationEntity> carReservations = reservationSessionBeanLocal.retrieveReservationsOfCarID(car.getCarID());
+
             // add cars with no reservations
             if (carReservations.isEmpty() && (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR))) {
                 availableCars.add(car);
