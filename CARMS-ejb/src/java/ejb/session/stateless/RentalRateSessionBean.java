@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.DeleteRentalRateException;
 
 /**
  *
@@ -21,6 +22,9 @@ import util.exception.CarCategoryNotFoundException;
  */
 @Stateless
 public class RentalRateSessionBean implements RentalRateSessionBeanRemote, RentalRateSessionBeanLocal {
+
+    @EJB(name = "ReservationSessionBeanLocal")
+    private ReservationSessionBeanLocal reservationSessionBeanLocal;
 
     @EJB(name = "CarCategorySessionBeanLocal")
     private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
@@ -85,11 +89,20 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
     
     @Override
-    public void deleteRentalRate(Long rentalRateID) {
+    public void deleteRentalRate(Long rentalRateID) throws DeleteRentalRateException {
         RentalRateEntity rentalRate = retrieveRentalRateByRentalRateID(rentalRateID);
         
         //dissociate
         
         em.remove(rentalRate);
+        
+       
+
+        if (reservationSessionBeanLocal.retrieveReservationsOfRentalRateID(rentalRateID).isEmpty()) {
+            em.remove(rentalRate);
+        } else {
+            rentalRate.setIsDisabled(Boolean.TRUE);
+            throw new DeleteRentalRateException("Rental Rate ID " + rentalRateID + " is associated with existing reservation(s) and cannot be deleted!");
+        }
     }
 }

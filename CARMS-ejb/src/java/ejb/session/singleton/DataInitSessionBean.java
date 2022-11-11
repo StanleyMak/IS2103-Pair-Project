@@ -29,6 +29,7 @@ import javax.persistence.PersistenceContext;
 import util.enumeration.EmployeeAccessRightEnum;
 import util.enumeration.RentalRateTypeEnum;
 import util.enumeration.StatusEnum;
+import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CustomerNotFoundException;
 
@@ -151,7 +152,7 @@ public class DataInitSessionBean {
             CarModelEntity bmw5Series = new CarModelEntity("BMW", "5 Series", luxurySedan);
             em.persist(bmw5Series);
             em.flush();
-            CarModelEntity audiA6 = new CarModelEntity("Audi", "A6", luxurySedan);
+            CarModelEntity audiA6 = new CarModelEntity("Audi", "A6", luxurySedan); //put in isdisabled = false
             em.persist(audiA6);
             em.flush();
 
@@ -160,7 +161,7 @@ public class DataInitSessionBean {
             try {
                 car1 = new CarEntity("SS00A1TC", toyotaCorolla, StatusEnum.AVAILABLE, outletA);
                 carSessionBeanLocal.createNewCar(car1, car1.getModel().getModelName(), car1.getCurrOutlet().getAddress());
-            } catch (CarModelNotFoundException carModelNotFoundException) {
+            } catch (CarModelNotFoundException | CarModelDisabledException e) {
                 System.out.println("hi");
             }
 //            em.persist(car1);
@@ -228,39 +229,39 @@ public class DataInitSessionBean {
             em.persist(rate);
             em.flush();
             
-            OwnCustomerEntity customer = new OwnCustomerEntity("hans", "stan");
-            customerSessionBeanLocal.createNewCustomer(customer);
-            
-            try {
-                OwnCustomerEntity test = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail("hans");
-                System.out.println(test.getCustomerID() + " " + test.getEmail() + " " + test.getPassword());
-            } catch (CustomerNotFoundException e) {
-                System.out.println("lol");
-            }
-            
-            try {
-                //OwnCustomerEntity me = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail("hans");
-       
-                        
-                ReservationEntity res = new ReservationEntity();
-                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("06/12/2022 00:00"), dateTimeFormat.parse("07/12/2022 00:00"), "1", true);
-                reservationSessionBeanLocal.createNewReservation(res, car1.getCarID(), "hans", "Outlet A", "Outlet A");
-                //me.getReservations().add(res);
-                
-                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("08/12/2022 00:00"), "2", true);
-                reservationSessionBeanLocal.createNewReservation(res, car2.getCarID(), "hans", "Outlet A", "Outlet B");
-                
-                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("09/12/2022 00:00"), "3", true);
-                reservationSessionBeanLocal.createNewReservation(res, car3.getCarID(), "hans", "Outlet B", "Outlet C");
-                
-                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("09/12/2022 12:00"), dateTimeFormat.parse("07/12/2022 00:00"), "4", true);
-                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
-            
-                
-                
-            } catch (ParseException | CustomerNotFoundException e) {
-                System.out.println("Error: " + e.getMessage() + "!\n");
-            } 
+//            OwnCustomerEntity customer = new OwnCustomerEntity("hans", "stan");
+//            customerSessionBeanLocal.createNewCustomer(customer);
+//            
+//            try {
+//                OwnCustomerEntity test = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail("hans");
+//                System.out.println(test.getCustomerID() + " " + test.getEmail() + " " + test.getPassword());
+//            } catch (CustomerNotFoundException e) {
+//                System.out.println("lol");
+//            }
+//            
+//            try {
+//                //OwnCustomerEntity me = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail("hans");
+//       
+//                        
+//                ReservationEntity res = new ReservationEntity();
+//                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("06/12/2022 00:00"), dateTimeFormat.parse("07/12/2022 00:00"), "1", true);
+//                reservationSessionBeanLocal.createNewReservation(res, car1.getCarID(), "hans", "Outlet A", "Outlet A");
+//                //me.getReservations().add(res);
+//                
+//                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("08/12/2022 00:00"), "2", true);
+//                reservationSessionBeanLocal.createNewReservation(res, car2.getCarID(), "hans", "Outlet A", "Outlet B");
+//                
+//                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("07/12/2022 12:00"), dateTimeFormat.parse("09/12/2022 00:00"), "3", true);
+//                reservationSessionBeanLocal.createNewReservation(res, car3.getCarID(), "hans", "Outlet B", "Outlet C");
+//                
+//                res = new ReservationEntity(0, "", "", dateTimeFormat.parse("09/12/2022 12:00"), dateTimeFormat.parse("07/12/2022 00:00"), "4", true);
+//                reservationSessionBeanLocal.createNewReservation(res, car4.getCarID(), "hans", "Outlet C", "Outlet A");
+//            
+//                
+//                
+//            } catch (ParseException | CustomerNotFoundException e) {
+//                System.out.println("Error: " + e.getMessage() + "!\n");
+//            } 
 //            
 //          /*Initialising Partner*/
             //Partner partner = new Partner("Holiday.com");

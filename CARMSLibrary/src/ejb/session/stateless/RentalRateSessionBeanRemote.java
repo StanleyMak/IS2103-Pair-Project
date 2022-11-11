@@ -9,6 +9,7 @@ import entity.RentalRateEntity;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.DeleteRentalRateException;
 
 /**
  *
@@ -27,8 +28,8 @@ public interface RentalRateSessionBeanRemote {
 
     public void updateRentalRate(RentalRateEntity rentalRate, String categoryName) throws CarCategoryNotFoundException;
 
-    public void deleteRentalRate(Long rentalRateID);
-
     public List<RentalRateEntity> retrieveRentalRatesOfCarCategory(String carCategoryName);
+    
+    public void deleteRentalRate(Long rentalRateID) throws DeleteRentalRateException;
 
 }

@@ -21,7 +21,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.StatusEnum;
+import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
+import util.exception.DeleteCarException;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -47,16 +49,20 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     private EntityManager em;
 
     @Override
-    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException {
+    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException, CarModelDisabledException {
         try {
             CarModelEntity carModel = carModelSessionBeanLocal.retrieveCarModelByCarModelName(modelName);
-            car.setModel(carModel);
+            if (!carModel.getIsDisabled()) {
+                car.setModel(carModel);
 
-            OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
-            car.setCurrOutlet(outlet);
+                OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
+                car.setCurrOutlet(outlet);
 
-            em.persist(car);
-            em.flush();
+                em.persist(car);
+                em.flush();
+            } else {
+                throw new CarModelDisabledException("Car Model " + modelName + " is disabled");
+            }
 
             return car.getCarID();
         } catch (CarModelNotFoundException e) {
@@ -95,13 +101,14 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         return cars;
     }
 
+    @Override
     public List<CarEntity> retrieveAllCarsOfOutlet(String outletAddress) {
         Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.currOutlet.address = ?1")
                 .setParameter(1, outletAddress);
         List<CarEntity> cars = query.getResultList();
         return cars;
     }
-    
+
     public List<CarEntity> retrieveAllCarsOfCarCategory(String carCategoryName) {
         List<CarEntity> cars = new ArrayList<>();
         List<CarModelEntity> carModels = carModelSessionBeanLocal.retrieveCarModelsOfCarCategory(carCategoryName);
@@ -127,10 +134,15 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public void deleteCar(Long carID) {
+    public void deleteCar(Long carID) throws DeleteCarException {
         CarEntity car = retrieveCarByCarID(carID);
 
-        em.remove(car);
+        if (reservationSessionBean.retrieveReservationsOfCarID(carID).isEmpty()) {
+            em.remove(car);
+        } else {
+            car.setStatus(StatusEnum.DISABLED);
+            throw new DeleteCarException("Car ID " + carID + " is associated with existing reservation(s) and cannot be deleted!");
+        }
     }
 
     @Override
@@ -168,20 +180,20 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         for (CarEntity car : cars) {
             List<ReservationEntity> carReservations = reservationSessionBean.retrieveReservationsOfCarID(car.getCarID());
             if (car.getCurrOutlet().getAddress().equals(pickupOutlet.getAddress())) {
-                boolean potential = true; 
+                boolean potential = true;
                 for (ReservationEntity res : carReservations) {
-                    if (res.getStartDateTime().compareTo(returnDateTime) <= 0 ||
-                            res.getEndDateTime().compareTo(pickupDateTime) >= 0) {
-                        potential = false; 
-                        break; 
+                    if (res.getStartDateTime().compareTo(returnDateTime) <= 0
+                            || res.getEndDateTime().compareTo(pickupDateTime) >= 0) {
+                        potential = false;
+                        break;
                     }
                 }
-                
+
                 if (potential) {
                     availableCars.add(car);
                 }
             } else {
-                boolean potential = true; 
+                boolean potential = true;
                 for (ReservationEntity res : carReservations) {
                     LocalDateTime startDateTime = LocalDateTime.ofInstant(res.getStartDateTime().toInstant(), ZoneId.systemDefault());
                     LocalDateTime endDateTime = LocalDateTime.ofInstant(res.getEndDateTime().toInstant(), ZoneId.systemDefault());
@@ -195,13 +207,13 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                     if (startDateTime.compareTo(returnDateTimeLocal) <= 0) {
                         carReservations.remove(res);
                     }
-                    
-                    if (startDateTime.compareTo(returnDateTimeLocal) <= 0 ||
-                            endDateTime.compareTo(pickupDateTimeLocal) >= 0) {
-                        potential = false; 
-                        break; 
+
+                    if (startDateTime.compareTo(returnDateTimeLocal) <= 0
+                            || endDateTime.compareTo(pickupDateTimeLocal) >= 0) {
+                        potential = false;
+                        break;
                     }
-                    
+
                     if (potential) {
                         availableCars.add(car);
                     }
@@ -212,4 +224,3 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
 }
-
