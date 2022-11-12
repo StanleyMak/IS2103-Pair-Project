@@ -10,6 +10,8 @@ import entity.CarEntity;
 import entity.CarModelEntity;
 import entity.OutletEntity;
 import entity.ReservationEntity;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +50,6 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @EJB(name = "CustomerSessionBeanLocal")
     private CustomerSessionBeanLocal customerSessionBeanLocal;
-    
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
@@ -178,34 +179,33 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @Override
     public List<CarCategoryEntity> doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet) {
-        
-        List<CarCategoryEntity> availableCategories = new ArrayList<>(); 
-        
-        List<CarCategoryEntity> allCategories = carCategorySessionBeanLocal.retrieveAllCarCategory(); 
-        
+
+        List<CarCategoryEntity> availableCategories = new ArrayList<>();
+
+        List<CarCategoryEntity> allCategories = carCategorySessionBeanLocal.retrieveAllCarCategory();
+
         // retrieve reservations of category and count num reservations per category
-        
         for (CarCategoryEntity cc : allCategories) {
-            
-            int numRes = getNumIntersectedReservations(pickupDateTime, returnDateTime, cc);
-            List<CarEntity> availableCarsByCategory = retrieveCarsFilteredByCarCategory(cc.getCategoryName()); 
-            
-            List<CarEntity> availableCars = new ArrayList<>(); 
-            
+
+            int numRes = getNumIntersectedReservationsForCategory(pickupDateTime, returnDateTime, cc, pickupOutlet, returnOutlet);
+            List<CarEntity> availableCarsByCategory = retrieveCarsFilteredByCarCategory(cc.getCategoryName());
+
+            List<CarEntity> availableCars = new ArrayList<>();
+
             for (CarEntity car : availableCarsByCategory) {
-                if (!car.getStatus().equals(StatusEnum.DISABLED)) {
+                if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
                     availableCars.add(car);
                 }
             }
-            
+
             if (numRes < availableCars.size()) {
                 availableCategories.add(cc);
             }
         }
-        
-        return availableCategories; 
+
+        return availableCategories;
     }
-    
+
 //    public List<CarEntity> getAvailableCars() {
 //        List<CarEntity> cars = retrieveAllCars();
 //        List<CarEntity> availableCars = new ArrayList<>();
@@ -261,37 +261,60 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 //        return availableCars; 
 //    } 
     
+    private int getNumIntersectedReservationsForCategory(Date newStartDate, Date newEndDate, CarCategoryEntity cc, OutletEntity pickUpOutlet, OutletEntity returnOutlet) {
+        
+        int numRes = 0;
+        List<ReservationEntity> allReservations = reservationSessionBeanLocal.retrieveReservationsByCategory(cc.getCategoryName());
 
-    public int getNumIntersectedReservations(Date newStartDate, Date newEndDate, CarCategoryEntity cc) {
-        int numRes = 0; 
-        List<ReservationEntity> allReservations = reservationSessionBeanLocal.retrieveReservationsByCategory(cc);           
+        LocalDateTime transitStartDateTime = LocalDateTime.ofInstant(newStartDate.toInstant(), ZoneId.systemDefault());
+        LocalDateTime transitEndDateTime = LocalDateTime.ofInstant(newEndDate.toInstant(), ZoneId.systemDefault());
+        // factor in transit duration (2 hours)
+
+        //Local Date Time for transit
+        transitEndDateTime = transitEndDateTime.minusHours(2);
+        transitStartDateTime = transitStartDateTime.plusHours(2);
+
         for (ReservationEntity res : allReservations) {
-            Date existingStartDate = res.getStartDateTime(); 
-            Date existingEndDate = res.getEndDateTime(); 
-            
-            if (newStartDate.before(existingEndDate) && newStartDate.after(existingStartDate) ||
-                    newEndDate.after(existingStartDate) && newEndDate.before(existingEndDate) ||
-                    newStartDate.before(existingStartDate) && newEndDate.after(existingEndDate) ||
-                    newStartDate.equals(existingStartDate) && newEndDate.equals(existingEndDate)) {
-                numRes++; 
+
+            //Local Date Time for res start/end dates
+            LocalDateTime resStartDateTime = LocalDateTime.ofInstant(newStartDate.toInstant(), ZoneId.systemDefault());
+            LocalDateTime resEndDateTime = LocalDateTime.ofInstant(newStartDate.toInstant(), ZoneId.systemDefault());
+
+            if (res.getStartDateTime().after(newStartDate)) {
+                if (res.getPickUpOutlet().equals(returnOutlet)) {
+                    if (res.getStartDateTime().before(newEndDate)) {
+                        numRes++;
+                    }
+                } else {
+                    if (resStartDateTime.isBefore(transitEndDateTime)) {
+                        numRes++;
+                    }
+                }
+            } else if (res.getEndDateTime().before(newEndDate)) {
+                if (res.getReturnOutlet().equals(pickUpOutlet)) {
+                    if (res.getEndDateTime().after(newStartDate)) {
+                        numRes++;
+                    }
+                } else {
+                    if (resEndDateTime.isAfter(transitStartDateTime)) {
+                        numRes++;
+                    }
+                }
             }
         }
-         return numRes;    
+        
+        return numRes;
     }
-    
-    @Override
-    public void doReserveCar(ReservationEntity reservation, String carCategoryName) {
-        List<ReservationEntity> reservationsForCat = reservationSessionBeanLocal.retrieveReservationsByCategory(carCategoryName);
-        CarCategoryEntity cat = new CarCategoryEntity(); 
-        cat.setCategoryName(carCategoryName);
-        reservation.setCarCategory(carCategory);
-        
-       
-        
-        
-        
-    }
-    
+
+//    @Override
+//    public void doReserveCar(ReservationEntity reservation, String carCategoryName) {
+//        List<ReservationEntity> reservationsForCat = reservationSessionBeanLocal.retrieveReservationsByCategory(carCategoryName);
+//        CarCategoryEntity cat = new CarCategoryEntity();
+//        cat.setCategoryName(carCategoryName);
+//        reservation.setCarCategory(carCategory);
+//
+//    }
+
     @Override
     public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException {
         CarEntity car = retrieveCarByCarID(carID);
@@ -342,7 +365,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         return potentialCars.get(0);
     }
-    
+
     @Override
     public CarEntity retrievePotentialCarOfCategoryOfOtherOutlet(String carCategoryName, String outletAddress, Date startDateTime, Date endDateTime) {
         Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.model.category.categoryName = ?1 AND c.currOutlet.address != ?2")

@@ -81,11 +81,8 @@ public class ReservationEntity implements Serializable {
     @OneToOne
     private OutletEntity returnOutlet;
     
-    @OneToOne
+    @ManyToOne
     private CarCategoryEntity carCategory;
-    
-    @OneToOne
-    private CarModelEntity carModel;
     
     @ManyToMany
     private List<RentalRateEntity> rentalRates;
@@ -224,14 +221,6 @@ public class ReservationEntity implements Serializable {
 
     public void setCarCategory(CarCategoryEntity carCategory) {
         this.carCategory = carCategory;
-    }
-
-    public CarModelEntity getCarModel() {
-        return carModel;
-    }
-
-    public void setCarModel(CarModelEntity carModel) {
-        this.carModel = carModel;
     }
 
     public List<RentalRateEntity> getRentalRates() {

@@ -22,6 +22,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.CarCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.ReservationNotFoundException;
 
@@ -31,6 +32,9 @@ import util.exception.ReservationNotFoundException;
  */
 @Stateless
 public class ReservationSessionBean implements ReservationSessionBeanRemote, ReservationSessionBeanLocal {
+
+    @EJB(name = "CarCategorySessionBeanLocal")
+    private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
 
     @EJB(name = "CarSessionBeanLocal")
     private CarSessionBeanLocal carSessionBean;
@@ -46,24 +50,33 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     private EntityManager em;
     
     @Override
-    public Long createNewReservation(ReservationEntity reservation, Long carID, String email, String returnOutletAddress, String pickupOutletAddress) throws CustomerNotFoundException {
+    public Long createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException {
         //AUTO ASSIGN THE CHEAPEST RENTAL RATE PER DAY!!!!!!!!!!!!!!
         // missing partner
-        
-        CarEntity car = carSessionBean.retrieveCarByCarID(carID);
-        OwnCustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
-        OutletEntity pickupOutlet = outletSessionBean.retrieveOutletByOutletAddress(pickupOutletAddress);
-        OutletEntity returnOutlet = outletSessionBean.retrieveOutletByOutletAddress(returnOutletAddress);
-        
-        reservation.setCar(car);
-        reservation.setReturnOutlet(returnOutlet);
-        reservation.setPickUpOutlet(pickupOutlet);
-        customer.getReservations().add(reservation);
-        
-        em.persist(reservation);
-        em.flush(); 
-        
-        return reservation.getReservationID();
+       
+        try {
+            OwnCustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
+            OutletEntity pickupOutlet = outletSessionBean.retrieveOutletByOutletAddress(pickupOutletAddress);
+            OutletEntity returnOutlet = outletSessionBean.retrieveOutletByOutletAddress(returnOutletAddress);
+            CarCategoryEntity carCategory = null;
+            try {
+                carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
+            } catch (CarCategoryNotFoundException e) {
+                throw new CarCategoryNotFoundException("Car Category Not Found");
+            }
+            reservation.setCarCategory(carCategory);
+            reservation.setReturnOutlet(returnOutlet);
+            reservation.setPickUpOutlet(pickupOutlet);
+            customer.getReservations().add(reservation);
+
+            em.persist(reservation);
+            em.flush();
+
+            return reservation.getReservationID();
+        } catch (CustomerNotFoundException e) {
+            throw new CustomerNotFoundException("Customer Not Found");
+        }
+
     }
     
     

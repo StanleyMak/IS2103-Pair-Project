@@ -12,6 +12,7 @@ import entity.ReservationEntity;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CarCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.ReservationNotFoundException;
 
@@ -22,7 +23,7 @@ import util.exception.ReservationNotFoundException;
 @Remote
 public interface ReservationSessionBeanRemote {
     
-    public Long createNewReservation(ReservationEntity reservation, Long carID, String username, String returnOutletAddress, String pickupOutletAddress) throws CustomerNotFoundException;
+    public Long createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException;
     
     public ReservationEntity retrieveReservationByID(Long reservationID) throws ReservationNotFoundException;
     

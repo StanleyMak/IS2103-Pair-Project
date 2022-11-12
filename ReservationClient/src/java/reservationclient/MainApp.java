@@ -43,9 +43,8 @@ public class MainApp {
     private CarSessionBeanRemote carSessionBeanRemote;
     // new
     private OutletSessionBeanRemote outletSessionBeanRemote;
-    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote; 
+    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private OwnCustomerEntity loggedInCustomer;
-    
 
     private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -55,12 +54,13 @@ public class MainApp {
         this.loggedInCustomer = null;
     }
 
-    public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote) {
+    public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
         this();
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.reservationSessionBeanRemote = reservationSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
+        this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
     }
 
     public void runApp() {
@@ -207,36 +207,19 @@ public class MainApp {
         if (outletClosingHours.isBefore(outletClosingHours)) {
             System.out.println("Invalid return time, outlet closes at: " + outletClosingHours);
         }
-        //SESSION BEAN CALL FOR LIST OF CATEGORIES TO BE DISPLAYED
-        //retrieveAllCategories
-        //for each category C,
-        //retrieveReservationsOfCategory
-        //for each res,
-        //check if intersect with customers specified timing
-        //resCount++
-        
-        //for cars in availableCars
-        //if car.getModel().getCategory().getName() == C
-        //count++
-        
-        //if resCount < count, display category with rental fee
-        
-        //RESERVE CAR
-        //new res() associate everything relevant
-        //associate CATEGORY 
 
         //return list of abled cars
         List<CarCategoryEntity> availableCat = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
-
-        System.out.println("Car Records:");
+        System.out.println("Size: " + availableCat.size());
+        
+        System.out.println("Available Car Categories For Rental:");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("%-5s%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", "No.", "ID", "License Plate Number", "Colour", "Category", "Make", "Model", "Status", "Outlet"/*, Disabled*/);
+        System.out.printf("%-5s%-20s%-10s\n", "No.", "Category Name", "Rental Fee");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         int i = 1;
         for (CarCategoryEntity cat : availableCat) {
-              //double rentalFee = rentalRateSessionBeanRemote.computeCheapestRentalRateFee(pickupDateTime, returnDateTime, cat.getCategoryName());
-//            System.out.printf("%-5s%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", i, car.getCarID(), car.getLicensePlateNumber(), car.getColour(), car.getModel().getCategory().getCategoryName(), car.getModel().getModelMake(), car.getModel().getModelName(), car.getStatus().toString(), car.getCurrOutlet().getAddress());
-              System.out.println(cat.getCategoryName());
+            double rentalFee = rentalRateSessionBeanRemote.computeCheapestRentalRateFee(pickupDateTime, returnDateTime, cat.getCategoryName());
+            System.out.printf("%-5s%-20s%-10s\n", i, availableCat.get(i - 1).getCategoryName(), rentalFee);
             i++;
         }
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -358,16 +341,15 @@ public class MainApp {
                 break;
             }
         }
-        
+
 //        reservation.setStartDateTime(startDateTime);
 //        reservation.setEndDateTime(endDateTime);
 //        reservation.setRentalFee(rentalFee);
 //        reservation.setPickUpOutlet(pickUpOutlet);
 //        reservation.setReturnOutlet(returnOutlet);
 //        reservation.setCar(car);
-
         // setters based on doSearchCar parameters
-        reservationSessionBeanRemote.createNewReservation(reservation, Long.MIN_VALUE, , returnOutletAddress, pickupOutletAddress);
+        //reservationSessionBeanRemote.createNewReservation(reservation, Long.MIN_VALUE, , returnOutletAddress, pickupOutletAddress);
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
 

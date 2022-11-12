@@ -6,6 +6,8 @@
 package entity;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,7 +26,9 @@ import util.enumeration.RentalRateTypeEnum;
  */
 @Entity
 public class RentalRateEntity implements Serializable, Comparable<RentalRateEntity> {
-
+    
+    private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,8 +66,23 @@ public class RentalRateEntity implements Serializable, Comparable<RentalRateEnti
         this();
         this.rentalName = rentalName;
         this.ratePerDay = ratePerDay;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        
+        try {
+            if (startDate == null) {
+                this.startDate = dateTimeFormat.parse("01/01/1800 00:00");
+            } else {
+                this.startDate = startDate;
+            }
+            
+            if (endDate == null) {
+                this.endDate = dateTimeFormat.parse("01/01/3000 00:00");
+            } else {
+                this.endDate = endDate;
+            }
+        } catch (ParseException e) {
+            System.out.println("Invalid Date/Time Format!");
+        }
+        
         this.carCategory = carCategory;
         this.rentalRateType = rentalRateType;
     }
