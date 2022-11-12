@@ -204,6 +204,22 @@ public class MainApp {
         if (outletClosingHours.isBefore(outletClosingHours)) {
             System.out.println("Invalid return time, outlet closes at: " + outletClosingHours);
         }
+        //retrieveAllCategories
+        //for each category C,
+        //retrieveReservationsOfCategory
+        //for each res,
+        //check if intersect with customers specified timing
+        //resCount++
+        
+        //for cars in availableCars
+        //if car.getModel().getCategory().getName() == C
+        //count++
+        
+        //if resCount < count, display category with rental fee
+        
+        //RESERVE CAR
+        //new res() associate everything relevant
+        //associate CATEGORY 
 
         //return list of abled cars
         List<CarEntity> availableCars = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
