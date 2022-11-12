@@ -56,6 +56,9 @@ public class DispatchRecordEntity implements Serializable {
     
     @ManyToOne
     private EmployeeEntity employee;
+    
+    @OneToOne
+    private ReservationEntity reservation;
 
     public DispatchRecordEntity() {
     }
@@ -159,6 +162,14 @@ public class DispatchRecordEntity implements Serializable {
 
     public void setReturnOutlet(OutletEntity returnOutlet) {
         this.returnOutlet = returnOutlet;
+    }
+
+    public ReservationEntity getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(ReservationEntity reservation) {
+        this.reservation = reservation;
     }
     
 }

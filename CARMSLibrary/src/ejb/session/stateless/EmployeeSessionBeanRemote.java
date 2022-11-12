@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.EmployeeEntity;
 import entity.OutletEntity;
+import java.util.List;
 import javax.ejb.Remote;
 import util.exception.InvalidLoginCredentialException;
 
@@ -24,5 +25,7 @@ public interface EmployeeSessionBeanRemote {
     public EmployeeEntity retrieveEmployeeByEmployeeUsername(String email);
 
     public EmployeeEntity loginEmployee(String email, String password) throws InvalidLoginCredentialException;
+    
+    public List<EmployeeEntity> retrieveAvailableEmployeesOfOutlet(OutletEntity outlet);
     
 }

@@ -8,9 +8,11 @@ package managementclient;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.DispatchRecordSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.EmployeeEntity;
 import java.util.Scanner;
 import javax.jms.ConnectionFactory;
@@ -35,6 +37,8 @@ public class MainApp {
     private CarSessionBeanRemote carSessionBeanRemote;
     private DispatchRecordSessionBeanRemote dispatchRecordSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private CustomerSessionBeanRemote customerSessionBeanRemote;
+    private ReservationSessionBeanRemote reservationSessionBeanRemote;
     
 
     private Queue queueCheckoutNotification;
@@ -50,13 +54,16 @@ public class MainApp {
     }
     
     public MainApp(CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, 
-            DispatchRecordSessionBeanRemote dispatchRecordSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+            DispatchRecordSessionBeanRemote dispatchRecordSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote,
+            CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote) {
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.dispatchRecordSessionBeanRemote = dispatchRecordSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
+        this.customerSessionBeanRemote = customerSessionBeanRemote;
+        this.reservationSessionBeanRemote = reservationSessionBeanRemote;
     }
 
 
@@ -91,8 +98,8 @@ public class MainApp {
                         doLogin();
                         System.out.println("Login successful!\n");
 
-                        customerServiceModule = new CustomerServiceModule();
-                        salesManagementModule = new SalesManagementModule(rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, dispatchRecordSessionBeanRemote, currentEmployee);
+                        customerServiceModule = new CustomerServiceModule(customerSessionBeanRemote, carSessionBeanRemote, reservationSessionBeanRemote, this.currentEmployee);
+                        salesManagementModule = new SalesManagementModule(rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, dispatchRecordSessionBeanRemote, employeeSessionBeanRemote, this.currentEmployee);
                         
                         menuMain();
                         

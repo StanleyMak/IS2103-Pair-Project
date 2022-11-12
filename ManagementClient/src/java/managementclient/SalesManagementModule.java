@@ -9,15 +9,18 @@ import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.DispatchRecordSessionBeanRemote;
+import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.CarEntity;
 import entity.CarModelEntity;
 import entity.DispatchRecordEntity;
 import entity.EmployeeEntity;
+import entity.OutletEntity;
 import entity.RentalRateEntity;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +37,7 @@ import util.exception.CarModelNotFoundException;
 import util.exception.DeleteCarException;
 import util.exception.DeleteCarModelException;
 import util.exception.DeleteRentalRateException;
+import util.exception.DispatchRecordNotFoundException;
 
 /**
  *
@@ -48,6 +52,7 @@ public class SalesManagementModule {
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
     private DispatchRecordSessionBeanRemote dispatchRecordSessionBeanRemote;
+    private EmployeeSessionBeanRemote employeeSessionBeanRemote;
 
     private EmployeeEntity currentEmployee;
 
@@ -60,12 +65,13 @@ public class SalesManagementModule {
 //        this.validator = (Validator) validatorFactory.getValidator();
     }
 
-    public SalesManagementModule(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, DispatchRecordSessionBeanRemote dispatchRecordSessionBeanRemote, EmployeeEntity currentEmployee) {
+    public SalesManagementModule(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, DispatchRecordSessionBeanRemote dispatchRecordSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, EmployeeEntity currentEmployee) {
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.dispatchRecordSessionBeanRemote = dispatchRecordSessionBeanRemote;
+        this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.currentEmployee = currentEmployee;
     }
     //
@@ -564,7 +570,6 @@ public class SalesManagementModule {
 
 //        System.out.println("Press Enter To Continue...");
 //        sc.nextLine();
-
     }
 
     private void doDeleteRentalRate(RentalRateEntity rentalRate) {
@@ -598,7 +603,7 @@ public class SalesManagementModule {
 
         System.out.print("Enter Car Category> ");
         String carCategoryName = sc.nextLine().trim();
-        
+
         carModel.setIsDisabled(Boolean.FALSE);
 
         try {
@@ -734,7 +739,7 @@ public class SalesManagementModule {
             }
         } catch (CarModelNotFoundException | CarCategoryNotFoundException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
-        } 
+        }
 
         System.out.println("Car Model: " + carModel.getModelName() + " successfully updated!\n");
 
@@ -752,7 +757,7 @@ public class SalesManagementModule {
             System.out.println("Car Model: " + carModelName + " successfully deleted!\n");
         } catch (CarModelNotFoundException | DeleteCarModelException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
-        } 
+        }
 
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -1016,7 +1021,7 @@ public class SalesManagementModule {
 
     private void doUpdateCarStatus(CarEntity car) {
         Scanner sc = new Scanner(System.in);
-        
+
         System.out.println("Enter New Status> ");
         Integer response = 0;
         while (true) {
@@ -1063,14 +1068,31 @@ public class SalesManagementModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: View Transit Dispatch Records For Current Day Reservations ***\n");
 
-        System.out.print("Enter Today's Date> ");
-        Date today = new Date(sc.nextLine());
+        Date currDate = new Date();
+        List<DispatchRecordEntity> dispatchRecords = new ArrayList<>();
+        try {
+            dispatchRecords = dispatchRecordSessionBeanRemote.retrieveDispatchRecordsForCurrentDayCurrentOutlet(currDate, currentEmployee.getOutlet());
+        } catch (ParseException e) {
+            System.out.println("Invalid Date/Time Format");
+        }
 
-//        List<DispatchRecordEntity> dispatchRecords = dispatchRecordSessionBeanRemote.retrieveDispatchRecordsForCurrentDayCurrentOutlet(today, currentEmployee.getOutlet());
-//        
-//        for (DispatchRecordEntity dispatchRecord : dispatchRecords) {
-//            System.out.println("Transit Driver Dispatch Record: " + dispatchRecord.getDispatchRecordID());
-//        }
+        System.out.println("Transit Dispatch Records:");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("%-5s%-5s%-15s%-15s%-15s%-15s%-15s\n", "No.", "ID", "Pick Up Date/Time", "Pick Up Outlet", "Return Outlet", "Completed");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        int i = 1;
+        for (DispatchRecordEntity dr : dispatchRecords) {
+            String completed = "";
+            if (dr.getIsCompleted()) {
+                completed = "YES";
+            } else {
+                completed = "NO";
+            }
+            System.out.printf("%-5s%-5s%-15s%-15s%-15s%-15s%-15s\n", i, dr.getDispatchRecordID(), dr.getPickUpTime().toString(), dr.getPickUpOutlet(), dr.getReturnOutlet(), dr.getReturnTime().toString(), completed);
+            i++;
+        }
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
     }
@@ -1078,6 +1100,63 @@ public class SalesManagementModule {
     private void doAssignTransitDriver() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Sales Management (Operations) :: Assign Transit Driver ***\n");
+
+        Date currDate = new Date();
+        OutletEntity currOutlet = this.currentEmployee.getOutlet();
+
+        List<DispatchRecordEntity> dispatchRecords = new ArrayList<>();
+        try {
+            dispatchRecords = dispatchRecordSessionBeanRemote.retrieveDispatchRecordsForCurrentDayCurrentOutlet(currDate, currentEmployee.getOutlet());
+        } catch (ParseException e) {
+            System.out.println("Invalid Date/Time Format");
+        }
+
+        System.out.println("Transit Dispatch Records:");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("%-5s%-5s%-15s%-15s%-15s%-15s%-15s\n", "No.", "ID", "Pick Up Date/Time", "Pick Up Outlet", "Return Outlet", "Completed");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        int i = 1;
+        for (DispatchRecordEntity dr : dispatchRecords) {
+            String completed = "";
+            if (dr.getIsCompleted()) {
+                completed = "YES";
+            } else {
+                completed = "NO";
+            }
+            System.out.printf("%-5s%-5s%-15s%-15s%-15s%-15s%-15s\n", i, dr.getDispatchRecordID(), dr.getPickUpTime().toString(), dr.getPickUpOutlet(), dr.getReturnOutlet(), dr.getReturnTime().toString(), completed);
+            i++;
+        }
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+        DispatchRecordEntity thisRecord = null;
+        System.out.println("Select Transit Dispatch Record Number: ");
+        Integer response = 0;
+
+        while (true) {
+            while (response < 1 || response > dispatchRecords.size()) {
+                System.out.print("> ");
+
+                response = sc.nextInt();
+
+                if (response > dispatchRecords.size()) {
+                    System.out.println("Invalid option, please try again!\n");
+                } else {
+                    thisRecord = dispatchRecords.get(response - 1);
+                    break;
+                }
+            }
+
+            if (response > 0 || response < dispatchRecords.size() + 1) {
+                break;
+            }
+        }
+
+        List<EmployeeEntity> employees = employeeSessionBeanRemote.retrieveAvailableEmployeesOfOutlet(currOutlet);
+        EmployeeEntity assignedEmployee = employees.get(0);
+
+        dispatchRecordSessionBeanRemote.assignTransitDriver(thisRecord, assignedEmployee);
+        
+        System.out.println("Successfully assigned Employee " + assignedEmployee.getName() + " to Transit Dispatch Record " + thisRecord.getDispatchRecordID() + " for pick up of Car " + thisRecord.getReservation().getCar().getLicensePlateNumber() + " at Outlet " + thisRecord.getPickUpOutlet().getAddress() + " at " + thisRecord.getPickUpTime().toString());
 
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -1090,7 +1169,11 @@ public class SalesManagementModule {
         System.out.print("Enter Dispatch Record ID> ");
         Long dispatchRecordID = sc.nextLong();
 
-        //dispatchRecordSessionBeanRemote.updateDispatchRecordAsCompleted(dispatchRecordID);
+        try {
+            dispatchRecordSessionBeanRemote.updateDispatchRecordAsCompleted(dispatchRecordID);
+        } catch (DispatchRecordNotFoundException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
+        }
         System.out.println("Dispatch Record: " + dispatchRecordID + " successfully updated as complete!\n");
 
         System.out.println("Press Enter To Continue...");

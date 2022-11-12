@@ -6,7 +6,12 @@
 package ejb.session.stateless;
 
 import entity.DispatchRecordEntity;
+import entity.EmployeeEntity;
 import entity.OutletEntity;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -28,6 +33,8 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
 
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    
     @Override
     public Long createNewDispatchRecord(DispatchRecordEntity dispatchRecord) throws DispatchRecordNameExistsException {
         try {
@@ -65,11 +72,24 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
     }
 
     @Override
-    public List<DispatchRecordEntity> retrieveDispatchRecordsForCurrentDayCurrentOutlet(Date date, OutletEntity outlet) {
-        Query query = em.createQuery("SELECT d FROM DispatchRecordEntity WHERE d.outlet.address = ?1 AND d.pickUpTime = ?2")
-                .setParameter(1, outlet.getAddress())
-                .setParameter(2, date);
+    public List<DispatchRecordEntity> retrieveDispatchRecordsForCurrentDayCurrentOutlet(Date date, OutletEntity outlet) throws ParseException {
+        Query query = em.createQuery("SELECT d FROM DispatchRecordEntity WHERE d.outlet.address = ?1")
+                .setParameter(1, outlet.getAddress());
         List<DispatchRecordEntity> dispatchRecords = query.getResultList();
+        Date pickUpDate = new Date();
+        Date dateOnly = new Date();
+        for (DispatchRecordEntity dr : dispatchRecords) {
+            try {
+                pickUpDate = dateFormat.parse(dateFormat.format(dr.getPickUpTime()));
+                dateOnly = dateFormat.parse(dateFormat.format(date));
+            } catch (ParseException e) {
+                throw new ParseException("Inalid Date/Time Format", 1); //wats the 1??
+            }
+            
+            if (!pickUpDate.equals(date)) {
+                dispatchRecords.remove(dr);
+            }
+        }
         return dispatchRecords;
     }
 
@@ -78,10 +98,19 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
         try {
             DispatchRecordEntity dispatchRecord = retrieveDisptachRecordByDispatchRecordID(dispatchRecordID);
             dispatchRecord.setIsCompleted(Boolean.TRUE);
+            dispatchRecord.getEmployee().setOnTransit(Boolean.FALSE);
             em.merge(dispatchRecord);
         } catch (DispatchRecordNotFoundException e) {
             throw new DispatchRecordNotFoundException("Dispatch Record ID " + dispatchRecordID + " does not exist!");
         }
+    }
+    
+    @Override
+    public void assignTransitDriver(DispatchRecordEntity dr, EmployeeEntity emp) {
+        dr.setEmployee(emp);
+        emp.setOnTransit(Boolean.TRUE);
+        em.merge(dr);
+        em.merge(emp);
     }
 //    no need delete
 //    public void deleteDispatchRecord(Long dispatchRecordID) throws DispatchRecordNotFoundException {

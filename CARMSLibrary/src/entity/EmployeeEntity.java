@@ -46,6 +46,8 @@ public class EmployeeEntity implements Serializable {
     @Column(nullable = false)
     private EmployeeAccessRightEnum employeeAccessRight;
     
+    private Boolean onTransit;
+    
 //    @OneToMany(mappedBy = "employee")
 //    private DispatchRecordEntity dispatchRecord;
     
@@ -56,15 +58,18 @@ public class EmployeeEntity implements Serializable {
     private OutletEntity outlet;
 
     public EmployeeEntity() {
+        this.onTransit = Boolean.FALSE;
     }
     
     public EmployeeEntity(String name, OutletEntity outlet, EmployeeAccessRightEnum employeeAccessRight) {
+        this();
         this.name = name;
         this.employeeAccessRight = employeeAccessRight;
         this.outlet = outlet;
     }
 
     public EmployeeEntity(String name, OutletEntity outlet, EmployeeAccessRightEnum employeeAccessRight, String username, String password) {
+        this();
         this.name = name;
         this.employeeAccessRight = employeeAccessRight;
         this.outlet = outlet;
@@ -153,6 +158,14 @@ public class EmployeeEntity implements Serializable {
     @Override
     public String toString() {
         return "entity.EmployeeEntity[ id=" + employeeID + " ]";
+    }
+
+    public Boolean getOnTransit() {
+        return onTransit;
+    }
+
+    public void setOnTransit(Boolean onTransit) {
+        this.onTransit = onTransit;
     }
     
 }

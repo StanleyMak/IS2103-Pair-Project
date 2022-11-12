@@ -6,7 +6,9 @@
 package ejb.session.stateless;
 
 import entity.DispatchRecordEntity;
+import entity.EmployeeEntity;
 import entity.OutletEntity;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
@@ -26,8 +28,10 @@ public interface DispatchRecordSessionBeanLocal {
 
     public DispatchRecordEntity retrieveDispatchRecordByDispatchRecordName(String dispatchRecordName) throws DispatchRecordNotFoundException;
 
-    public List<DispatchRecordEntity> retrieveDispatchRecordsForCurrentDayCurrentOutlet(Date date, OutletEntity outlet);
+    public List<DispatchRecordEntity> retrieveDispatchRecordsForCurrentDayCurrentOutlet(Date date, OutletEntity outlet) throws ParseException;
 
     public void updateDispatchRecordAsCompleted(Long dispatchRecordID) throws DispatchRecordNotFoundException;
+
+    public void assignTransitDriver(DispatchRecordEntity dr, EmployeeEntity emp);
     
 }

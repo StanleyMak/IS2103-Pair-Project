@@ -5,4 +5,9 @@
     <ejb-ref-type>Session</ejb-ref-type>
     <remote>ejb.session.stateless.CarSessionBeanRemote</remote>
   </ejb-ref>
+  <ejb-ref>
+    <ejb-ref-name>EjbTimerSessionBean</ejb-ref-name>
+    <ejb-ref-type>Session</ejb-ref-type>
+    <remote>ejb.session.stateless.EjbTimerSessionBeanRemote</remote>
+  </ejb-ref>
 </application-client>

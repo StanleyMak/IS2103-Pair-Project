@@ -54,10 +54,10 @@ public interface CarSessionBeanLocal {
 
     public List<CarEntity> retrieveCarsFilteredByCarMakeAndModel(String carModelMake, String carModelName);
 
-    public boolean isPotential(Long carID, Date startDateTime, Date endDateTime);
+    public CarEntity retrievePotentialCarOfCategoryOfOutlet(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet, CarCategoryEntity carCategory);
 
-    public CarEntity retrievePotentialCarOfCategoryOfOutlet(String carCategoryName, String outletAddress, Date startDateTime, Date endDateTime);
+    public CarEntity retrievePotentialCarOfCategoryOfOtherOutlet(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet, CarCategoryEntity carCategory);
 
-    public CarEntity retrievePotentialCarOfCategoryOfOtherOutlet(String carCategoryName, String outletAddress, Date startDateTime, Date endDateTime);
+    
 
 }

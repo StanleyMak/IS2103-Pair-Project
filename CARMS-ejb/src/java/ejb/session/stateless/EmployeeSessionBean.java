@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.EmployeeEntity;
 import entity.OutletEntity;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -54,6 +55,15 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         } else {
             throw new InvalidLoginCredentialException("Email or Password Incorrect");
         }
+    }
+    
+    @Override
+    public List<EmployeeEntity> retrieveAvailableEmployeesOfOutlet(OutletEntity outlet) {
+        Query query = em.createQuery("SELECT e FROM EmployeeEntity e WHERE e.outlet.address = ?1 AND e.onTransit = FALSE")
+                .setParameter(1, outlet.getAddress());
+        List<EmployeeEntity> employees = query.getResultList();
+
+        return employees;
     }
 
     
