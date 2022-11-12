@@ -8,6 +8,7 @@ package reservationclient;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.RentalRateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.CarCategoryEntity;
 import entity.CarEntity;
@@ -42,7 +43,9 @@ public class MainApp {
     private CarSessionBeanRemote carSessionBeanRemote;
     // new
     private OutletSessionBeanRemote outletSessionBeanRemote;
+    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote; 
     private OwnCustomerEntity loggedInCustomer;
+    
 
     private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -223,15 +226,17 @@ public class MainApp {
         //associate CATEGORY 
 
         //return list of abled cars
-        List<CarEntity> availableCars = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
+        List<CarCategoryEntity> availableCat = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
 
         System.out.println("Car Records:");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.printf("%-5s%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", "No.", "ID", "License Plate Number", "Colour", "Category", "Make", "Model", "Status", "Outlet"/*, Disabled*/);
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         int i = 1;
-        for (CarEntity car : availableCars) {
-            System.out.printf("%-5s%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", i, car.getCarID(), car.getLicensePlateNumber(), car.getColour(), car.getModel().getCategory().getCategoryName(), car.getModel().getModelMake(), car.getModel().getModelName(), car.getStatus().toString(), car.getCurrOutlet().getAddress());
+        for (CarCategoryEntity cat : availableCat) {
+              //double rentalFee = rentalRateSessionBeanRemote.computeCheapestRentalRateFee(pickupDateTime, returnDateTime, cat.getCategoryName());
+//            System.out.printf("%-5s%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", i, car.getCarID(), car.getLicensePlateNumber(), car.getColour(), car.getModel().getCategory().getCategoryName(), car.getModel().getModelMake(), car.getModel().getModelName(), car.getStatus().toString(), car.getCurrOutlet().getAddress());
+              System.out.println(cat.getCategoryName());
             i++;
         }
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -323,7 +328,6 @@ public class MainApp {
 
         // loop through list of cars and find the one matching to response = carID
         ReservationEntity reservation = new ReservationEntity();
-
         System.out.print("Enter Credit Card Number> ");
         reservation.setCreditCardNumber(sc.nextLine().trim());
 
@@ -363,7 +367,7 @@ public class MainApp {
 //        reservation.setCar(car);
 
         // setters based on doSearchCar parameters
-        // reservationSessionBeanRemote.createNewReservation(reservation, Long.MIN_VALUE, email, returnOutletAddress, pickupOutletAddress);
+        reservationSessionBeanRemote.createNewReservation(reservation, Long.MIN_VALUE, , returnOutletAddress, pickupOutletAddress);
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
 

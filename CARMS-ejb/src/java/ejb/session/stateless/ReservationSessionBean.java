@@ -164,9 +164,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         return reservations;
     }
     
-    public List<ReservationEntity> retrieveReservationsByCategory(CarCategoryEntity carCategory) {
-        Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE r.carCategory = ?1")
-                .setParameter(1, carCategory); 
+    public List<ReservationEntity> retrieveReservationsByCategory(String carCategoryName) {
+        Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE r.carCategory.categoryName = ?1")
+                .setParameter(1, carCategoryName); 
         List<ReservationEntity> reservations = query.getResultList(); 
         
         return reservations; 

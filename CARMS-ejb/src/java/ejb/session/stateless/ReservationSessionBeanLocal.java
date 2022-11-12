@@ -34,9 +34,9 @@ public interface ReservationSessionBeanLocal {
 
     public List<ReservationEntity> retrieveReservationsOfRentalRateID(Long rentalRateID);
 
-    public List<ReservationEntity> retrieveReservationsByCategory(CarCategoryEntity carCategory);
-
     public List<ReservationEntity> retrieveReservationsForCurrentDay(Date currDay);
+
+    public List<ReservationEntity> retrieveReservationsByCategory(String carCategoryName);
 
     
 }
