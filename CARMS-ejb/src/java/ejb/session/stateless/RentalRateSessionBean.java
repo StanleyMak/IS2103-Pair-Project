@@ -115,7 +115,10 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         LocalDateTime currDateLocal = LocalDateTime.ofInstant(startDateTime.toInstant(), ZoneId.systemDefault());
         while (currDate.compareTo(endDateTime) <= 0) {
             total += retrieveCheapestRentalRateFeeForCurrentDay(currDate, carCategoryName);
-            currDate = Date.from(currDateLocal.plusDays(1).atZone(ZoneId.systemDefault()).toInstant());
+            System.out.println("total: " + total);
+            currDateLocal = currDateLocal.plusDays(1);
+            currDate = Date.from(currDateLocal.atZone(ZoneId.systemDefault()).toInstant());
+            System.out.println("Date: " + currDate.toString());
         }
         
         return total;
@@ -123,6 +126,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
     //check if returns double or returns rentalRate
     private double retrieveCheapestRentalRateFeeForCurrentDay(Date today, String carCategoryName) {
+        System.out.println("Enter Method 2");
         List<RentalRateEntity> rentalRatesForCategory = retrieveRentalRatesOfCarCategory(carCategoryName);
         List<RentalRateEntity> rentalRatesForCategoryForCurrentDay = new ArrayList<>();
 
