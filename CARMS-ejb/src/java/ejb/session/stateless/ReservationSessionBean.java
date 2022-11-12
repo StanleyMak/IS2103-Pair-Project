@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategoryEntity;
 import entity.CarEntity;
 import entity.CustomerEntity;
 import entity.OutletEntity;
@@ -162,6 +163,15 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         List<ReservationEntity> reservations = query.getResultList();
         return reservations;
     }
+    
+    public List<ReservationEntity> retrieveReservationsByCategory(CarCategoryEntity carCategory) {
+        Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE r.carCategory = ?1")
+                .setParameter(1, carCategory); 
+        List<ReservationEntity> reservations = query.getResultList(); 
+        
+        return reservations; 
+    }
+    
     /*
     @Override
     public List<ReservationEntity> retrieveAvailableCars(Date pickupDateTime, Date returnDateTime, String pickupOutletAddress, String returnOutletAddress) {
