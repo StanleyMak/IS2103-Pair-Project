@@ -86,13 +86,14 @@ public class CustomerServiceModule {
         this.currentEmployee = null;
     }
     
+    //retrieve car from allocate car method from ejb timer, car should have been associated by now
     private void doPickUpCar() throws InvalidReservationCodeException {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS :: Customer Service :: Pick Up Car ***\n");
         
         System.out.print("Enter Reservation Code> ");         
         String reservationCode = sc.nextLine().trim();
-        ReservationEntity reservation = new ReservationEntity(); 
+        ReservationEntity reservation = null; 
         try {
             reservation = reservationSessionBeanRemote.retrieveReservationByReservationCode(reservationCode); 
         } catch (ReservationNotFoundException ex) {

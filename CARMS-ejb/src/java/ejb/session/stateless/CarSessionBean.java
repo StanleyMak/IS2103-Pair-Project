@@ -151,14 +151,18 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
     }
 
+    //LOOK AT ALLOCATE CAR, CAR SHOULD HAVE BEEN ASSOCIATED BY NOW
     @Override
     public void pickUpCar(ReservationEntity reservation) {
+        //
         CarEntity pickUpCar = reservation.getCar();
-        em.persist(pickUpCar);
+        
         // update car status to rented out
         pickUpCar.setStatus(StatusEnum.ON_RENTAL);
         // update car location to pick up location
         pickUpCar.setCurrOutlet(reservation.getPickUpOutlet());
+        
+        em.persist(pickUpCar);
         em.flush();
     }
 

@@ -43,7 +43,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     @Override
     public CustomerEntity retrieveCustomerByID(Long customerID) {
         CustomerEntity customer = em.find(CustomerEntity.class, customerID);
-        //customer.getXX.size();
+        customer.getReservations().size();
         return customer;
     }
 
@@ -59,7 +59,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             throw new CustomerNotFoundException("Customer email " + email + "does not exist!");
         }
     }
-    
+
     public OwnCustomerEntity retrieveOwnCustomerByOwnCustomerEmail(String email) throws CustomerNotFoundException {
         Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.email = ?1")
                 .setParameter(1, email);
@@ -86,6 +86,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             OwnCustomerEntity customer = retrieveOwnCustomerByOwnCustomerEmail(email);
 
             if (password.equals(customer.getPassword())) {
+                customer.getReservations().size();
                 return customer;
             } else {
                 throw new InvalidLoginCredentialException("Invalid email or password");
@@ -94,28 +95,31 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             throw new InvalidLoginCredentialException("Invalid email or password");
         }
     }
-    
+
     @Override
     public List<CustomerEntity> retrieveAllCustomers() {
         Query query = em.createQuery("SELECT c FROM CustomerEntity c");
         List<CustomerEntity> customers = query.getResultList();
+        for (CustomerEntity cus : customers) {
+            cus.getReservations().size();
+        }
         return customers;
     }
-    
+
     private Boolean containsReservationID(CustomerEntity customer, Long reservationID) {
         List<ReservationEntity> reservations = customer.getReservations();
         for (ReservationEntity reservation : reservations) {
-            if (reservation.getReservationID()== reservationID) {
+            if (reservation.getReservationID() == reservationID) {
                 return true;
             }
         }
         return false;
     }
-    
+
     //review return type
     @Override
     public CustomerEntity retrieveCustomerOfReservationID(Long reservationID) {
-        List<CustomerEntity> customers = retrieveAllCustomers(); 
+        List<CustomerEntity> customers = retrieveAllCustomers();
         for (CustomerEntity customer : customers) {
             if (containsReservationID(customer, reservationID)) {
                 return customer;

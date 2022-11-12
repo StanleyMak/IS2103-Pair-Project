@@ -21,7 +21,7 @@ import util.exception.ReservationNotFoundException;
 @Local
 public interface ReservationSessionBeanLocal {
     
-    public Long createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException;
+    public String createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException;
     
     public ReservationEntity retrieveReservationByID(Long reservationID) throws ReservationNotFoundException;
     
@@ -38,6 +38,8 @@ public interface ReservationSessionBeanLocal {
     public List<ReservationEntity> retrieveReservationsForCurrentDay(Date currDay);
 
     public List<ReservationEntity> retrieveReservationsByCategory(String carCategoryName);
+
+    public String cancelReservation(String email, String reservationCode, Date currDate) throws ReservationNotFoundException, CustomerNotFoundException;
 
     
 }

@@ -136,6 +136,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 //        break;
     }
 
+    //SET CAR STATUS TO BE ON TRANSIT!!!!!!!!
     private void generateDispatchRecordCurrentDayReservation(ReservationEntity reservation) {
         String currDate = dateTimeFormat.format(new Date());
         System.out.println("********** Dispatch Record Generation For Current Day Reservation: Timeout at " + currDate);

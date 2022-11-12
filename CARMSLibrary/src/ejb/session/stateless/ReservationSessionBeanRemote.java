@@ -22,20 +22,23 @@ import util.exception.ReservationNotFoundException;
  */
 @Remote
 public interface ReservationSessionBeanRemote {
-    
-    public Long createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException;
-    
+
+    public String createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException;
+
     public ReservationEntity retrieveReservationByID(Long reservationID) throws ReservationNotFoundException;
-    
-    public ReservationEntity retrieveReservationByReservationCode(String reservationCode) throws ReservationNotFoundException; 
-    
+
+    public ReservationEntity retrieveReservationByReservationCode(String reservationCode) throws ReservationNotFoundException;
+
     public void deleteReservation(String email, String reservationCode) throws CustomerNotFoundException, ReservationNotFoundException;
-    
+
     public List<ReservationEntity> retrieveAllReservations();
-    
+
     public List<ReservationEntity> retrieveReservationsOfCarID(Long carID);
-    
+
     public List<ReservationEntity> retrieveReservationsOfRentalRateID(Long rentalRateID);
-    
+
     public List<ReservationEntity> retrieveReservationsByCategory(String carCategoryName);
+
+    public String cancelReservation(String email, String reservationCode, Date currDate) throws ReservationNotFoundException, CustomerNotFoundException;
+
 }

@@ -12,6 +12,8 @@ import entity.OutletEntity;
 import entity.OwnCustomerEntity;
 import entity.RentalRateEntity;
 import entity.ReservationEntity;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,16 +46,15 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     @EJB(name = "CustomerSessionBeanLocal")
     private CustomerSessionBeanLocal customerSessionBean;
-    
-    
+
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
-    
+
     @Override
-    public Long createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException {
+    public String createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException {
         //AUTO ASSIGN THE CHEAPEST RENTAL RATE PER DAY!!!!!!!!!!!!!!
         // missing partner
-       
+
         try {
             OwnCustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
             OutletEntity pickupOutlet = outletSessionBean.retrieveOutletByOutletAddress(pickupOutletAddress);
@@ -72,14 +73,13 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             em.persist(reservation);
             em.flush();
 
-            return reservation.getReservationID();
+            return reservation.getReservationCode();
         } catch (CustomerNotFoundException e) {
             throw new CustomerNotFoundException("Customer Not Found");
         }
 
     }
-    
-    
+
     @Override
     public ReservationEntity retrieveReservationByID(Long reservationID) throws ReservationNotFoundException {
         ReservationEntity reservation = em.find(ReservationEntity.class, reservationID);
@@ -90,22 +90,22 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             throw new ReservationNotFoundException("Reservation " + reservationID + "does not exist!");
         }
     }
-    
+
     @Override
     public ReservationEntity retrieveReservationByReservationCode(String reservationCode) throws ReservationNotFoundException {
         Query query = em.createQuery("SELECT rc FROM ReservationEntity rc WHERE rc.reservationCode = ?1")
-                .setParameter(1, reservationCode); 
-        
+                .setParameter(1, reservationCode);
+
         try {
-            ReservationEntity reservation  = (ReservationEntity) query.getSingleResult(); 
+            ReservationEntity reservation = (ReservationEntity) query.getSingleResult();
             return reservation;
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new ReservationNotFoundException("Reservation " + reservationCode + "does not exist");
         }
-        
+
         //reservation.getXX().size();
     }
-    
+
     /*
     @Override
     public void deleteReservation(Long reservationID) throws DeleteReservationException, ReservationNotFoundException {
@@ -118,33 +118,73 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             throw new DeleteReservationException("Reservation " + reservationID + " is associated with existing car and outlets");
         }
     }
-*/
-    
+     */
+    @Override
+    public String cancelReservation(String email, String reservationCode, Date currDate) throws ReservationNotFoundException, CustomerNotFoundException {
+        LocalDateTime currDateLocal = LocalDateTime.ofInstant(currDate.toInstant(), ZoneId.systemDefault());
+        ReservationEntity res = null;
+        try {
+            res = retrieveReservationByReservationCode(reservationCode);
+        } catch (ReservationNotFoundException e) {
+            throw new ReservationNotFoundException("Reservation Not Found");
+        }
+        Date pickUpDate = res.getStartDateTime();
+        LocalDateTime pickUpDateLocal = LocalDateTime.ofInstant(pickUpDate.toInstant(), ZoneId.systemDefault());
+        LocalDateTime penalty14 = pickUpDateLocal.minusDays(14);
+        LocalDateTime penalty7 = pickUpDateLocal.minusDays(7);
+        LocalDateTime penalty3 = pickUpDateLocal.minusDays(3);
+        double rentalFee = res.getRentalFee();
+        double penaltyFee = 0;
+        
+        if (currDateLocal.isAfter(penalty3)) {
+            penaltyFee = 0.7 * rentalFee;
+        } else if (currDateLocal.isAfter(penalty7)) {
+            penaltyFee = 0.5 * rentalFee;
+        } else if (currDateLocal.isAfter(penalty14)) {
+            penaltyFee = 0.2 * rentalFee;
+        }
+        
+        try {
+            this.deleteReservation(email, reservationCode);
+            System.out.println("Reservation " + reservationCode + " successfully cancelled!\n");
+        } catch (CustomerNotFoundException customerNotFoundException) {
+            throw new CustomerNotFoundException("Customer Not Found");
+        } catch (ReservationNotFoundException reservationNotFoundException) {
+            throw new ReservationNotFoundException("Reservation Not Found");
+        }
+        
+        if (res.isOnlinePayment()) {
+            return "Amount of $" + (rentalFee - penaltyFee) + " has been refunded after charging a cancellation fee of $" + penaltyFee;
+        } else {
+            return "Cancellation fee of $" + penaltyFee + " has been charged";
+        }
+
+    }
+
     @Override
     public void deleteReservation(String email, String reservationCode) throws CustomerNotFoundException, ReservationNotFoundException {
         CustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
         ReservationEntity reservationToDelete = retrieveReservationByReservationCode(reservationCode);
         customer.getReservations().remove(reservationToDelete);
-        
+
         em.remove(reservationToDelete);
     }
-    
-    
-    @Override 
+
+    @Override
     public List<ReservationEntity> retrieveAllReservations() {
         Query query = em.createQuery("SELECT r FROM ReservationEntity r");
         List<ReservationEntity> reservations = query.getResultList();
         return reservations;
     }
-    
+
     @Override
     public List<ReservationEntity> retrieveReservationsOfCarID(Long carID) {
         Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE r.car.carID = ?1")
-                .setParameter(1, carID); 
-        List<ReservationEntity> reservations = query.getResultList(); 
-        return reservations; 
+                .setParameter(1, carID);
+        List<ReservationEntity> reservations = query.getResultList();
+        return reservations;
     }
-    
+
     private Boolean containsRentalRateID(ReservationEntity res, Long rentalRateID) {
         List<RentalRateEntity> rentalRates = res.getRentalRates();
         for (RentalRateEntity rentalRate : rentalRates) {
@@ -154,11 +194,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         }
         return false;
     }
-            
+
     @Override
     public List<ReservationEntity> retrieveReservationsOfRentalRateID(Long rentalRateID) {
         List<ReservationEntity> correctReservations = new ArrayList<>();
-        List<ReservationEntity> reservations = retrieveAllReservations(); 
+        List<ReservationEntity> reservations = retrieveAllReservations();
         for (ReservationEntity res : reservations) {
             if (containsRentalRateID(res, rentalRateID)) {
                 correctReservations.add(res);
@@ -167,7 +207,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         return correctReservations;
 
     }
-    
+
     //review date = ?1
     @Override
     public List<ReservationEntity> retrieveReservationsForCurrentDay(Date currDay) {
@@ -176,15 +216,15 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         List<ReservationEntity> reservations = query.getResultList();
         return reservations;
     }
-    
+
     public List<ReservationEntity> retrieveReservationsByCategory(String carCategoryName) {
         Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE r.carCategory.categoryName = ?1")
-                .setParameter(1, carCategoryName); 
-        List<ReservationEntity> reservations = query.getResultList(); 
-        
-        return reservations; 
+                .setParameter(1, carCategoryName);
+        List<ReservationEntity> reservations = query.getResultList();
+
+        return reservations;
     }
-    
+
     /*
     @Override
     public List<ReservationEntity> retrieveAvailableCars(Date pickupDateTime, Date returnDateTime, String pickupOutletAddress, String returnOutletAddress) {
@@ -224,7 +264,5 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         
         // check for sufficient inventory
     }
-*/
-    
-    
+     */
 }
