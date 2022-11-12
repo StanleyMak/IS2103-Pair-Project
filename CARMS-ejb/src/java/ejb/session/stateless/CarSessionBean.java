@@ -33,6 +33,12 @@ import util.exception.ReservationNotFoundException;
 @Stateless
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
 
+    @EJB(name = "RentalRateSessionBeanLocal")
+    private RentalRateSessionBeanLocal rentalRateSessionBeanLocal;
+
+    @EJB(name = "CarCategorySessionBeanLocal")
+    private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
+
     @EJB(name = "ReservationSessionBeanLocal")
     private ReservationSessionBeanLocal reservationSessionBeanLocal;
 
@@ -44,6 +50,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @EJB(name = "CustomerSessionBeanLocal")
     private CustomerSessionBeanLocal customerSessionBeanLocal;
+    
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
@@ -172,13 +179,40 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public List<CarEntity> doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet) {
+    public void doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet) {
+        
+        List<CarCategoryEntity> availableCategories = new ArrayList<>(); 
+        
+        List<CarEntity> availableCars = getAvailableCars(); 
+        
+        List<CarCategoryEntity> allCategories = carCategorySessionBean.retrieveAllCarCategory(); 
+        
+        // retrieve reservations of category and count num reservations per category
+        int numAvailCars = 0;
+        for (CarCategoryEntity cc : allCategories) {
+            
+            int numRes = getNumIntersectedReservations(pickupDateTime, returnDateTime);
+            
+            for (CarEntity car : availableCars) {
+                if (car.getModel().getCategory().equals(cc)) {
+                    numAvailCars++; 
+                }
+            }
+            if (numRes < numAvailCars) {
+                availableCategories.add(cc);
+            }
+        }
+        
+        for (CarCategoryEntity carCategory : availableCategories) {
+            double rentalRate = rentalRateSessionBeanLocal.computeCheapestRentalRateFee(pickupDateTime, returnDateTime, carCategory.getCategoryName());
+            System.out.println(carCategory + " " + rentalRate);
+        }
+    }
+    
+    public List<CarEntity> getAvailableCars() {
         List<CarEntity> cars = retrieveAllCars();
         List<CarEntity> availableCars = new ArrayList<>();
-
-        // available cars = cars that do not have any reservation recrods at specified date + cars with no reservations
         for (CarEntity car : cars) {
-
             List<ReservationEntity> carReservations = reservationSessionBeanLocal.retrieveReservationsOfCarID(car.getCarID());
 
             // add cars with no reservations
@@ -190,14 +224,6 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             if (car.getCurrOutlet().getAddress().equals(pickupOutlet.getAddress())) {
                 boolean potential = true;
                 for (ReservationEntity res : carReservations) {
-
-//                    if (pickupDateTime.compareTo(res.getEndDateTime()) < 0) {
-//                        potential = false; 
-//                        break; 
-//                    } else if (returnDateTime.compareTo(res.getStartDateTime()) > 0) {
-//                        potential = false; 
-//                        break;
-//                    }
                     if (pickupDateTime.compareTo(res.getEndDateTime()) < 0 && returnDateTime.compareTo(res.getStartDateTime()) > 0) {
                         potential = false;
                         break;
@@ -220,7 +246,6 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
                     LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
                     LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
-                    // need to check
 
                     if (pickupDateTimeLocal.compareTo(endDateTime) < 0 && returnDateTimeLocal.compareTo(startDateTime) > 0) {
                         potential = false;
@@ -228,22 +253,99 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                     }
                 }
 
-//                    if (startDateTime.compareTo(returnDateTimeLocal) <= 0
-//                            || endDateTime.compareTo(pickupDateTimeLocal) >= 0) {
-//                        potential = false;
-//                        break;
-//                    }
                 if (potential) {
                     if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
                         availableCars.add(car);
                     }
-
                 }
             }
         }
-        return availableCars;
+        
+        return availableCars; 
+    } 
+    
+    @Override
+    public List<CarCategoryEntity> searchAvailableCarCategory(Date rNewStart, Date rNewEnd) {
+
+        List<CarCategoryEntity> allCategories = retrieveAllCarCategories();
+
+        List<CarCategoryEntity> availableCategories = new ArrayList<>();
+
+        for (CarCategoryEntity cc : allCategories) {
+
+            // get number of reservations during selected reservation time
+
+            List<ReservationEntity> allReservations = cc.getReservations();
+
+            int numOfReservations = 0;
+
+            for (ReservationEntity r : allReservations) {
+
+                Date rExistingStart = r.getReservationStartDate();
+
+                Date rExistingEnd = r.getReservationEndDate();
+
+
+
+
+                if ((rNewStart.before(rExistingEnd) && rNewStart.after(rExistingStart))
+
+                        || (rNewEnd.after(rExistingStart) && rNewEnd.before(rExistingEnd))
+
+                        || (rNewStart.before(rExistingStart) && rNewEnd.after(rExistingEnd))
+
+                        || (rNewStart.equals(rExistingStart) && rNewEnd.equals(rExistingEnd))) {
+
+                    numOfReservations++;
+
+                }
+
+            }
+
+            // get number of cars available at any one point of time
+
+            List<CarEntity> cars = carSessionBeanLocal.retrieveCarsByCarCategory(cc);
+
+            List<CarEntity> availableCars = new ArrayList<>();
+
+            for (CarEntity c:cars) {
+
+                if (!c.getIsDisabled()) {
+
+                    availableCars.add(c); 
+
+                }
+
+            }
+
+            if (numOfReservations < availableCars.size()) {
+
+                availableCategories.add(cc);
+
+            }
+
+        }
+
+        return availableCategories;
     }
 
+    public int getNumIntersectedReservations(Date newStartDate, Date newEndDate) {
+        int numRes = 0; 
+        List<ReservationEntity> allReservations = reservationSessionBeanLocal.retrieveReservationsByCategory(cc);           
+        for (ReservationEntity res : allReservations) {
+            Date existingStartDate = res.getStartDateTime(); 
+            Date existingEndDate = res.getEndDateTime(); 
+            
+            if (newStartDate.before(existingEndDate) && newStartDate.after(existingStartDate) ||
+                    newEndDate.after(existingStartDate) && newEndDate.before(existingEndDate) ||
+                    newStartDate.before(existingStartDate) && newEndDate.after(existingEndDate) ||
+                    newStartDate.equals(existingStartDate) && newEndDate.equals(existingEndDate)) {
+                numRes++; 
+            }
+        }
+         return numRes;    
+    }
+    
     @Override
     public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException {
         CarEntity car = retrieveCarByCarID(carID);
