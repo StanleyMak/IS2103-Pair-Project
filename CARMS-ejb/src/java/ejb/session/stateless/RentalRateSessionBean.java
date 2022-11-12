@@ -113,9 +113,12 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         double total = 0;
         Date currDate = startDateTime;
         LocalDateTime currDateLocal = LocalDateTime.ofInstant(startDateTime.toInstant(), ZoneId.systemDefault());
+        LocalDateTime endDateLocal = LocalDateTime.ofInstant(endDateTime.toInstant(), ZoneId.systemDefault());
+        
         while (currDate.compareTo(endDateTime) <= 0) {
             total += retrieveCheapestRentalRateFeeForCurrentDay(currDate, carCategoryName);
-            currDate = Date.from(currDateLocal.plusDays(1).atZone(ZoneId.systemDefault()).toInstant());
+            currDateLocal = currDateLocal.plusDays(1);
+            currDate = Date.from(currDateLocal.atZone(ZoneId.systemDefault()).toInstant());
         }
         
         return total;
