@@ -219,6 +219,8 @@ public class MainApp {
         int i = 1;
         for (CarCategoryEntity cat : availableCat) {
             double rentalFee = rentalRateSessionBeanRemote.computeCheapestRentalRateFee(pickupDateTime, returnDateTime, cat.getCategoryName());
+            System.out.println("Category: " + cat.getCategoryName());
+            System.out.println("Rental Fee: " + rentalFee);
             System.out.printf("%-5s%-20s%-10s\n", i, availableCat.get(i - 1).getCategoryName(), rentalFee);
             i++;
         }
