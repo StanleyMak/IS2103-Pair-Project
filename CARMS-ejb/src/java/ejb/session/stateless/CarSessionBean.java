@@ -257,8 +257,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public List<CarEntity> retrieveCarsFilteredByCarCategory(String carCategoryName
-    ) {
+    public List<CarEntity> retrieveCarsFilteredByCarCategory(String carCategoryName) {
         Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.model.category.categoryName = ?1")
                 .setParameter(1, carCategoryName);
         List<CarEntity> cars = query.getResultList();
@@ -266,13 +265,49 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public List<CarEntity> retrieveCarsFilteredByCarMakeAndModel(String carModelMake, String carModelName
-    ) {
+    public List<CarEntity> retrieveCarsFilteredByCarMakeAndModel(String carModelMake, String carModelName) {
         Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.model.modelMake = ?1 AND c.model.modelName = ?2")
                 .setParameter(1, carModelMake)
                 .setParameter(2, carModelName);
         List<CarEntity> cars = query.getResultList();
         return cars;
+    }
+
+    @Override
+    public boolean isPotential(Long carID, Date startDateTime, Date endDateTime) {
+        //same outlet
+        //diff outlet +/- 2hrs
+        return true;
+    }
+
+    @Override
+    public CarEntity retrievePotentialCarOfCategoryOfOutlet(String carCategoryName, String outletAddress, Date startDateTime, Date endDateTime) {
+        Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.model.category.categoryName = ?1 AND c.currOutlet.address = ?2")
+                .setParameter(1, carCategoryName)
+                .setParameter(2, outletAddress);
+        List<CarEntity> cars = query.getResultList();
+        List<CarEntity> potentialCars = new ArrayList<>();
+        for (CarEntity car : cars) {
+            if (isPotential(car.getCarID(), startDateTime, endDateTime)) {
+                potentialCars.add(car);
+            }
+        }
+        return potentialCars.get(0);
+    }
+    
+    @Override
+    public CarEntity retrievePotentialCarOfCategoryOfOtherOutlet(String carCategoryName, String outletAddress, Date startDateTime, Date endDateTime) {
+        Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.model.category.categoryName = ?1 AND c.currOutlet.address != ?2")
+                .setParameter(1, carCategoryName)
+                .setParameter(2, outletAddress);
+        List<CarEntity> cars = query.getResultList();
+        List<CarEntity> potentialCars = new ArrayList<>();
+        for (CarEntity car : cars) {
+            if (isPotential(car.getCarID(), startDateTime, endDateTime)) {
+                potentialCars.add(car);
+            }
+        }
+        return potentialCars.get(0);
     }
 
 }
