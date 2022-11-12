@@ -5,7 +5,9 @@
  */
 package ejb.session.stateless;
 
+import entity.PartnerEntity;
 import javax.ejb.Remote;
+import util.exception.InvalidLoginCredentialException;
 
 /**
  *
@@ -13,5 +15,7 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface PartnerSessionBeanRemote {
+    
+    public PartnerEntity partnerLogin(String username, String password) throws InvalidLoginCredentialException;
     
 }

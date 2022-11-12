@@ -15,3 +15,4 @@ import javax.ejb.Local;
 public interface EjbTimerSessionBeanLocal {
     
 }
+//

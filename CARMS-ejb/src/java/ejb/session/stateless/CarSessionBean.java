@@ -10,8 +10,6 @@ import entity.CarEntity;
 import entity.CarModelEntity;
 import entity.OutletEntity;
 import entity.ReservationEntity;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +31,12 @@ import util.exception.ReservationNotFoundException;
 @Stateless
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
 
+    @EJB(name = "RentalRateSessionBeanLocal")
+    private RentalRateSessionBeanLocal rentalRateSessionBeanLocal;
+
+    @EJB(name = "CarCategorySessionBeanLocal")
+    private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
+
     @EJB(name = "ReservationSessionBeanLocal")
     private ReservationSessionBeanLocal reservationSessionBeanLocal;
 
@@ -44,6 +48,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @EJB(name = "CustomerSessionBeanLocal")
     private CustomerSessionBeanLocal customerSessionBeanLocal;
+    
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
@@ -172,78 +177,121 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public List<CarEntity> doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet) {
-        List<CarEntity> cars = retrieveAllCars();
-        List<CarEntity> availableCars = new ArrayList<>();
-
-        // available cars = cars that do not have any reservation recrods at specified date + cars with no reservations
-        for (CarEntity car : cars) {
-
-            List<ReservationEntity> carReservations = reservationSessionBeanLocal.retrieveReservationsOfCarID(car.getCarID());
-
-            // add cars with no reservations
-            if (carReservations.isEmpty() && (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR))) {
-                availableCars.add(car);
-                continue;
+    public List<CarCategoryEntity> doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet) {
+        
+        List<CarCategoryEntity> availableCategories = new ArrayList<>(); 
+        
+        List<CarCategoryEntity> allCategories = carCategorySessionBeanLocal.retrieveAllCarCategory(); 
+        
+        // retrieve reservations of category and count num reservations per category
+        
+        for (CarCategoryEntity cc : allCategories) {
+            
+            int numRes = getNumIntersectedReservations(pickupDateTime, returnDateTime, cc);
+            List<CarEntity> availableCarsByCategory = retrieveCarsFilteredByCarCategory(cc.getCategoryName()); 
+            
+            List<CarEntity> availableCars = new ArrayList<>(); 
+            
+            for (CarEntity car : availableCarsByCategory) {
+                if (!car.getStatus().equals(StatusEnum.DISABLED)) {
+                    availableCars.add(car);
+                }
             }
-
-            if (car.getCurrOutlet().getAddress().equals(pickupOutlet.getAddress())) {
-                boolean potential = true;
-                for (ReservationEntity res : carReservations) {
-
-//                    if (pickupDateTime.compareTo(res.getEndDateTime()) < 0) {
-//                        potential = false; 
-//                        break; 
-//                    } else if (returnDateTime.compareTo(res.getStartDateTime()) > 0) {
-//                        potential = false; 
-//                        break;
-//                    }
-                    if (pickupDateTime.compareTo(res.getEndDateTime()) < 0 && returnDateTime.compareTo(res.getStartDateTime()) > 0) {
-                        potential = false;
-                        break;
-                    }
-                }
-
-                if (potential) {
-                    if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
-                        availableCars.add(car);
-                    }
-                }
-            } else {
-                boolean potential = true;
-                for (ReservationEntity res : carReservations) {
-                    LocalDateTime startDateTime = LocalDateTime.ofInstant(res.getStartDateTime().toInstant(), ZoneId.systemDefault());
-                    LocalDateTime endDateTime = LocalDateTime.ofInstant(res.getEndDateTime().toInstant(), ZoneId.systemDefault());
-                    // factor in transit duration (2 hours)
-                    endDateTime = endDateTime.plusHours(2);
-                    startDateTime = startDateTime.minusHours(2);
-
-                    LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
-                    LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
-                    // need to check
-
-                    if (pickupDateTimeLocal.compareTo(endDateTime) < 0 && returnDateTimeLocal.compareTo(startDateTime) > 0) {
-                        potential = false;
-                        break;
-                    }
-                }
-
-//                    if (startDateTime.compareTo(returnDateTimeLocal) <= 0
-//                            || endDateTime.compareTo(pickupDateTimeLocal) >= 0) {
+            
+            if (numRes < availableCars.size()) {
+                availableCategories.add(cc);
+            }
+        }
+        
+        return availableCategories; 
+    }
+    
+//    public List<CarEntity> getAvailableCars() {
+//        List<CarEntity> cars = retrieveAllCars();
+//        List<CarEntity> availableCars = new ArrayList<>();
+//        for (CarEntity car : cars) {
+//            List<ReservationEntity> carReservations = reservationSessionBeanLocal.retrieveReservationsOfCarID(car.getCarID());
+//
+//            // add cars with no reservations
+//            if (carReservations.isEmpty() && (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR))) {
+//                availableCars.add(car);
+//                continue;
+//            }
+//
+//            if (car.getCurrOutlet().getAddress().equals(pickupOutlet.getAddress())) {
+//                boolean potential = true;
+//                for (ReservationEntity res : carReservations) {
+//                    if (pickupDateTime.compareTo(res.getEndDateTime()) < 0 && returnDateTime.compareTo(res.getStartDateTime()) > 0) {
 //                        potential = false;
 //                        break;
 //                    }
-                if (potential) {
-                    if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
-                        availableCars.add(car);
-                    }
+//                }
+//
+//                if (potential) {
+//                    if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
+//                        availableCars.add(car);
+//                    }
+//                }
+//            } else {
+//                boolean potential = true;
+//                for (ReservationEntity res : carReservations) {
+//                    LocalDateTime startDateTime = LocalDateTime.ofInstant(res.getStartDateTime().toInstant(), ZoneId.systemDefault());
+//                    LocalDateTime endDateTime = LocalDateTime.ofInstant(res.getEndDateTime().toInstant(), ZoneId.systemDefault());
+//                    // factor in transit duration (2 hours)
+//                    endDateTime = endDateTime.plusHours(2);
+//                    startDateTime = startDateTime.minusHours(2);
+//
+//                    LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
+//                    LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
+//
+//                    if (pickupDateTimeLocal.compareTo(endDateTime) < 0 && returnDateTimeLocal.compareTo(startDateTime) > 0) {
+//                        potential = false;
+//                        break;
+//                    }
+//                }
+//
+//                if (potential) {
+//                    if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
+//                        availableCars.add(car);
+//                    }
+//                }
+//            }
+//        }
+//        
+//        return availableCars; 
+//    } 
+    
 
-                }
+    public int getNumIntersectedReservations(Date newStartDate, Date newEndDate, CarCategoryEntity cc) {
+        int numRes = 0; 
+        List<ReservationEntity> allReservations = reservationSessionBeanLocal.retrieveReservationsByCategory(cc);           
+        for (ReservationEntity res : allReservations) {
+            Date existingStartDate = res.getStartDateTime(); 
+            Date existingEndDate = res.getEndDateTime(); 
+            
+            if (newStartDate.before(existingEndDate) && newStartDate.after(existingStartDate) ||
+                    newEndDate.after(existingStartDate) && newEndDate.before(existingEndDate) ||
+                    newStartDate.before(existingStartDate) && newEndDate.after(existingEndDate) ||
+                    newStartDate.equals(existingStartDate) && newEndDate.equals(existingEndDate)) {
+                numRes++; 
             }
         }
-        return availableCars;
+         return numRes;    
     }
-
+    
+    @Override
+    public void doReserveCar(ReservationEntity reservation, String carCategoryName) {
+        List<ReservationEntity> reservationsForCat = reservationSessionBeanLocal.retrieveReservationsByCategory(carCategoryName);
+        CarCategoryEntity cat = new CarCategoryEntity(); 
+        cat.setCategoryName(carCategoryName);
+        reservation.setCarCategory(carCategory);
+        
+       
+        
+        
+        
+    }
+    
     @Override
     public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException {
         CarEntity car = retrieveCarByCarID(carID);

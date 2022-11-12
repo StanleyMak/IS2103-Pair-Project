@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategoryEntity;
 import entity.ReservationEntity;
 import java.util.Date;
 import java.util.List;
@@ -27,8 +28,6 @@ public interface ReservationSessionBeanLocal {
     
     public void deleteReservation(String email, String reservationCode) throws CustomerNotFoundException, ReservationNotFoundException;
     
-    // public List<ReservationEntity> retrieveAvailableCars(Date pickupDateTime, Date returnDateTime, String pickUpOutlet, String returnOutlet); 
-    
     public List<ReservationEntity> retrieveAllReservations();
 
     public List<ReservationEntity> retrieveReservationsOfCarID(Long carID);
@@ -36,5 +35,8 @@ public interface ReservationSessionBeanLocal {
     public List<ReservationEntity> retrieveReservationsOfRentalRateID(Long rentalRateID);
 
     public List<ReservationEntity> retrieveReservationsForCurrentDay(Date currDay);
+
+    public List<ReservationEntity> retrieveReservationsByCategory(String carCategoryName);
+
     
 }

@@ -6,7 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategoryEntity;
-import entity.CarModelEntity;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -123,6 +123,13 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         }
 
         return msg;
+    }
+    
+    @Override 
+    public List<CarCategoryEntity> retrieveAllCarCategory() {
+        Query query = em.createQuery("SELECT cc FROM CarCategoryEntity cc");
+        List<CarCategoryEntity> carCategories = query.getResultList();
+        return carCategories; 
     }
 
 }

@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategoryEntity;
 import entity.CarEntity;
 import entity.OutletEntity;
 import entity.ReservationEntity;
@@ -43,8 +44,8 @@ public interface CarSessionBeanLocal {
     
     public void returnCar(String reservationCode);
     
-    public List<CarEntity> doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet);
-
+    public List<CarCategoryEntity> doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet);
+        
     public List<CarEntity> retrieveAllCarsOfCarCategory(String carCategoryName);
 
     public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException;
@@ -58,4 +59,5 @@ public interface CarSessionBeanLocal {
     public CarEntity retrievePotentialCarOfCategoryOfOutlet(String carCategoryName, String outletAddress, Date startDateTime, Date endDateTime);
 
     public CarEntity retrievePotentialCarOfCategoryOfOtherOutlet(String carCategoryName, String outletAddress, Date startDateTime, Date endDateTime);
+
 }

@@ -24,6 +24,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
+ 
     
     public Long createNewPartner(PartnerEntity partnerEntity) {
         em.persist(partnerEntity);

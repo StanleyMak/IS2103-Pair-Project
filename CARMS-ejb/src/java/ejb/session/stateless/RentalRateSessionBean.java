@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.CarCategoryEntity;
 import entity.RentalRateEntity;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
@@ -108,12 +109,14 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         }
     }
     
-    public double computeCheapestRentalRateFee(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    @Override
+    public double computeCheapestRentalRateFee(Date startDateTime, Date endDateTime, String carCategoryName) {
         double total = 0;
-        LocalDateTime currDate = startDateTime;
+        Date currDate = startDateTime;
+        LocalDateTime currDateLocal = LocalDateTime.ofInstant(currDate.toInstant(), ZoneId.systemDefault());
         while (currDate.compareTo(endDateTime) <= 0) {
-            total += retrieveCheapestRentalRateFeeForCurrentDay(currDate);
-            currDate.plusDays(1);
+            total += retrieveCheapestRentalRateFeeForCurrentDay(currDate, carCategoryName);
+            currDateLocal.plusDays(1);
         }
         //take into account of extra time thereafter
 //        for (Date currDate.compareTo(startDateTime) == 0; currDate.compareTo(endDateTime) <= 0; currDate++) {
@@ -123,9 +126,10 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
     
     //check if returns double or returns rentalRate
-    public double retrieveCheapestRentalRateFeeForCurrentDay(LocalDateTime today) {
-        Query query = em.createQuery("SELECT MIN(r.ratePerDay) FROM RentalRateEntity r WHERE r.startDate <= ?1 AND r.endDate >= ?1")
-                .setParameter(1, today);
+    public double retrieveCheapestRentalRateFeeForCurrentDay(Date today, String carCategoryName) {
+        Query query = em.createQuery("SELECT MIN(r.ratePerDay) FROM RentalRateEntity r WHERE r.startDate <= ?1 AND r.endDate >= ?1 AND r.carCategory.categoryName = ?2")
+                .setParameter(1, today)
+                .setParameter(2, carCategoryName);
         double rentalRateFee = (double) query.getSingleResult();
         return rentalRateFee;
     }
