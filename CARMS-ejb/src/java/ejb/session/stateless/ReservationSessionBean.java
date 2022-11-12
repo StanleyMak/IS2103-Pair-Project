@@ -156,8 +156,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
     
     //review date = ?1
-    public List<ReservationEntity> retrieveReservationsForCurrentDay() {
-        Date currDay = new Date();
+    @Override
+    public List<ReservationEntity> retrieveReservationsForCurrentDay(Date currDay) {
         Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE r.startDateTime = ?1")
                 .setParameter(1, currDay);
         List<ReservationEntity> reservations = query.getResultList();

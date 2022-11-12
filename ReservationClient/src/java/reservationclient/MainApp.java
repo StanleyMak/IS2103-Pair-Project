@@ -204,6 +204,7 @@ public class MainApp {
         if (outletClosingHours.isBefore(outletClosingHours)) {
             System.out.println("Invalid return time, outlet closes at: " + outletClosingHours);
         }
+        //SESSION BEAN CALL FOR LIST OF CATEGORIES TO BE DISPLAYED
         //retrieveAllCategories
         //for each category C,
         //retrieveReservationsOfCategory

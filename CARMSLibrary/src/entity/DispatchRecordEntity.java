@@ -48,11 +48,14 @@ public class DispatchRecordEntity implements Serializable {
     //@Column(nullable = false)
     private Date returnTime;
     
-//    @ManyToOne
-//    private OutletEntity currOutlet;
+    @ManyToOne
+    private OutletEntity pickUpOutlet;
     
-//    @OneToOne
-//    private EmployeeEntity employee;
+    @ManyToOne
+    private OutletEntity returnOutlet;
+    
+    @ManyToOne
+    private EmployeeEntity employee;
 
     public DispatchRecordEntity() {
     }
@@ -87,21 +90,21 @@ public class DispatchRecordEntity implements Serializable {
         this.returnTime = returnTime;
     }
 
-//    public OutletEntity getCurrOutlet() {
-//        return currOutlet;
-//    }
-//
-//    public void setCurrOutlet(OutletEntity currOutlet) {
-//        this.currOutlet = currOutlet;
-//    }
+    public OutletEntity getPickUpOutlet() {
+        return pickUpOutlet;
+    }
 
-//    public EmployeeEntity getEmployee() {
-//        return employee;
-//    }
-//
-//    public void setEmployee(EmployeeEntity employee) {
-//        this.employee = employee;
-//    }
+    public void setPickUpOutlet(OutletEntity pickUpOutlet) {
+        this.pickUpOutlet = pickUpOutlet;
+    }
+
+    public EmployeeEntity getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(EmployeeEntity employee) {
+        this.employee = employee;
+    }
 
     public Long getDispatchRecordID() {
         return dispatchRecordID;
@@ -148,6 +151,14 @@ public class DispatchRecordEntity implements Serializable {
      */
     public void setDispatchRecordName(String dispatchRecordName) {
         this.dispatchRecordName = dispatchRecordName;
+    }
+
+    public OutletEntity getReturnOutlet() {
+        return returnOutlet;
+    }
+
+    public void setReturnOutlet(OutletEntity returnOutlet) {
+        this.returnOutlet = returnOutlet;
     }
     
 }

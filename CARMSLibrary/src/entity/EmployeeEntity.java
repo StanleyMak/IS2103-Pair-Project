@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import util.enumeration.EmployeeAccessRightEnum;
@@ -45,8 +46,8 @@ public class EmployeeEntity implements Serializable {
     @Column(nullable = false)
     private EmployeeAccessRightEnum employeeAccessRight;
     
-    @OneToOne
-    private DispatchRecordEntity dispatchRecord;
+//    @OneToMany(mappedBy = "employee")
+//    private DispatchRecordEntity dispatchRecord;
     
     //@NotNull
     //@ManyToOne(optional = false)
@@ -111,13 +112,13 @@ public class EmployeeEntity implements Serializable {
         this.employeeAccessRight = employeeAccessRight;
     }
 
-    public DispatchRecordEntity getDispatchRecord() {
-        return dispatchRecord;
-    }
-
-    public void setDispatchRecord(DispatchRecordEntity dispatchRecord) {
-        this.dispatchRecord = dispatchRecord;
-    }
+//    public DispatchRecordEntity getDispatchRecord() {
+//        return dispatchRecord;
+//    }
+//
+//    public void setDispatchRecord(DispatchRecordEntity dispatchRecord) {
+//        this.dispatchRecord = dispatchRecord;
+//    }
 
     public OutletEntity getOutlet() {
         return outlet;

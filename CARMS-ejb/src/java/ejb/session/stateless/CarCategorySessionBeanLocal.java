@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategoryEntity;
+import java.util.List;
 import javax.ejb.Local;
 import util.exception.CarCategoryNameExistsException;
 import util.exception.CarCategoryNotFoundException;
@@ -27,6 +28,8 @@ public interface CarCategorySessionBeanLocal {
     public CarCategoryEntity retrieveCarCategoryByCarCategoryName(String carCategoryName) throws CarCategoryNotFoundException;
 
     public void deleteCarCategory(Long carCategoryID) throws CarCategoryNotFoundException, DeleteCarCategoryException;
+
+    public List<CarCategoryEntity> retrieveAllCarCategory();
     
     
 }
