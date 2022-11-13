@@ -106,6 +106,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
             newDispatch.setPickUpTime(dispatchDateTime);
             newDispatch.setIsCompleted(Boolean.FALSE);
             newDispatch.setReservation(reservation);
+            
 
             dispatchRecordSessionBeanLocal.createNewDispatchRecord(newDispatch);
             System.out.println("New Transit Dispatch Record Created for " + reservation.getCar().getLicensePlateNumber() + "at " + reservation.getCar().getCurrOutlet() + " at " + dispatchDateTime.toString());
