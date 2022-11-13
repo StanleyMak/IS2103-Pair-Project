@@ -199,7 +199,10 @@ public class MainApp {
         LocalTime outletOpeningHours = LocalDateTime.ofInstant(pickupOutlet.getOpenHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
 
         if (pickupTime.isBefore(outletOpeningHours)) {
-            System.out.println("Invalid Pick Up Time! Outlet opens at: " + outletOpeningHours);
+            System.out.println("Invalid Pick Up Time! Outlet opens at: " + outletOpeningHours + "\n");
+            System.out.println("Press Enter To Continue...");
+            sc.nextLine();
+            return;
         }
 
         System.out.print("Enter End Date (DD/MM/YYYY hh:mm (24hr format))> ");
@@ -213,8 +216,11 @@ public class MainApp {
         OutletEntity returnOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(returnOutletAddress);
         LocalTime outletClosingHours = LocalDateTime.ofInstant(returnOutlet.getOpenHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
 
-        if (outletClosingHours.isBefore(outletClosingHours)) {
-            System.out.println("Invalid return time, outlet closes at: " + outletClosingHours);
+        if (returnTime.isAfter(outletClosingHours)) {
+            System.out.println("Invalid return time, outlet closes at: " + outletClosingHours + "\n");
+            System.out.println("Press Enter To Continue...");
+            sc.nextLine();
+            return;
         }
 
         //return list of abled cars
@@ -319,7 +325,6 @@ public class MainApp {
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
         //RESEVRE STARTS HERE -----------------------------------------------------
-        
         CarCategoryEntity carCategory = null;
         Integer response = 0;
 
@@ -390,7 +395,7 @@ public class MainApp {
         } catch (CustomerNotFoundException | CarCategoryNotFoundException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         }
-        
+
         sc.nextLine();
         System.out.println("Press Enter To Continue...");
         sc.nextLine();
@@ -523,7 +528,7 @@ public class MainApp {
         System.out.println("*** CaRMS Reservation Client :: Cancel Reservation ***\n");
         String email = customer.getEmail();
         String reservationCode = res.getReservationCode();
-        
+
         Date currDate = new Date();
         try {
             String cancelMessage = reservationSessionBeanRemote.cancelReservation(email, reservationCode, currDate);
@@ -543,7 +548,7 @@ public class MainApp {
 
         System.out.print("Enter Reservation Code> ");
         String reservationCode = sc.nextLine().trim();
-        
+
         ReservationEntity reservation = null;
         try {
             reservation = reservationSessionBeanRemote.retrieveReservationByReservationCode(reservationCode);

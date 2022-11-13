@@ -79,9 +79,8 @@ public class DataInitSessionBean {
             em.persist(outletB);
             em.flush();
             
-            Date openingHours = timeFormat.parse("08:00");
-            Date closingHours = timeFormat.parse("22:00");
-            OutletEntity outletC = new OutletEntity("Outlet C", openingHours, closingHours);
+       
+            OutletEntity outletC = new OutletEntity("Outlet C", timeFormat.parse("08:00"), timeFormat.parse("22:00"));
             em.persist(outletC);
             em.flush();
 

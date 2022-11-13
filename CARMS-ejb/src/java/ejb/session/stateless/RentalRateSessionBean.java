@@ -170,7 +170,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
         if (!isPromo.isEmpty()) {
             return findMin(isPromo).getRatePerDay();
-        } else if (isPeak != null) {
+        } else if (!isPeak.isEmpty()) {
             return findMin(isPeak).getRatePerDay();
         } else {
             return findMin(isDefault).getRatePerDay();
