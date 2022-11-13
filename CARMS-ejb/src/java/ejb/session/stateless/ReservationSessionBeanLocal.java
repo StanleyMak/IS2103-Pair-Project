@@ -12,6 +12,7 @@ import java.util.List;
 import javax.ejb.Local;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
+import util.exception.PartnerNotFoundException;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -42,6 +43,14 @@ public interface ReservationSessionBeanLocal {
     public String cancelReservation(String email, String reservationCode, Date currDate) throws ReservationNotFoundException, CustomerNotFoundException;
 
     public List<ReservationEntity> retrieveReservationsOfPartnerID(Long partnerID);
+
+    public String cancelReservationForPartner(String username, String reservationCode, Date currDate) throws ReservationNotFoundException, PartnerNotFoundException;
+
+    public void deleteReservationForPartner(String username, String reservationCode) throws PartnerNotFoundException, ReservationNotFoundException;
+
+    public String createNewReservationForPartner(ReservationEntity reservation, String username, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws PartnerNotFoundException, CarCategoryNotFoundException;
+
+    public void updateReservation(ReservationEntity res);
 
     
 }

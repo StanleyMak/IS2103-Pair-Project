@@ -38,5 +38,7 @@ public interface CustomerSessionBeanLocal {
     public List<CustomerEntity> retrieveAllCustomers();
 
     public CustomerEntity retrieveCustomerOfReservationID(Long reservationID);
+
+    public List<CustomerEntity> retrieveCustomersOfPartnerUsername(String username);
     
 }

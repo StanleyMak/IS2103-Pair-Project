@@ -28,11 +28,15 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.persistence.PersistenceException;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.CustomerEmailExistsException;
 import util.exception.CustomerNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.InvalidReservationCodeException;
 import util.exception.ReservationNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -160,22 +164,26 @@ public class MainApp {
     }
 
     public void doRegisterAsCustomer() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("*** CaRMS Reservation Client :: Register As Customer ***\n");
-        OwnCustomerEntity newCustomer = new OwnCustomerEntity();
-
-        System.out.print("Enter Email> ");
-        newCustomer.setEmail(scanner.nextLine().trim());
-
-        System.out.print("Enter Password> ");
-        newCustomer.setPassword(scanner.nextLine().trim());
-
-        Long customerID = customerSessionBeanRemote.createNewCustomer(newCustomer);
-
-        System.out.println("New Customer: " + customerID + " successfully registered!\n");
-
-        System.out.println("Press Enter To Continue...");
-        scanner.nextLine();
+        try {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("*** CaRMS Reservation Client :: Register As Customer ***\n");
+            OwnCustomerEntity newCustomer = new OwnCustomerEntity();
+            
+            System.out.print("Enter Email> ");
+            newCustomer.setEmail(scanner.nextLine().trim());
+            
+            System.out.print("Enter Password> ");
+            newCustomer.setPassword(scanner.nextLine().trim());
+            
+            Long customerID = customerSessionBeanRemote.createNewCustomer(newCustomer);
+            
+            System.out.println("New Customer: " + customerID + " successfully registered!\n");
+            
+            System.out.println("Press Enter To Continue...");
+            scanner.nextLine();
+        } catch (CustomerEmailExistsException | UnknownPersistenceException | InputDataValidationException | PersistenceException ex) {
+            System.out.println("Error: " + ex.getMessage() + "!\n");
+        }
     }
 
     //CATCH EXCEPTION NOT THROW

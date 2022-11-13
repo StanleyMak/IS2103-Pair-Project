@@ -172,5 +172,16 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
 
         return msg;
     }
+    
+    @Override
+    public List<CustomerEntity> retrieveCustomersOfPartnerUsername(String username) {
+        Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.partner.username = ?1")
+                .setParameter(1, username);
+        List<CustomerEntity> customers = query.getResultList();
+        for (CustomerEntity cus : customers) {
+            cus.getReservations().size();
+        }
+        return customers;
+    }
 
 }

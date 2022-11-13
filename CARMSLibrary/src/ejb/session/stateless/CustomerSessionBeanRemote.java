@@ -22,7 +22,7 @@ import util.exception.UnknownPersistenceException;
  */
 @Remote
 public interface CustomerSessionBeanRemote {
-    
+
     public Long createNewCustomer(CustomerEntity customer) throws CustomerEmailExistsException, UnknownPersistenceException, InputDataValidationException, PersistenceException;
 
     public CustomerEntity retrieveCustomerByID(Long customerID);
@@ -30,13 +30,15 @@ public interface CustomerSessionBeanRemote {
     public void deleteCustomer(Long customerID);
 
     public OwnCustomerEntity customerLogin(String email, String password) throws InvalidLoginCredentialException;
-    
+
     public CustomerEntity retrieveCustomerByCustomerEmail(String email) throws CustomerNotFoundException;
 
     public OwnCustomerEntity retrieveOwnCustomerByOwnCustomerEmail(String email) throws CustomerNotFoundException;
-    
+
     public List<CustomerEntity> retrieveAllCustomers();
 
     public CustomerEntity retrieveCustomerOfReservationID(Long reservationID);
+
+    public List<CustomerEntity> retrieveCustomersOfPartnerUsername(String username);
 
 }

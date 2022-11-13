@@ -14,6 +14,7 @@ import entity.CarModelEntity;
 import entity.EmployeeEntity;
 import entity.OutletEntity;
 import entity.OwnCustomerEntity;
+import entity.PartnerEntity;
 import entity.RentalRateEntity;
 import entity.ReservationEntity;
 import java.text.ParseException;
@@ -54,9 +55,7 @@ public class DataInitSessionBean {
 
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
-    
-    
-    
+
     @PostConstruct
     public void postConstruct() {
         if (em.find(EmployeeEntity.class, 1l) == null) {
@@ -65,7 +64,7 @@ public class DataInitSessionBean {
     }
 
     private void initialiseData() {
-        
+
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
@@ -74,12 +73,11 @@ public class DataInitSessionBean {
             OutletEntity outletA = new OutletEntity("Outlet A", null, null);//24 hours
             em.persist(outletA);
             em.flush();
-            
+
             OutletEntity outletB = new OutletEntity("Outlet B", null, null);
             em.persist(outletB);
             em.flush();
-            
-       
+
             OutletEntity outletC = new OutletEntity("Outlet C", timeFormat.parse("08:00"), timeFormat.parse("22:00"));
             em.persist(outletC);
             em.flush();
@@ -100,7 +98,7 @@ public class DataInitSessionBean {
             employee = new EmployeeEntity("Employee A5", outletA, EmployeeAccessRightEnum.EMPLOYEE, "a5", "a5");
             em.persist(employee);
             em.flush();
-            
+
             employee = new EmployeeEntity("Employee B1", outletB, EmployeeAccessRightEnum.SALES_MANAGER, "b1", "b1");
             em.persist(employee);
             em.flush();
@@ -110,7 +108,7 @@ public class DataInitSessionBean {
             employee = new EmployeeEntity("Employee B3", outletB, EmployeeAccessRightEnum.CUSTOMER_SERVICE_EXEC, "b3", "b3");
             em.persist(employee);
             em.flush();
-            
+
             employee = new EmployeeEntity("Employee C1", outletC, EmployeeAccessRightEnum.SALES_MANAGER, "c1", "c1");
             em.persist(employee);
             em.flush();
@@ -229,10 +227,7 @@ public class DataInitSessionBean {
             rate = new RentalRateEntity("SUV and Minivan - Default", RentalRateTypeEnum.DEFAULT, suvMinivan, 400, null, null);
             em.persist(rate);
             em.flush();
-            
-            
-            
-            
+
 //            OwnCustomerEntity customer = new OwnCustomerEntity("hans", "stan");
 //            customerSessionBeanLocal.createNewCustomer(customer);
 //            
@@ -283,9 +278,11 @@ public class DataInitSessionBean {
 //                System.out.println("Error: " + e.getMessage() + "!\n");
 //            } 
 //            
-//          /*Initialising Partner*/
-//            //Partner partner = new Partner("Holiday.com");
-//            
+            //Initialising Partner
+            PartnerEntity partner = new PartnerEntity("Holiday.com", "password");
+            em.persist(partner);
+            em.flush();
+
         } catch (ParseException e) {
             System.out.println("Invalid Date/Time format! Please try again!\n");
         }
