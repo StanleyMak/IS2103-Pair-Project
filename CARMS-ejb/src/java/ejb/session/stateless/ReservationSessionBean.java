@@ -6,8 +6,6 @@
 package ejb.session.stateless;
 
 import entity.CarCategoryEntity;
-import entity.CarEntity;
-import entity.CarModelEntity;
 import entity.CustomerEntity;
 import entity.OutletEntity;
 import entity.OwnCustomerEntity;
@@ -32,10 +30,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.exception.CarCategoryNameExistsException;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.PartnerNotFoundException;
+import util.exception.ReservationCodeExistsException;
 import util.exception.ReservationNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -81,9 +80,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
         if (constraintViolations.isEmpty()) {
             try {
-                OwnCustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
-                OutletEntity pickupOutlet = outletSessionBean.retrieveOutletByOutletAddress(pickupOutletAddress);
-                OutletEntity returnOutlet = outletSessionBean.retrieveOutletByOutletAddress(returnOutletAddress);
+                OwnCustomerEntity customer = customerSessionBeanLocal.retrieveOwnCustomerByOwnCustomerEmail(email);
+                OutletEntity pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(pickupOutletAddress);
+                OutletEntity returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(returnOutletAddress);
                 CarCategoryEntity carCategory = null;
                 try {
                     carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
@@ -166,34 +165,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     }
     
-    @Override
-    public String createNewReservationForPartner(ReservationEntity reservation, String username, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws PartnerNotFoundException, CarCategoryNotFoundException {
-
-        try {
-            PartnerEntity partner = partnerSessionBeanLocal.retrievePartnerByUsername(username);
-            OutletEntity pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(pickupOutletAddress);
-            OutletEntity returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(returnOutletAddress);
-            CarCategoryEntity carCategory = null;
-            try {
-                carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
-            } catch (CarCategoryNotFoundException e) {
-                throw new CarCategoryNotFoundException("Car Category Not Found");
-            }
-            reservation.setCarCategory(carCategory);
-            reservation.setReturnOutlet(returnOutlet);
-            reservation.setPickUpOutlet(pickupOutlet);
-            reservation.setPartner(partner);
-
-            em.persist(reservation);
-            em.flush();
-
-            return reservation.getReservationCode();
-        } catch (PartnerNotFoundException e) {
-            throw new PartnerNotFoundException("Partner Not Found");
-        }
-
-    }
-
     @Override
     public ReservationEntity retrieveReservationByID(Long reservationID) throws ReservationNotFoundException {
         ReservationEntity reservation = em.find(ReservationEntity.class, reservationID);
@@ -304,47 +275,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     }
     
-    @Override
-    public String cancelReservationForPartner(String username, String reservationCode, Date currDate) throws ReservationNotFoundException, PartnerNotFoundException {
-        LocalDateTime currDateLocal = LocalDateTime.ofInstant(currDate.toInstant(), ZoneId.systemDefault());
-        ReservationEntity res = null;
-        try {
-            res = retrieveReservationByReservationCode(reservationCode);
-        } catch (ReservationNotFoundException e) {
-            throw new ReservationNotFoundException("Reservation Not Found");
-        }
-        Date pickUpDate = res.getStartDateTime();
-        LocalDateTime pickUpDateLocal = LocalDateTime.ofInstant(pickUpDate.toInstant(), ZoneId.systemDefault());
-        LocalDateTime penalty14 = pickUpDateLocal.minusDays(14);
-        LocalDateTime penalty7 = pickUpDateLocal.minusDays(7);
-        LocalDateTime penalty3 = pickUpDateLocal.minusDays(3);
-        double rentalFee = res.getRentalFee();
-        double penaltyFee = 0;
-        
-        if (currDateLocal.isAfter(penalty3)) {
-            penaltyFee = 0.7 * rentalFee;
-        } else if (currDateLocal.isAfter(penalty7)) {
-            penaltyFee = 0.5 * rentalFee;
-        } else if (currDateLocal.isAfter(penalty14)) {
-            penaltyFee = 0.2 * rentalFee;
-        }
-        
-        try {
-            this.deleteReservationForPartner(username, reservationCode);
-            System.out.println("Reservation " + reservationCode + " successfully cancelled!\n");
-        } catch (PartnerNotFoundException customerNotFoundException) {
-            throw new PartnerNotFoundException("Partner Not Found");
-        } catch (ReservationNotFoundException reservationNotFoundException) {
-            throw new ReservationNotFoundException("Reservation Not Found");
-        }
-        
-        if (res.isOnlinePayment()) {
-            return "Amount of $" + (rentalFee - penaltyFee) + " has been refunded after charging a cancellation fee of $" + penaltyFee;
-        } else {
-            return "Cancellation fee of $" + penaltyFee + " has been charged";
-        }
-
-    }
     
     @Override
     public void deleteReservationForPartner(String username, String reservationCode) throws PartnerNotFoundException, ReservationNotFoundException {

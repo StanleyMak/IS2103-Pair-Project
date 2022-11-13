@@ -41,6 +41,7 @@ import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.InvalidReservationCodeException;
 import util.exception.PartnerNotFoundException;
+import util.exception.ReservationCodeExistsException;
 import util.exception.ReservationNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -138,7 +139,7 @@ public class PartnerWebService {
             @WebParam(name = "returnOutletAddress") String returnOutletAddress,
             @WebParam(name = "pickupOutletAddress") String pickupOutletAddress,
             @WebParam(name = "catName") String catName,
-            @WebParam(name = "custName") String custName) throws PartnerNotFoundException, CarCategoryNotFoundException, CustomerNotFoundException, CustomerEmailExistsException, UnknownPersistenceException, InputDataValidationException {
+            @WebParam(name = "custName") String custName) throws PartnerNotFoundException, CarCategoryNotFoundException, CustomerNotFoundException, CustomerEmailExistsException, UnknownPersistenceException, InputDataValidationException, ReservationCodeExistsException {
 
         String resCode = "";
         try {
@@ -151,6 +152,8 @@ public class PartnerWebService {
                 throw new CustomerNotFoundException();
             } catch (CarCategoryNotFoundException carCategoryNotFoundException) {
                 throw new CarCategoryNotFoundException();
+            } catch (ReservationCodeExistsException ex) {
+                throw new ReservationCodeExistsException();
             }
         } catch (PartnerNotFoundException ex) {
             throw new PartnerNotFoundException("Partner Not Found");
