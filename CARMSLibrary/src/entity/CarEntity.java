@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import util.enumeration.StatusEnum;
 
 /**
@@ -29,29 +31,26 @@ public class CarEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carID;
     
-    //@NotNull
-    //@Column(nullable = false, length = 64)
+    @NotNull
+    @Column(nullable = false, unique = true)
+    @Size(min = 5, max = 10)
     private String licensePlateNumber;
     
-    //@NotNull
-    //@Column(nullable = false, length = 32)
+    
+    @Size(min = 3)
     private String colour;
     
-    //@NotNull
+    @NotNull
     @Column(nullable = false)
     @Enumerated (EnumType.STRING)
     private StatusEnum status;
     
-    //@NotNull
-    //@ManyToOne(optional = false)
-    //@JoinColumn(nullable = false)
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private CarModelEntity model;
     
-    //@NotNull
-    //@ManyToOne(optional = false)
-    //@JoinColumn(nullable = false)
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private OutletEntity currOutlet;
 
     public CarEntity() {

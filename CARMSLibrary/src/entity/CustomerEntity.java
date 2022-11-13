@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -28,8 +30,9 @@ public class CustomerEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerID;
 
-    //@NotNull
-    //@Column(nullable = false, length = 64)
+    @NotNull
+    @Column(nullable = false, unique = true)
+    @Size(min = 3)
     private String email;
 
     @ManyToOne

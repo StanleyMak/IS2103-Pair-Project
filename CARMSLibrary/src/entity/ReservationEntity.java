@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -36,52 +37,51 @@ public class ReservationEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationID;
     
-    //@NotNull
-    //@Column(nullable = false)
+    @NotNull
+    @Column(nullable = false)
+    @Size(min = 5)
     private String reservationCode;
     
-    //@Column(nullable = false)
+    @NotNull
+    @Column(nullable = false)
     private double rentalFee; 
     
-    //@Column(nullable = false, length = 16)
-    //@Size(min = 16, max = 16)
+    @NotNull
+    @Column(nullable = false, length = 16)
+    @Size(min = 5, max = 16)
     private String creditCardNumber; 
     
-    //@Temporal(TemporalType.TIMESTAMP)
-    //@NotNull
-    //@Column(nullable = false)
+    @NotNull
+    @Future
+    @Column(nullable = false)
     private Date startDateTime; 
     
-    //@Temporal(TemporalType.TIMESTAMP)
-    //@NotNull
-    //@Column(nullable = false)
+    @NotNull
+    @Future
+    @Column(nullable = false)
     private Date endDateTime; 
     
-    //@Column(nullable = false)
-    //@Column(nullable = false)
+    @NotNull
+    @Column(nullable = false)
     private boolean onlinePayment;
     
-    //@NotNull
-    @ManyToOne(/*optional = false*/)
-    //@JoinColumn(nullable = false)
+    @ManyToOne
     private CarEntity car; 
     
     @ManyToOne
     private PartnerEntity partner; 
     
-    //@NotNull
-    //@OneToOne(optional = false)
-    //@JoinColumn(nullable = false)
-    @OneToOne
+    @OneToOne(optional = false)
+    @JoinColumn(nullable = false)
     private OutletEntity pickUpOutlet;
     
-    //@NotNull
-    //@OneToOne(optional = false)
-    //@JoinColumn(nullable = false)
-    @OneToOne
+    
+    @OneToOne(optional = false)
+    @JoinColumn(nullable = false)
     private OutletEntity returnOutlet;
     
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private CarCategoryEntity carCategory;
     
     @ManyToMany
