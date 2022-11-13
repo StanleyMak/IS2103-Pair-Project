@@ -75,10 +75,16 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
 
     @Override
-    public CustomerEntity retrieveCustomerByID(Long customerID) {
+    public CustomerEntity retrieveCustomerByID(Long customerID) throws CustomerNotFoundException {
+        
         CustomerEntity customer = em.find(CustomerEntity.class, customerID);
         customer.getReservations().size();
-        return customer;
+        
+        if (customer != null) {
+            return customer;
+        } else {
+            throw new CustomerNotFoundException("Customer " + customerID + "does not exist");
+        } 
     }
 
     public CustomerEntity retrieveCustomerByCustomerEmail(String email) throws CustomerNotFoundException {
@@ -109,7 +115,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
 
     @Override
-    public void deleteCustomer(Long customerID) {
+    public void deleteCustomer(Long customerID) throws CustomerNotFoundException {
         CustomerEntity customer = retrieveCustomerByID(customerID);
         //dissociate
         em.remove(customer);
