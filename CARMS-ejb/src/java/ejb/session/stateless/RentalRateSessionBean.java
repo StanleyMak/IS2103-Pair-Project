@@ -111,50 +111,79 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     public double computeCheapestRentalRateFee(Date startDateTime, Date endDateTime, String carCategoryName) {
         double total = 0;
         Date currDate = startDateTime;
-        LocalDateTime currDateLocal = LocalDateTime.ofInstant(startDateTime.toInstant(), ZoneId.systemDefault());        
-        while (currDate.compareTo(endDateTime) <= 0) {
-            total += retrieveCheapestRentalRateFeeForCurrentDay(currDate, carCategoryName);
-            currDateLocal = currDateLocal.plusDays(1);
-            currDate = Date.from(currDateLocal.atZone(ZoneId.systemDefault()).toInstant());
+
+        LocalDateTime cycleStartLocal = LocalDateTime.ofInstant(currDate.toInstant(), ZoneId.systemDefault());;
+        LocalDateTime cycleEndLocal = cycleStartLocal.plusDays(1);
+
+        Date cycleStart = Date.from(cycleStartLocal.atZone(ZoneId.systemDefault()).toInstant());
+        Date cycleEnd = Date.from(cycleEndLocal.atZone(ZoneId.systemDefault()).toInstant());
+
+        while (cycleStart.compareTo(endDateTime) < 0) {
+
+            if (cycleEnd.after(endDateTime)) {
+                cycleEnd = endDateTime;
+            }
+
+            total += retrieveCheapestRentalRateFeeForCurrentDay(cycleStart, cycleEnd, carCategoryName);
+
+            cycleStartLocal = cycleStartLocal.plusDays(1);
+            cycleEndLocal = cycleEndLocal.plusDays(1);
+
+            cycleStart = Date.from(cycleStartLocal.atZone(ZoneId.systemDefault()).toInstant());
+            cycleEnd = Date.from(cycleEndLocal.atZone(ZoneId.systemDefault()).toInstant());
+
         }
-        
+
         return total;
     }
 
     //check if returns double or returns rentalRate
-    private double retrieveCheapestRentalRateFeeForCurrentDay(Date today, String carCategoryName) {
+    private double retrieveCheapestRentalRateFeeForCurrentDay(Date cycleStart, Date cycleEnd, String carCategoryName) {
         System.out.println("Enter Method 2");
         List<RentalRateEntity> rentalRatesForCategory = retrieveRentalRatesOfCarCategory(carCategoryName);
         List<RentalRateEntity> rentalRatesForCategoryForCurrentDay = new ArrayList<>();
 
         for (RentalRateEntity rentalRate : rentalRatesForCategory) {
-            if ((today.after(rentalRate.getStartDate()) && today.before(rentalRate.getEndDate())) || today.equals(rentalRate.getStartDate()) || today.equals(rentalRate.getEndDate())) {
+            if ((cycleStart.after(rentalRate.getStartDate()) && cycleStart.before(rentalRate.getEndDate()))
+                    || (cycleEnd.after(rentalRate.getStartDate()) && cycleEnd.before(rentalRate.getEndDate()))
+                    || (cycleStart.before(rentalRate.getStartDate()) && cycleEnd.after(rentalRate.getEndDate()))
+                    || (cycleStart.equals(rentalRate.getStartDate()) && cycleEnd.equals(rentalRate.getEndDate()))) {
                 rentalRatesForCategoryForCurrentDay.add(rentalRate);
             }
         }
 
-        RentalRateEntity isPromo = null;
-        RentalRateEntity isPeak = null;
-        RentalRateEntity isDefault = null;
+        List<RentalRateEntity> isPromo = new ArrayList<>();
+        List<RentalRateEntity> isPeak = new ArrayList<>();
+        List<RentalRateEntity> isDefault = new ArrayList<>();
 
         for (RentalRateEntity rentalRate : rentalRatesForCategoryForCurrentDay) {
             if (rentalRate.getRentalRateType().equals(RentalRateTypeEnum.PROMO)) {
-                isPromo = rentalRate;
+                isPromo.add(rentalRate);
             }
             if (rentalRate.getRentalRateType().equals(RentalRateTypeEnum.PEAK)) {
-                isPeak = rentalRate;
+                isPeak.add(rentalRate);
             }
             if (rentalRate.getRentalRateType().equals(RentalRateTypeEnum.DEFAULT)) {
-                isDefault = rentalRate;
+                isDefault.add(rentalRate);
             }
         }
 
-        if (isPromo != null) {
-            return isPromo.getRatePerDay();
+        if (!isPromo.isEmpty()) {
+            return findMin(isPromo).getRatePerDay();
         } else if (isPeak != null) {
-            return isPeak.getRatePerDay();
+            return findMin(isPeak).getRatePerDay();
         } else {
-            return isDefault.getRatePerDay();
+            return findMin(isDefault).getRatePerDay();
         }
+    }
+
+    private RentalRateEntity findMin(List<RentalRateEntity> rr) {
+        RentalRateEntity min = rr.get(0);
+        for (RentalRateEntity r : rr) {
+            if (r.getRatePerDay() < min.getRatePerDay()) {
+                min = r;
+            }
+        }
+        return min;
     }
 }

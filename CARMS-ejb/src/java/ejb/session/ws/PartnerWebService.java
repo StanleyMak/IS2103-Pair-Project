@@ -8,6 +8,7 @@ package ejb.session.ws;
 import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
+import ejb.session.stateless.RentalRateSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
 import entity.PartnerEntity;
 import javax.ejb.EJB;
@@ -15,6 +16,8 @@ import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -25,6 +28,10 @@ import util.exception.InvalidLoginCredentialException;
 @Stateless()
 public class PartnerWebService {
 
+        
+    @PersistenceContext(unitName = "CARMS-ejbPU")
+    private EntityManager em;
+    
     @EJB
     private OutletSessionBeanLocal outletSessionBean;
 
@@ -36,6 +43,9 @@ public class PartnerWebService {
 
     @EJB(name = "PartnerSessionBeanLocal")
     private PartnerSessionBeanLocal partnerSessionBeanLocal;
+    
+    @EJB(name = "RentalRateSessionBeanLocal")
+    private RentalRateSessionBeanLocal rentalRateSessionBeanLocal;
 
     /**
      * This is a sample web service operation
@@ -80,4 +90,6 @@ public class PartnerWebService {
     public String partnerLogout(@WebParam(name = "name") String txt) {
         return "Hello " + txt + " !";
     }
+
+
 }

@@ -118,31 +118,38 @@ public class MainApp {
 
         while (true) {
             System.out.println("*** CaRMS Reservation Client ***\n");
-            System.out.println("1: Reserve Car");
+            System.out.println("1: Search Car");
+            System.out.println("2: Reserve Car");
             System.out.println("----------------------------------");
-            System.out.println("2: View Reservation Details");
-            System.out.println("3: View All My Reservation");
+            System.out.println("3: View Reservation Details");
+            System.out.println("4: View All My Reservation");
             System.out.println("----------------------------------");
-            System.out.println("4: Customer Logout");
+            System.out.println("5: Customer Logout");
             response = 0;
 
-            while (response < 1 || response > 4) {
+            while (response < 1 || response > 5) {
                 System.out.print("> ");
 
                 response = sc.nextInt();
 
                 if (response == 1) {
+                    try {
+                        doSearchCarForVisitor();
+                    } catch (ParseException e) {
+                        System.out.println("Invalid Date/Time Format!\n");
+                    }
+                } else if (response == 2) {
                     List<CarEntity> cars = new ArrayList<>();
                     doReserveCar(cars);
-                } else if (response == 2) {
+                } else if (response == 3) {
                     try {
                         doViewReservationDetails();
                     } catch (InvalidReservationCodeException ex) {
                         System.out.println("Invalid reservation details: " + ex.getMessage());
                     }
-                } else if (response == 3) {
-                    doViewAllMyReservations();
                 } else if (response == 4) {
+                    doViewAllMyReservations();
+                } else if (response == 5) {
                     doLogout();
                     break;
                 } else {
@@ -150,7 +157,7 @@ public class MainApp {
                 }
             }
 
-            if (response == 4) {
+            if (response == 5) {
                 break;
             }
         }
@@ -158,7 +165,7 @@ public class MainApp {
 
     public void doRegisterAsCustomer() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("*** CaRMS Reservation Client ::  ***\n");
+        System.out.println("*** CaRMS Reservation Client :: Register As Customer ***\n");
         OwnCustomerEntity newCustomer = new OwnCustomerEntity();
 
         System.out.print("Enter Email> ");
@@ -177,7 +184,7 @@ public class MainApp {
 
     public void doSearchCarForVisitor() throws java.text.ParseException {
         Scanner sc = new Scanner(System.in);
-        System.out.println("*** CaRMS Reservation Client :: Search Car (Visitor) ***\n");
+        System.out.println("*** CaRMS Reservation Client :: Search Car ***\n");
 
         System.out.print("Enter Start Date (DD/MM/YYYY hh:mm) (24hr format)> ");
         String startDateTime = sc.nextLine();
@@ -545,9 +552,9 @@ public class MainApp {
         }
 
         System.out.println("Reservation Record:");
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.printf("%-5s%-50s%-20s%-28s%-28s%-20s%-20s%-5s\n", "ID", "Code", "Rental Fee ($)", "Start Date/Time", "End Date/Time", "Pick Up Outlet", "Return Outlet", "Online Payment?");
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         String onlinePayment = "";
         if (reservation.isOnlinePayment()) {
             onlinePayment = "YES";
@@ -555,7 +562,7 @@ public class MainApp {
             onlinePayment = "NO";
         }
         System.out.printf("%-5s%-50s%-20s%-28s%-28s%-20s%-20s%-5s\n", reservation.getReservationID(), reservation.getReservationCode(), reservation.getRentalFee(), dateTimeFormat.format(reservation.getStartDateTime()), dateTimeFormat.format(reservation.getEndDateTime()), reservation.getPickUpOutlet().getAddress(), reservation.getReturnOutlet().getAddress(), onlinePayment);
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.println();
 
         System.out.print("Cancel Reservation? (Y/N)> ");
