@@ -43,13 +43,13 @@ public interface CarSessionBeanRemote {
     public void pickUpCar(ReservationEntity reservation);
 
     public void returnCar(String reservationCode);
-    
+
     public List<CarCategoryEntity> doSearchCar(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet);
-    
+
     public List<CarEntity> retrieveAllCarsOfCarCategory(String carCategoryName);
-    
+
     public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException;
-    
+
     public List<CarEntity> retrieveCarsFilteredByCarCategory(String carCategoryName);
 
     public List<CarEntity> retrieveCarsFilteredByCarMakeAndModel(String carModelMake, String carModelName);
@@ -57,5 +57,7 @@ public interface CarSessionBeanRemote {
     public CarEntity retrievePotentialCarOfCategoryOfOutlet(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet, CarCategoryEntity carCategory);
 
     public CarEntity retrievePotentialCarOfCategoryOfOtherOutlet(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet, CarCategoryEntity carCategory);
+
+    public void updateCarEntity(CarEntity car);
 
 }

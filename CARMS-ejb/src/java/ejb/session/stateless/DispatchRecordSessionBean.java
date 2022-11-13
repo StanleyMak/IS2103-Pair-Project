@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarEntity;
 import entity.DispatchRecordEntity;
 import entity.EmployeeEntity;
 import entity.OutletEntity;
@@ -20,6 +21,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.StatusEnum;
 import util.exception.DispatchRecordNameExistsException;
 import util.exception.DispatchRecordNotFoundException;
 
@@ -99,7 +101,12 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
             DispatchRecordEntity dispatchRecord = retrieveDisptachRecordByDispatchRecordID(dispatchRecordID);
             dispatchRecord.setIsCompleted(Boolean.TRUE);
             dispatchRecord.getEmployee().setOnTransit(Boolean.FALSE);
+            
+            CarEntity car = dispatchRecord.getReservation().getCar();
+            car.setStatus(StatusEnum.AVAILABLE);
+            
             em.merge(dispatchRecord);
+            em.merge(car);
         } catch (DispatchRecordNotFoundException e) {
             throw new DispatchRecordNotFoundException("Dispatch Record ID " + dispatchRecordID + " does not exist!");
         }

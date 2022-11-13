@@ -9,8 +9,12 @@ import entity.RentalRateEntity;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
+import javax.persistence.PersistenceException;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.DeleteRentalRateException;
+import util.exception.InputDataValidationException;
+import util.exception.RentalRateNameExistsException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -19,8 +23,8 @@ import util.exception.DeleteRentalRateException;
 @Remote
 public interface RentalRateSessionBeanRemote {
 
-    public Long createNewRentalRate(RentalRateEntity rentalRate, String categoryName) throws CarCategoryNotFoundException;
-
+    public Long createNewRentalRate(RentalRateEntity rentalRate, String categoryName) throws CarCategoryNotFoundException, PersistenceException, RentalRateNameExistsException, UnknownPersistenceException, InputDataValidationException;
+    
     public List<RentalRateEntity> retrieveAllRentalRates();
 
     public RentalRateEntity retrieveRentalRateByRentalRateID(Long rentalRateID);

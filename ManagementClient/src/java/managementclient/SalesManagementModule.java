@@ -25,7 +25,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.validator.Validator;
+import javax.persistence.PersistenceException;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import util.enumeration.RentalRateTypeEnum;
@@ -38,6 +41,9 @@ import util.exception.DeleteCarException;
 import util.exception.DeleteCarModelException;
 import util.exception.DeleteRentalRateException;
 import util.exception.DispatchRecordNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.RentalRateNameExistsException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -195,50 +201,50 @@ public class SalesManagementModule {
     }
 
     private void doCreateRentalRate() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("*** CaRMS :: Sales Management (Sales) :: Create Rental Rate ***\n");
-        RentalRateEntity rentalRate = new RentalRateEntity();
+        try {
+            Scanner sc = new Scanner(System.in);
+            System.out.println("*** CaRMS :: Sales Management (Sales) :: Create Rental Rate ***\n");
+            RentalRateEntity rentalRate = new RentalRateEntity();
 
-        System.out.print("Enter Rental Rate Name> ");
-        rentalRate.setRentalName(sc.nextLine().trim());
+            System.out.print("Enter Rental Rate Name> ");
+            rentalRate.setRentalName(sc.nextLine().trim());
 
-        // does this mean that rnetal rate points at car category??
-        System.out.print("Enter Car Category> ");
-        String carCategoryName = sc.nextLine().trim();
+            // does this mean that rnetal rate points at car category??
+            System.out.print("Enter Car Category> ");
+            String carCategoryName = sc.nextLine().trim();
 
-        System.out.println("Select Rental Rate Type: ");
-        Integer response = 0;
+            System.out.println("Select Rental Rate Type: ");
+            Integer response = 0;
 
-        while (true) {
-            System.out.println("1: Default");
-            System.out.println("2: Promo");
-            System.out.println("3: Peak");
-            response = 0;
+            while (true) {
+                System.out.println("1: Default");
+                System.out.println("2: Promo");
+                System.out.println("3: Peak");
+                response = 0;
 
-            while (response < 1 || response > 3) {
-                System.out.print("> ");
+                while (response < 1 || response > 3) {
+                    System.out.print("> ");
 
-                response = sc.nextInt();
+                    response = sc.nextInt();
+
+                    if (response > 0 && response < 4) {
+                        rentalRate.setRentalRateType(RentalRateTypeEnum.values()[response - 1]);
+                        break;
+                    } else {
+                        System.out.println("Invalid option, please try again!\n");
+                    }
+                }
 
                 if (response > 0 && response < 4) {
-                    rentalRate.setRentalRateType(RentalRateTypeEnum.values()[response - 1]);
                     break;
-                } else {
-                    System.out.println("Invalid option, please try again!\n");
                 }
             }
 
-            if (response > 0 && response < 4) {
-                break;
-            }
-        }
+            System.out.print("Enter Rate Per Day (in Dollars)> ");
+            rentalRate.setRatePerDay(sc.nextDouble());
 
-        System.out.print("Enter Rate Per Day (in Dollars)> ");
-        rentalRate.setRatePerDay(sc.nextDouble());
+            sc.nextLine();
 
-        sc.nextLine();
-
-        try {
             System.out.print("Enter Start Date (DD/MM/YYYY hh:mm)> ");
             String startDate = sc.nextLine();
             if (!startDate.equals("null")) {
@@ -255,19 +261,16 @@ public class SalesManagementModule {
                 rentalRate.setEndDate(null);
             }
 
-            try {
-                Long rentalRateID = rentalRateSessionBeanRemote.createNewRentalRate(rentalRate, carCategoryName); //add category or associate category here
-                System.out.println("New Rental Rate: " + rentalRateID + " successfully created!\n");
-            } catch (CarCategoryNotFoundException e) {
-                System.out.println("Error: " + e.getMessage() + "!\n");
-            }
+            Long rentalRateID = rentalRateSessionBeanRemote.createNewRentalRate(rentalRate, carCategoryName); //add category or associate category here
+            System.out.println("New Rental Rate: " + rentalRateID + " successfully created!\n");
 
+            System.out.println("Press Enter To Continue...");
+            sc.nextLine();
         } catch (ParseException e) {
-            System.out.println("Invalid Date/Time Format! Please Try Again!\n");
+            System.out.println("Invalid Date/Time Format");
+        } catch (CarCategoryNotFoundException | PersistenceException | RentalRateNameExistsException | UnknownPersistenceException | InputDataValidationException e) {
+            System.out.println("Error: " + e.getMessage() + "!\n");
         }
-
-        System.out.println("Press Enter To Continue...");
-        sc.nextLine();
     }
 
     private void doViewAllRentalRates() {
@@ -591,30 +594,30 @@ public class SalesManagementModule {
     }
 
     private void doCreateNewModel() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("*** CaRMS :: Sales Management (Operations) :: Create New Model ***\n");
-        CarModelEntity carModel = new CarModelEntity();
-
-        System.out.print("Enter Model Make> ");
-        carModel.setModelMake(sc.nextLine().trim());
-
-        System.out.print("Enter Model Name> ");
-        carModel.setModelName(sc.nextLine().trim());
-
-        System.out.print("Enter Car Category> ");
-        String carCategoryName = sc.nextLine().trim();
-
-        carModel.setIsDisabled(Boolean.FALSE);
-
         try {
+            Scanner sc = new Scanner(System.in);
+            System.out.println("*** CaRMS :: Sales Management (Operations) :: Create New Model ***\n");
+            CarModelEntity carModel = new CarModelEntity();
+
+            System.out.print("Enter Model Make> ");
+            carModel.setModelMake(sc.nextLine().trim());
+
+            System.out.print("Enter Model Name> ");
+            carModel.setModelName(sc.nextLine().trim());
+
+            System.out.print("Enter Car Category> ");
+            String carCategoryName = sc.nextLine().trim();
+
+            carModel.setIsDisabled(Boolean.FALSE);
+
             Long carModelID = carModelSessionBeanRemote.createNewCarModel(carModel, carCategoryName);
             System.out.println("New Car Model: " + carModelID + " successfully created!\n");
-        } catch (CarModelNameExistsException | CarCategoryNotFoundException e) {
+
+            System.out.println("Press Enter To Continue...");
+            sc.nextLine();
+        } catch (CarModelNameExistsException | CarCategoryNotFoundException | UnknownPersistenceException | InputDataValidationException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         }
-
-        System.out.println("Press Enter To Continue...");
-        sc.nextLine();
     }
 
     private void doViewAllModels() {
@@ -1155,7 +1158,7 @@ public class SalesManagementModule {
         EmployeeEntity assignedEmployee = employees.get(0);
 
         dispatchRecordSessionBeanRemote.assignTransitDriver(thisRecord, assignedEmployee);
-        
+
         System.out.println("Successfully assigned Employee " + assignedEmployee.getName() + " to Transit Dispatch Record " + thisRecord.getDispatchRecordID() + " for pick up of Car " + thisRecord.getReservation().getCar().getLicensePlateNumber() + " at Outlet " + thisRecord.getPickUpOutlet().getAddress() + " at " + thisRecord.getPickUpTime().toString());
 
         System.out.println("Press Enter To Continue...");

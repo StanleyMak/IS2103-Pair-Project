@@ -12,14 +12,23 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.enumeration.RentalRateTypeEnum;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.DeleteRentalRateException;
+import util.exception.InputDataValidationException;
+import util.exception.RentalRateNameExistsException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -37,17 +46,40 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
 
-    @Override
-    public Long createNewRentalRate(RentalRateEntity rentalRate, String categoryName) throws CarCategoryNotFoundException {
-        try {
-            CarCategoryEntity carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(categoryName);
-            rentalRate.setCarCategory(carCategory);
-            em.persist(rentalRate);
-            em.flush();
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
 
-            return rentalRate.getRentalRateID();
-        } catch (CarCategoryNotFoundException e) {
-            throw new CarCategoryNotFoundException("Car Category Name " + categoryName + "does not exist!\n");
+    public RentalRateSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }
+
+    @Override
+    public Long createNewRentalRate(RentalRateEntity rentalRate, String categoryName) throws CarCategoryNotFoundException, PersistenceException, RentalRateNameExistsException, UnknownPersistenceException, InputDataValidationException {
+
+        Set<ConstraintViolation<RentalRateEntity>> constraintViolations = validator.validate(rentalRate);
+
+        if (constraintViolations.isEmpty()) {
+            try {
+                CarCategoryEntity carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(categoryName);
+                rentalRate.setCarCategory(carCategory);
+                
+                em.persist(rentalRate);
+                em.flush();
+                return rentalRate.getRentalRateID();
+            } catch (PersistenceException ex) {
+                if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                        throw new RentalRateNameExistsException("Rental Rate Name Exists");
+                    } else {
+                        throw new UnknownPersistenceException(ex.getMessage());
+                    }
+                } else {
+                    throw new UnknownPersistenceException(ex.getMessage());
+                }
+            }
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
     }
 
@@ -185,5 +217,15 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
             }
         }
         return min;
+    }
+
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRateEntity>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
     }
 }

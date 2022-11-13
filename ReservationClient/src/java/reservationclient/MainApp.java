@@ -142,11 +142,7 @@ public class MainApp {
                     List<CarEntity> cars = new ArrayList<>();
                     doReserveCar(cars);
                 } else if (response == 3) {
-                    try {
-                        doViewReservationDetails();
-                    } catch (InvalidReservationCodeException ex) {
-                        System.out.println("Invalid reservation details: " + ex.getMessage());
-                    }
+                    doViewReservationDetails();
                 } else if (response == 4) {
                     doViewAllMyReservations();
                 } else if (response == 5) {
@@ -182,6 +178,7 @@ public class MainApp {
         scanner.nextLine();
     }
 
+    //CATCH EXCEPTION NOT THROW
     public void doSearchCarForVisitor() throws java.text.ParseException {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: Search Car ***\n");
@@ -383,7 +380,7 @@ public class MainApp {
         String[] dateString = new Date().toString().split(" ");
         String finalDate = "";
         for (int j = 0; j < dateString.length; j++) {
-           finalDate += dateString[j];
+            finalDate += dateString[j];
         }
         reservation.setReservationCode(this.loggedInCustomer.getEmail() + finalDate);
         reservation.setStartDateTime(pickupDateTime);
@@ -545,7 +542,7 @@ public class MainApp {
         sc.nextLine();
     }
 
-    private void doViewReservationDetails() throws InvalidReservationCodeException {
+    private void doViewReservationDetails() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: View Reservation Details ***\n");
 
@@ -556,7 +553,7 @@ public class MainApp {
         try {
             reservation = reservationSessionBeanRemote.retrieveReservationByReservationCode(reservationCode);
         } catch (ReservationNotFoundException ex) {
-            throw new InvalidReservationCodeException("Reservation Code " + reservationCode + " is invalid");
+            System.out.println("Error: " + ex.getMessage() + "!\n");
         }
 
         System.out.println("Reservation Record:");

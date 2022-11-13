@@ -138,6 +138,11 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             throw new CarModelNotFoundException("Car Model Name " + modelName + " does not exist!\n");
         }
     }
+    
+    @Override
+    public void updateCarEntity(CarEntity car) {
+        em.merge(car);
+    }
 
     @Override
     public void deleteCar(Long carID) throws DeleteCarException {

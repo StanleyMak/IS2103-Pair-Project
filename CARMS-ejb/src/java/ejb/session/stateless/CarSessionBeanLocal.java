@@ -58,6 +58,8 @@ public interface CarSessionBeanLocal {
 
     public CarEntity retrievePotentialCarOfCategoryOfOtherOutlet(Date pickupDateTime, Date returnDateTime, OutletEntity pickupOutlet, OutletEntity returnOutlet, CarCategoryEntity carCategory);
 
+    public void updateCarEntity(CarEntity car);
+
     
 
 }

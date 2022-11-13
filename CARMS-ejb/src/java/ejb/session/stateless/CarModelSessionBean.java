@@ -9,17 +9,26 @@ import entity.CarCategoryEntity;
 import entity.CarEntity;
 import entity.CarModelEntity;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import util.exception.CarCategoryNameExistsException;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarModelNameExistsException;
 import util.exception.CarModelNameExistsException;
 import util.exception.CarModelNotFoundException;
 import util.exception.DeleteCarModelException;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -37,28 +46,41 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+    
+    public CarModelSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }
+
     @Override
-    public Long createNewCarModel(CarModelEntity carModel, String carCategoryName) throws CarModelNameExistsException, CarCategoryNotFoundException {
+    public Long createNewCarModel(CarModelEntity carModel, String carCategoryName) throws CarModelNameExistsException, CarCategoryNotFoundException, UnknownPersistenceException, InputDataValidationException {
 
-        // ONLY CREATE WITH MODELS THAT ARE NOT DISABLED
-        CarCategoryEntity carCategory = null;
-        try {
-            carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
-        } catch (CarCategoryNotFoundException e) {
-            throw new CarCategoryNotFoundException("Car Category Not Found");
+        Set<ConstraintViolation<CarModelEntity>> constraintViolations = validator.validate(carModel);
+
+        if (constraintViolations.isEmpty()) {
+            try {
+                CarCategoryEntity carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
+                carModel.setCategory(carCategory);
+                em.persist(carModel);
+                em.flush();
+
+                return carModel.getCarModelID();
+            } catch (PersistenceException ex) {
+                if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                        throw new CarModelNameExistsException("Car Model Name Exists");
+                    } else {
+                        throw new UnknownPersistenceException(ex.getMessage());
+                    }
+                } else {
+                    throw new UnknownPersistenceException(ex.getMessage());
+                }
+            }
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
-
-        try {
-            CarModelEntity thisCarModel = retrieveCarModelByCarModelName(carModel.getModelName());
-            throw new CarModelNameExistsException("Car Model Name: " + carModel.getModelName() + " already exists");
-        } catch (CarModelNotFoundException e) {
-            carModel.setCategory(carCategory);
-            em.persist(carModel);
-            em.flush();
-        }
-
-        return carModel.getCarModelID();
-
     }
 
     @Override
@@ -117,7 +139,6 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         }
 
     }
-   
 
     @Override
     public void deleteCarModel(String carModelName) throws CarModelNotFoundException, DeleteCarModelException {
@@ -130,6 +151,16 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
             carModel.setIsDisabled(Boolean.TRUE);
             throw new DeleteCarModelException("Car Model Name " + carModelName + " is associated with existing car(s) and cannot be deleted!");
         }
+    }
+    
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModelEntity>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
     }
 
 }

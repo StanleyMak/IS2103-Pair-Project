@@ -41,5 +41,7 @@ public interface ReservationSessionBeanLocal {
 
     public String cancelReservation(String email, String reservationCode, Date currDate) throws ReservationNotFoundException, CustomerNotFoundException;
 
+    public List<ReservationEntity> retrieveReservationsOfPartnerID(Long partnerID);
+
     
 }

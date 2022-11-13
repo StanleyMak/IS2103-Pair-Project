@@ -26,6 +26,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     private EntityManager em;
  
     
+    @Override
     public Long createNewPartner(PartnerEntity partnerEntity) {
         em.persist(partnerEntity);
         em.flush(); 
@@ -33,12 +34,14 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         return partnerEntity.getPartnerID();
     }
     
+    @Override
     public PartnerEntity retrievePartnerByID(Long partnerID) {
         PartnerEntity partner = em.find(PartnerEntity.class, partnerID); 
         //partner.getXX().size();
         return partner; 
     }
     
+    @Override
     public PartnerEntity retrievePartnerByUsername(String username) throws PartnerNotFoundException {
         try {
             Query query = em.createQuery("SELECT p FROM PartnerEntity p WHERE p.username = ?1")
@@ -50,6 +53,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         }
     }
     
+    @Override
     public void deletePartner(Long partnerID) {
         PartnerEntity partner = retrievePartnerByID(partnerID);
         //dissociate
@@ -58,6 +62,10 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     
     @Override
     public PartnerEntity partnerLogin(String username, String password) throws InvalidLoginCredentialException {
+        
+        if (username.length() <= 0 && password.length() <= 0) {
+            throw new InvalidLoginCredentialException("Invalid username or password");
+        }
         
         try {
             PartnerEntity partner = retrievePartnerByUsername(username);
