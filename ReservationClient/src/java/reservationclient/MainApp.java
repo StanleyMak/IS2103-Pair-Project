@@ -28,11 +28,16 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.persistence.PersistenceException;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.CustomerEmailExistsException;
 import util.exception.CustomerNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.InvalidReservationCodeException;
+import util.exception.ReservationCodeExistsException;
 import util.exception.ReservationNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -160,22 +165,26 @@ public class MainApp {
     }
 
     public void doRegisterAsCustomer() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("*** CaRMS Reservation Client :: Register As Customer ***\n");
-        OwnCustomerEntity newCustomer = new OwnCustomerEntity();
-
-        System.out.print("Enter Email> ");
-        newCustomer.setEmail(scanner.nextLine().trim());
-
-        System.out.print("Enter Password> ");
-        newCustomer.setPassword(scanner.nextLine().trim());
-
-        Long customerID = customerSessionBeanRemote.createNewCustomer(newCustomer);
-
-        System.out.println("New Customer: " + customerID + " successfully registered!\n");
-
-        System.out.println("Press Enter To Continue...");
-        scanner.nextLine();
+        try {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("*** CaRMS Reservation Client :: Register As Customer ***\n");
+            OwnCustomerEntity newCustomer = new OwnCustomerEntity();
+            
+            System.out.print("Enter Email> ");
+            newCustomer.setEmail(scanner.nextLine().trim());
+            
+            System.out.print("Enter Password> ");
+            newCustomer.setPassword(scanner.nextLine().trim());
+            
+            Long customerID = customerSessionBeanRemote.createNewCustomer(newCustomer);
+            
+            System.out.println("New Customer: " + customerID + " successfully registered!\n");
+            
+            System.out.println("Press Enter To Continue...");
+            scanner.nextLine();
+        } catch (CustomerEmailExistsException | UnknownPersistenceException | InputDataValidationException | PersistenceException ex) {
+            System.out.println("Error: " + ex.getMessage() + "!\n");
+        } 
     }
 
     //CATCH EXCEPTION NOT THROW
@@ -260,245 +269,145 @@ public class MainApp {
 
     private void doReserveCar(List<CarEntity> cars) {
 
-        Scanner sc = new Scanner(System.in);
-        System.out.println("*** CaRMS Reservation Client :: Reserve Car ***\n");
-
-        System.out.print("Enter Start Date (DD/MM/YYYY hh:mm) (24hr format)> ");
-        String startDateTime = sc.nextLine();
-        // converting input time to HH:mm format
-        Date pickupDateTime = null;
         try {
-            pickupDateTime = dateTimeFormat.parse(startDateTime);
-        } catch (ParseException e) {
-            System.out.println("Invalid Date/Time Format");
-        }
-        LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
-        LocalTime pickupTime = pickupDateTimeLocal.toLocalTime();
-
-        System.out.print("Enter Pick Up Outlet> "); // A, B, C -> check opening/closing hours
-        String pickupOutletAddress = sc.nextLine().trim();
-        OutletEntity pickupOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(pickupOutletAddress);
-        LocalTime outletOpeningHours = LocalDateTime.ofInstant(pickupOutlet.getOpenHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
-
-        if (pickupTime.isBefore(outletOpeningHours)) {
-            System.out.println("Invalid Pick Up Time! Outlet opens at: " + outletOpeningHours);
-        }
-
-        System.out.print("Enter End Date (DD/MM/YYYY hh:mm (24hr format))> ");
-        String endDateTime = sc.nextLine();
-        Date returnDateTime = null;
-        try {
-            returnDateTime = dateTimeFormat.parse(endDateTime);
-        } catch (ParseException e) {
-            System.out.println("Invalid Date/Time Format");
-        }
-
-        LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
-        LocalTime returnTime = returnDateTimeLocal.toLocalTime();
-
-        System.out.print("Enter Return Outlet Address> ");
-        String returnOutletAddress = sc.nextLine().trim();
-        OutletEntity returnOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(returnOutletAddress);
-        LocalTime outletClosingHours = LocalDateTime.ofInstant(returnOutlet.getCloseHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
-
-        if (returnTime.isAfter(outletClosingHours)) {
-            System.out.println("Invalid return time, outlet closes at: " + outletClosingHours);
-        }
-
-        //return list of abled cars
-        List<CarCategoryEntity> availableCat = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
-        double rentalFee = 0;
-        System.out.println("Available Car Categories For Rental:");
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("%-5s%-20s%-10s\n", "No.", "Category Name", "Rental Fee");
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        int i = 1;
-        for (CarCategoryEntity cat : availableCat) {
-            rentalFee = rentalRateSessionBeanRemote.computeCheapestRentalRateFee(pickupDateTime, returnDateTime, cat.getCategoryName());
-            System.out.printf("%-5s%-20s%-10s\n", i, availableCat.get(i - 1).getCategoryName(), rentalFee);
-            i++;
-        }
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-        //RESEVRE STARTS HERE -----------------------------------------------------
-        CarCategoryEntity carCategory = null;
-        Integer response = 0;
-
-        while (true) {
-            System.out.println("Select A Category Number: ");
-            response = 0;
-
-            while (response < 1 || response > availableCat.size()) {
-                System.out.print("> ");
-
-                response = sc.nextInt();
-
-                if (response > availableCat.size()) {
-                    System.out.println("Invalid option, please try again!\n");
-                } else {
-                    carCategory = availableCat.get(response - 1);
+            
+            Scanner sc = new Scanner(System.in);
+            System.out.println("*** CaRMS Reservation Client :: Reserve Car ***\n");
+            
+            System.out.print("Enter Start Date (DD/MM/YYYY hh:mm) (24hr format)> ");
+            String startDateTime = sc.nextLine();
+            // converting input time to HH:mm format
+            Date pickupDateTime = null;
+            try {
+                pickupDateTime = dateTimeFormat.parse(startDateTime);
+            } catch (ParseException e) {
+                System.out.println("Invalid Date/Time Format");
+            }
+            LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
+            LocalTime pickupTime = pickupDateTimeLocal.toLocalTime();
+            
+            System.out.print("Enter Pick Up Outlet> "); // A, B, C -> check opening/closing hours
+            String pickupOutletAddress = sc.nextLine().trim();
+            OutletEntity pickupOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(pickupOutletAddress);
+            LocalTime outletOpeningHours = LocalDateTime.ofInstant(pickupOutlet.getOpenHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
+            
+            if (pickupTime.isBefore(outletOpeningHours)) {
+                System.out.println("Invalid Pick Up Time! Outlet opens at: " + outletOpeningHours);
+            }
+            
+            System.out.print("Enter End Date (DD/MM/YYYY hh:mm (24hr format))> ");
+            String endDateTime = sc.nextLine();
+            Date returnDateTime = null;
+            try {
+                returnDateTime = dateTimeFormat.parse(endDateTime);
+            } catch (ParseException e) {
+                System.out.println("Invalid Date/Time Format");
+            }
+            
+            LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
+            LocalTime returnTime = returnDateTimeLocal.toLocalTime();
+            
+            System.out.print("Enter Return Outlet Address> ");
+            String returnOutletAddress = sc.nextLine().trim();
+            OutletEntity returnOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(returnOutletAddress);
+            LocalTime outletClosingHours = LocalDateTime.ofInstant(returnOutlet.getCloseHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
+            
+            if (returnTime.isAfter(outletClosingHours)) {
+                System.out.println("Invalid return time, outlet closes at: " + outletClosingHours);
+            }
+            
+            //return list of abled cars
+            List<CarCategoryEntity> availableCat = carSessionBeanRemote.doSearchCar(pickupDateTime, returnDateTime, pickupOutlet, returnOutlet);
+            double rentalFee = 0;
+            System.out.println("Available Car Categories For Rental:");
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-5s%-20s%-10s\n", "No.", "Category Name", "Rental Fee");
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            int i = 1;
+            for (CarCategoryEntity cat : availableCat) {
+                rentalFee = rentalRateSessionBeanRemote.computeCheapestRentalRateFee(pickupDateTime, returnDateTime, cat.getCategoryName());
+                System.out.printf("%-5s%-20s%-10s\n", i, availableCat.get(i - 1).getCategoryName(), rentalFee);
+                i++;
+            }
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            
+            //RESEVRE STARTS HERE -----------------------------------------------------
+            CarCategoryEntity carCategory = null;
+            Integer response = 0;
+            
+            while (true) {
+                System.out.println("Select A Category Number: ");
+                response = 0;
+                
+                while (response < 1 || response > availableCat.size()) {
+                    System.out.print("> ");
+                    
+                    response = sc.nextInt();
+                    
+                    if (response > availableCat.size()) {
+                        System.out.println("Invalid option, please try again!\n");
+                    } else {
+                        carCategory = availableCat.get(response - 1);
+                        break;
+                    }
+                }
+                
+                if (response > 0 || response < availableCat.size() + 1) {
                     break;
                 }
             }
-
-            if (response > 0 || response < availableCat.size() + 1) {
-                break;
-            }
-        }
-        sc.nextLine();
-        ReservationEntity reservation = new ReservationEntity();
-        System.out.print("Enter Credit Card Number> ");
-        reservation.setCreditCardNumber(sc.nextLine().trim());
-
-        Integer res = 0;
-        while (true) {
-            System.out.println("Payment Choice:");
-            System.out.println("1: Pay Now Online");
-            System.out.println("2: Pay Later Upfront");
-            res = 0;
-
-            while (res < 1 || res > 2) {
-                System.out.print("> ");
-
-                res = sc.nextInt();
-
-                if (res == 1) {
-                    reservation.setOnlinePayment(true);
+            sc.nextLine();
+            ReservationEntity reservation = new ReservationEntity();
+            System.out.print("Enter Credit Card Number> ");
+            reservation.setCreditCardNumber(sc.nextLine().trim());
+            
+            Integer res = 0;
+            while (true) {
+                System.out.println("Payment Choice:");
+                System.out.println("1: Pay Now Online");
+                System.out.println("2: Pay Later Upfront");
+                res = 0;
+                
+                while (res < 1 || res > 2) {
+                    System.out.print("> ");
+                    
+                    res = sc.nextInt();
+                    if (res == 1) {
+                        reservation.setOnlinePayment(true);
+                        break;
+                    } else if (res == 2) {
+                        reservation.setOnlinePayment(false);
+                        break;
+                    } else {
+                        System.out.println("Invalid option, please try again!\n");
+                    }
+                }
+                
+                if (res == 1 || res == 2) {
                     break;
-                } else if (res == 2) {
-                    reservation.setOnlinePayment(false);
-                    break;
-                } else {
-                    System.out.println("Invalid option, please try again!\n");
                 }
             }
-
-            if (res == 1 || res == 2) {
-                break;
+            String[] dateString = new Date().toString().split(" ");
+            String finalDate = "";
+            for (int j = 0; j < dateString.length; j++) {
+                finalDate += dateString[j];
             }
-        }
-        String[] dateString = new Date().toString().split(" ");
-        String finalDate = "";
-        for (int j = 0; j < dateString.length; j++) {
-            finalDate += dateString[j];
-        }
-        reservation.setReservationCode(this.loggedInCustomer.getEmail() + finalDate);
-        reservation.setStartDateTime(pickupDateTime);
-        reservation.setEndDateTime(returnDateTime);
-        reservation.setRentalFee(rentalFee);
-        reservation.setPickUpOutlet(pickupOutlet);
-        reservation.setReturnOutlet(returnOutlet);
-
-        try {
+            reservation.setReservationCode(this.loggedInCustomer.getEmail() + finalDate);
+            reservation.setStartDateTime(pickupDateTime);
+            reservation.setEndDateTime(returnDateTime);
+            reservation.setRentalFee(rentalFee);
+            reservation.setPickUpOutlet(pickupOutlet);
+            reservation.setReturnOutlet(returnOutlet);
+            
+            
             String resCode = reservationSessionBeanRemote.createNewReservation(reservation, this.loggedInCustomer.getEmail(), returnOutletAddress, pickupOutletAddress, carCategory.getCategoryName());
-            System.out.println("New Reservation " + resCode + " successfully created!\n");
-        } catch (CustomerNotFoundException | CarCategoryNotFoundException e) {
-            System.out.println("Error: " + e.getMessage() + "!\n");
-        }
-
-        sc.nextLine();
-        System.out.println("Press Enter To Continue...");
-        sc.nextLine();
-
-//        CarCategoryEntity carCategory = null;
-//        CarModelEntity carModel = null;
-//        Integer response = 0;
-//
-//        while (true) {
-//            System.out.println("Filter By: ");
-//            System.out.println("1: Car Category");
-//            System.out.println("2: Car Make and Model");
-//            System.out.println("3: Exit\n");
-//            response = 0;
-//
-//            while (response < 1 || response > 3) {
-//                System.out.print("> ");
-//
-//                response = sc.nextInt();
-//
-//                if (response == 1) {
-//                    carCategory = selectCarCategory(cars);
-//                    break;
-//                } else if (response == 2) {
-//                    carModel = selectCarModel(cars);
-//                    break;
-//                } else if (response == 3) {
-//                    break;
-//                } else {
-//                    System.out.println("Invalid option, please try again!\n");
-//                }
-//            }
-//
-//            if (response > 0 && response < 4) {
-//                break;
-//            }
-//        }
-//
-//        List<CarEntity> filteredCars = new ArrayList<>();
-//        if (carCategory != null) {
-//            filteredCars = carSessionBeanRemote.retrieveCarsFilteredByCarCategory(carCategory.getCategoryName());
-//        } else {
-//            filteredCars = carSessionBeanRemote.retrieveCarsFilteredByCarMakeAndModel(carModel.getModelMake(), carModel.getModelName());
-//        }
-//
-//        System.out.println("Car Records:");
-//        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-//        System.out.printf("%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", "ID", "License Plate Number", "Colour", "Category", "Make", "Model", "Status", "Outlet"/*, "Rental Fee"*/);
-//        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-//        int i = 1;
-//        for (CarEntity car : filteredCars) {
-//            System.out.printf("%-5s%-40s%-15s%-30s%-15s%-15s%-15s%-15s\n", car.getCarID(), car.getLicensePlateNumber(), car.getColour(), car.getModel().getCategory().getCategoryName(), car.getModel().getModelMake(), car.getModel().getModelName(), car.getStatus().toString(), car.getCurrOutlet().getAddress()/*, car.getRentalFee()*/);
-//            i++;
-//        }
-//        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-//
-//        System.out.print("Select Car to Reserve> ");
-//        int selectedCar = sc.nextInt();
-//        sc.nextLine();
-//
-//        // loop through list of cars and find the one matching to response = carID
-//        ReservationEntity reservation = new ReservationEntity();
-//        System.out.print("Enter Credit Card Number> ");
-//        reservation.setCreditCardNumber(sc.nextLine().trim());
-//
-//        Integer res = 0;
-//        while (true) {
-//            System.out.print("Payment Choice:");
-//            System.out.println("1: Pay Now Online");
-//            System.out.println("2: Pay Later Upfront");
-//            res = 0;
-//
-//            while (res < 1 || res > 2) {
-//                System.out.print("> ");
-//
-//                res = sc.nextInt();
-//
-//                if (res == 1) {
-//                    reservation.setOnlinePayment(true);
-//                    break;
-//                } else if (res == 2) {
-//                    reservation.setOnlinePayment(false);
-//                    break;
-//                } else {
-//                    System.out.println("Invalid option, please try again!\n");
-//                }
-//            }
-//
-//            if (res == 1 || res == 2) {
-//                break;
-//            }
-//        }
-//
-////        reservation.setStartDateTime(startDateTime);
-////        reservation.setEndDateTime(endDateTime);
-////        reservation.setRentalFee(rentalFee);
-////        reservation.setPickUpOutlet(pickUpOutlet);
-////        reservation.setReturnOutlet(returnOutlet);
-////        reservation.setCar(car);
-//        // setters based on doSearchCar parameters
-//        //reservationSessionBeanRemote.createNewReservation(reservation, Long.MIN_VALUE, , returnOutletAddress, pickupOutletAddress);
-//        System.out.println("Press Enter To Continue...");
-//        sc.nextLine();
+            System.out.println("New Reservation " + resCode + " successfully created!\n");    
+            sc.nextLine();
+            System.out.println("Press Enter To Continue...");
+            sc.nextLine();
+        } catch (CustomerNotFoundException | ReservationCodeExistsException | InputDataValidationException | UnknownPersistenceException | CarCategoryNotFoundException ex) {
+            System.out.println("Error: " + ex.getMessage() + "!\n");
+        } 
     }
 
     private CarCategoryEntity selectCarCategory(List<CarEntity> cars) {
@@ -585,8 +494,15 @@ public class MainApp {
     private void doViewAllMyReservations() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Reservation Client :: View All My Reservations ***\n");
-
-        CustomerEntity customer = customerSessionBeanRemote.retrieveCustomerByID(this.loggedInCustomer.getCustomerID());
+        
+        CustomerEntity customer = null;
+        
+        try {
+            customer = customerSessionBeanRemote.retrieveCustomerByID(this.loggedInCustomer.getCustomerID());
+        } catch (CustomerNotFoundException ex) {
+            System.out.println("Error retrieving reservations");
+        }
+        
         List<ReservationEntity> reservations = customer.getReservations();
 
         System.out.println("Reservation Records:");
