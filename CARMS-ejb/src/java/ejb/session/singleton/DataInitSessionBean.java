@@ -158,13 +158,13 @@ public class DataInitSessionBean {
             em.flush();
 
             /*Initialising Car*/
-            CarEntity car1 = null;
-            try {
-                car1 = new CarEntity("SS00A1TC", toyotaCorolla, StatusEnum.AVAILABLE, outletA);
-                carSessionBeanLocal.createNewCar(car1, car1.getModel().getModelName(), car1.getCurrOutlet().getAddress());
-            } catch (CarModelNotFoundException | CarModelDisabledException e) {
-                System.out.println("hi");
-            }
+//            CarEntity car1 = null;
+//            try {
+//                car1 = new CarEntity("SS00A1TC", toyotaCorolla, StatusEnum.AVAILABLE, outletA);
+//                carSessionBeanLocal.createNewCar(car1, car1.getModel().getModelName(), car1.getCurrOutlet().getAddress());
+//            } catch (CarModelNotFoundException | CarModelDisabledException e) {
+//                System.out.println("hi");
+//            }
 //            em.persist(car1);
 //            em.flush();
             CarEntity car2 = new CarEntity("SS00A2TC", toyotaCorolla, StatusEnum.AVAILABLE, outletA);
