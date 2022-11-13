@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.CarCategoryEntity;
 import entity.CarEntity;
+import entity.CarModelEntity;
 import entity.CustomerEntity;
 import entity.OutletEntity;
 import entity.OwnCustomerEntity;
@@ -17,16 +18,26 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import util.exception.CarCategoryNameExistsException;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.ReservationCodeExistsException;
 import util.exception.ReservationNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -50,34 +61,78 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+
+    public ReservationSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }
+
     @Override
-    public String createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException {
+    public String createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException, UnknownPersistenceException, InputDataValidationException, ReservationCodeExistsException {
         //AUTO ASSIGN THE CHEAPEST RENTAL RATE PER DAY!!!!!!!!!!!!!!
         // missing partner
 
-        try {
-            OwnCustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
-            OutletEntity pickupOutlet = outletSessionBean.retrieveOutletByOutletAddress(pickupOutletAddress);
-            OutletEntity returnOutlet = outletSessionBean.retrieveOutletByOutletAddress(returnOutletAddress);
-            CarCategoryEntity carCategory = null;
+        Set<ConstraintViolation<ReservationEntity>> constraintViolations = validator.validate(reservation);
+
+        if (constraintViolations.isEmpty()) {
             try {
-                carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
-            } catch (CarCategoryNotFoundException e) {
-                throw new CarCategoryNotFoundException("Car Category Not Found");
+                OwnCustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
+                OutletEntity pickupOutlet = outletSessionBean.retrieveOutletByOutletAddress(pickupOutletAddress);
+                OutletEntity returnOutlet = outletSessionBean.retrieveOutletByOutletAddress(returnOutletAddress);
+                CarCategoryEntity carCategory = null;
+                try {
+                    carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
+                } catch (CarCategoryNotFoundException e) {
+                    throw new CarCategoryNotFoundException("Car Category Not Found");
+                }
+                reservation.setCarCategory(carCategory);
+                reservation.setReturnOutlet(returnOutlet);
+                reservation.setPickUpOutlet(pickupOutlet);
+                customer.getReservations().add(reservation);
+
+                em.persist(reservation);
+                em.flush();
+
+                return reservation.getReservationCode();
+            } catch (PersistenceException ex) {
+                if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                        throw new ReservationCodeExistsException();
+                    } else {
+                        throw new UnknownPersistenceException(ex.getMessage());
+                    }
+                } else {
+                    throw new UnknownPersistenceException(ex.getMessage());
+                }
             }
-            reservation.setCarCategory(carCategory);
-            reservation.setReturnOutlet(returnOutlet);
-            reservation.setPickUpOutlet(pickupOutlet);
-            customer.getReservations().add(reservation);
-
-            em.persist(reservation);
-            em.flush();
-
-            return reservation.getReservationCode();
-        } catch (CustomerNotFoundException e) {
-            throw new CustomerNotFoundException("Customer Not Found");
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
 
+//        try {
+//            OwnCustomerEntity customer = customerSessionBean.retrieveOwnCustomerByOwnCustomerEmail(email);
+//            OutletEntity pickupOutlet = outletSessionBean.retrieveOutletByOutletAddress(pickupOutletAddress);
+//            OutletEntity returnOutlet = outletSessionBean.retrieveOutletByOutletAddress(returnOutletAddress);
+//            CarCategoryEntity carCategory = null;
+//            try {
+//                carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByCarCategoryName(carCategoryName);
+//            } catch (CarCategoryNotFoundException e) {
+//                throw new CarCategoryNotFoundException("Car Category Not Found");
+//            }
+//            reservation.setCarCategory(carCategory);
+//            reservation.setReturnOutlet(returnOutlet);
+//            reservation.setPickUpOutlet(pickupOutlet);
+//            customer.getReservations().add(reservation);
+//
+//            em.persist(reservation);
+//            em.flush();
+//
+//            return reservation.getReservationCode();
+//        } catch (CustomerNotFoundException e) {
+//            throw new CustomerNotFoundException("Customer Not Found");
+//        }
     }
 
     @Override
@@ -106,19 +161,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         //reservation.getXX().size();
     }
 
-    /*
-    @Override
-    public void deleteReservation(Long reservationID) throws DeleteReservationException, ReservationNotFoundException {
-        ReservationEntity reservationToDelete = retrieveReservationByID(reservationID);
-        //dissociate
-        
-        if(reservationToDelete.getCar() == null && reservationToDelete.getPickUpOutlet() == null && reservationToDelete.getReturnOutlet() == null) {
-            em.remove(reservationToDelete);
-        } else {
-            throw new DeleteReservationException("Reservation " + reservationID + " is associated with existing car and outlets");
-        }
-    }
-     */
     @Override
     public String cancelReservation(String email, String reservationCode, Date currDate) throws ReservationNotFoundException, CustomerNotFoundException {
         LocalDateTime currDateLocal = LocalDateTime.ofInstant(currDate.toInstant(), ZoneId.systemDefault());
@@ -135,7 +177,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         LocalDateTime penalty3 = pickUpDateLocal.minusDays(3);
         double rentalFee = res.getRentalFee();
         double penaltyFee = 0;
-        
+
         if (currDateLocal.isAfter(penalty3)) {
             penaltyFee = 0.7 * rentalFee;
         } else if (currDateLocal.isAfter(penalty7)) {
@@ -143,7 +185,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         } else if (currDateLocal.isAfter(penalty14)) {
             penaltyFee = 0.2 * rentalFee;
         }
-        
+
         try {
             this.deleteReservation(email, reservationCode);
             System.out.println("Reservation " + reservationCode + " successfully cancelled!\n");
@@ -152,7 +194,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         } catch (ReservationNotFoundException reservationNotFoundException) {
             throw new ReservationNotFoundException("Reservation Not Found");
         }
-        
+
         if (res.isOnlinePayment()) {
             return "Amount of $" + (rentalFee - penaltyFee) + " has been refunded after charging a cancellation fee of $" + penaltyFee;
         } else {
@@ -216,7 +258,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         List<ReservationEntity> reservations = query.getResultList();
         return reservations;
     }
-    
+
     @Override
     public List<ReservationEntity> retrieveReservationsOfPartnerID(Long partnerID) {
         Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE r.partner.partnerID = ?1")
@@ -233,44 +275,13 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         return reservations;
     }
 
-    /*
-    @Override
-    public List<ReservationEntity> retrieveAvailableCars(Date pickupDateTime, Date returnDateTime, String pickupOutletAddress, String returnOutletAddress) {
-          
-        // query for available cars based on pickup time and return time
-        Query query = em.createQuery("SELECT r FROM ReservationEntity r WHERE pickUpDateTime >= r.endDateTime AND returnDateTime <= r.startDateTime");
-        List<ReservationEntity> availResGivenDateTime = query.getResultList(); 
-        
-        OutletEntity pickupOutlet = outletSessionBean.retrieveOutletByOutletAddress(pickupOutletAddress);
-        Date pickupOutletOpeningHours = pickupOutlet.getOpenHour();
-        OutletEntity returnOutlet = outletSessionBean.retrieveOutletByOutletAddress(returnOutletAddress);
-        Date returnOutletClosingHours = pickupOutlet.getCloseHour(); 
-        
-        System.out.println("List of available cars:");
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        // check outlet
-        for (ReservationEntity res : availResGivenDateTime) {
-            CarEntity car = res.getCar();
-            if (car.getStatus().equals(StatusEnum.AVAILABLE)) {
-                if (car.getCurrOutlet().getAddress().equals(pickupOutletAddress)) {
-                    if (pickupOutletOpeningHours <= pickupDateTime && returnDateTime <= returnOutletClosingHours) {
-                        
-                        // need to add rental fee of car rentalFee = rentalRatePerDay * numDays
-                        
-                        
-                        
-                        System.out.printf("%-5s%-5s%-40s%-15s%-15s\n", "car.getModel().getCategory()", "car.getModel().getModelMake()", "car.getModel().getModelName()");   
-                    }       
-                } else { // different outlet
-                    // add 2 hours
-                    if (pickupOutletOpeningHours <= pickupDateTime && returnDateTime <= returnOutletClosingHours) {
-                        System.out.printf("%-5s%-5s%-40s%-15s%-15s\n", "car.getModel().getCategory()", "car.getModel().getModelMake()", "car.getModel().getModelName()");
-                    }
-                }
-            }
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<ReservationEntity>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
         }
-        
-        // check for sufficient inventory
+
+        return msg;
     }
-     */
 }
