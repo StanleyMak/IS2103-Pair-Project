@@ -184,7 +184,6 @@ public class MainApp {
             scanner.nextLine();
         } catch (CustomerEmailExistsException | UnknownPersistenceException | InputDataValidationException | PersistenceException ex) {
             System.out.println("Error: " + ex.getMessage() + "!\n");
-        } 
         }
     }
 
