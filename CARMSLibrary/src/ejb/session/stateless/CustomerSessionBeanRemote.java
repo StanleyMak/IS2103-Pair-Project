@@ -25,9 +25,9 @@ public interface CustomerSessionBeanRemote {
     
     public Long createNewCustomer(CustomerEntity customer) throws CustomerEmailExistsException, UnknownPersistenceException, InputDataValidationException, PersistenceException;
 
-    public CustomerEntity retrieveCustomerByID(Long customerID);
+    public CustomerEntity retrieveCustomerByID(Long customerID) throws CustomerNotFoundException;
 
-    public void deleteCustomer(Long customerID);
+    public void deleteCustomer(Long customerID) throws CustomerNotFoundException;
 
     public OwnCustomerEntity customerLogin(String email, String password) throws InvalidLoginCredentialException;
     
