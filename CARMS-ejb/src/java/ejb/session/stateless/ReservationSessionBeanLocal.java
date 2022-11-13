@@ -12,7 +12,10 @@ import java.util.List;
 import javax.ejb.Local;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.ReservationCodeExistsException;
 import util.exception.ReservationNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -21,7 +24,7 @@ import util.exception.ReservationNotFoundException;
 @Local
 public interface ReservationSessionBeanLocal {
     
-    public String createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException;
+    public String createNewReservation(ReservationEntity reservation, String email, String returnOutletAddress, String pickupOutletAddress, String carCategoryName) throws CustomerNotFoundException, CarCategoryNotFoundException, UnknownPersistenceException, InputDataValidationException, ReservationCodeExistsException;
     
     public ReservationEntity retrieveReservationByID(Long reservationID) throws ReservationNotFoundException;
     
