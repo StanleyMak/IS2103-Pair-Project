@@ -15,6 +15,7 @@ import util.exception.CarCategoryNotFoundException;
 import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNameExistsException;
+import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -28,15 +29,15 @@ public interface RentalRateSessionBeanLocal {
 
     public List<RentalRateEntity> retrieveAllRentalRates();
 
-    public RentalRateEntity retrieveRentalRateByRentalRateID(Long rentalRateID);
+    public RentalRateEntity retrieveRentalRateByRentalRateID(Long rentalRateID) throws RentalRateNotFoundException;
 
-    public RentalRateEntity retrieveRentalRateByRentalRateName(String rentalRateName);
+    public RentalRateEntity retrieveRentalRateByRentalRateName(String rentalRateName) throws RentalRateNotFoundException;
 
     public void updateRentalRate(RentalRateEntity rentalRate, String categoryName) throws CarCategoryNotFoundException;
 
     public List<RentalRateEntity> retrieveRentalRatesOfCarCategory(String carCategoryName);
     
-    public void deleteRentalRate(Long rentalRateID) throws DeleteRentalRateException;
+    public void deleteRentalRate(Long rentalRateID) throws DeleteRentalRateException, RentalRateNotFoundException;
 
     public double computeCheapestRentalRateFee(Date startDateTime, Date endDateTime, String carCategoryName);
 

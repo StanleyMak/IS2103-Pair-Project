@@ -185,6 +185,7 @@ public class MainApp {
         } catch (CustomerEmailExistsException | UnknownPersistenceException | InputDataValidationException | PersistenceException ex) {
             System.out.println("Error: " + ex.getMessage() + "!\n");
         } 
+        }
     }
 
     //CATCH EXCEPTION NOT THROW

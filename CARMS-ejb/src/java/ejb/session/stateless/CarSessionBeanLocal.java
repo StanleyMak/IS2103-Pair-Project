@@ -12,10 +12,15 @@ import entity.ReservationEntity;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
+import javax.persistence.PersistenceException;
+import util.exception.CarLicensePlateExistsException;
 import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
+import util.exception.CarNotFoundException;
 import util.exception.DeleteCarException;
+import util.exception.InputDataValidationException;
 import util.exception.ReservationNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -24,17 +29,17 @@ import util.exception.ReservationNotFoundException;
 @Local
 public interface CarSessionBeanLocal {
 
-    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException, CarModelDisabledException;
+    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException, CarModelDisabledException, PersistenceException, CarLicensePlateExistsException, UnknownPersistenceException, InputDataValidationException;
 
-    public CarEntity retrieveCarByCarID(Long carID);
-
-    public CarEntity retrieveCarByCarLicensePlateNumber(String licensePlateNumber);
-
+    public CarEntity retrieveCarByCarID(Long carID) throws CarNotFoundException;
+    
+    public CarEntity retrieveCarByCarLicensePlateNumber(String licensePlateNumber) throws CarNotFoundException;
+       
     public List<CarEntity> retrieveAllCars();
 
     public void updateCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException;
 
-    public void deleteCar(Long carID) throws DeleteCarException;
+    public void deleteCar(Long carID) throws DeleteCarException, CarNotFoundException;
 
     public List<CarEntity> retrieveAllCarsOfCarModel(String carModelName);
 
@@ -48,7 +53,7 @@ public interface CarSessionBeanLocal {
         
     public List<CarEntity> retrieveAllCarsOfCarCategory(String carCategoryName);
 
-    public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException;
+    public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException, CarNotFoundException;
     
     public List<CarEntity> retrieveCarsFilteredByCarCategory(String carCategoryName);
 

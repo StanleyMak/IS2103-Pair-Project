@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.EmployeeNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -31,32 +32,48 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         em.flush();
         return employee.getEmployeeID();
     }
-    
+
     @Override
-    public EmployeeEntity retrieveEmployeeByEmployeeID(Long employeeID) {
+    public EmployeeEntity retrieveEmployeeByEmployeeID(Long employeeID) throws EmployeeNotFoundException {
+
         EmployeeEntity employee = em.find(EmployeeEntity.class, employeeID);
-        return employee;
+        if (employee != null) {
+            return employee;
+        } else {
+            throw new EmployeeNotFoundException("Employee " + employeeID + " does not exist");
+        }
     }
-    
+
     @Override
-    public EmployeeEntity retrieveEmployeeByEmployeeUsername(String username) {
+    public EmployeeEntity retrieveEmployeeByEmployeeUsername(String username) throws EmployeeNotFoundException {
         Query query = em.createQuery("SELECT e FROM EmployeeEntity e WHERE e.username = ?1")
                 .setParameter(1, username);
         EmployeeEntity employee = (EmployeeEntity) query.getSingleResult();
-        return employee;
-    }
-    
-    @Override
-    public EmployeeEntity loginEmployee(String username, String password) throws InvalidLoginCredentialException {
-        EmployeeEntity employee = retrieveEmployeeByEmployeeUsername(username);
-        
-        if (employee.getPassword().equals(password)) {
+
+        if (employee != null) {
             return employee;
         } else {
-            throw new InvalidLoginCredentialException("Email or Password Incorrect");
+            throw new EmployeeNotFoundException("Employee " + username + " does not exist");
+        }
+
+    }
+
+    @Override
+    public EmployeeEntity loginEmployee(String username, String password) throws InvalidLoginCredentialException {
+
+        try {
+            EmployeeEntity employee = retrieveEmployeeByEmployeeUsername(username);
+
+            if (employee.getPassword().equals(password)) {
+                return employee;
+            } else {
+                throw new InvalidLoginCredentialException("Email or Password Incorrect");
+            }
+        } catch (EmployeeNotFoundException ex) {
+            throw new InvalidLoginCredentialException("Invalid username/password");
         }
     }
-    
+
     @Override
     public List<EmployeeEntity> retrieveAvailableEmployeesOfOutlet(OutletEntity outlet) {
         Query query = em.createQuery("SELECT e FROM EmployeeEntity e WHERE e.outlet.address = ?1 AND e.onTransit = FALSE")
@@ -66,5 +83,4 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         return employees;
     }
 
-    
 }

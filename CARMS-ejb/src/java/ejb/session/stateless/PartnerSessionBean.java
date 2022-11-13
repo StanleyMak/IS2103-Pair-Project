@@ -80,4 +80,5 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         }
     }
     
+    
 }

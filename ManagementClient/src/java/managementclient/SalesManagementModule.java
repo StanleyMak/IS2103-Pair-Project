@@ -34,15 +34,18 @@ import javax.validation.ValidatorFactory;
 import util.enumeration.RentalRateTypeEnum;
 import util.enumeration.StatusEnum;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.CarLicensePlateExistsException;
 import util.exception.CarModelDisabledException;
 import util.exception.CarModelNameExistsException;
 import util.exception.CarModelNotFoundException;
+import util.exception.CarNotFoundException;
 import util.exception.DeleteCarException;
 import util.exception.DeleteCarModelException;
 import util.exception.DeleteRentalRateException;
 import util.exception.DispatchRecordNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNameExistsException;
+import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -303,7 +306,14 @@ public class SalesManagementModule {
         System.out.println("*** CaRMS :: Sales Management (Sales) :: View Rental Rate Details ***\n");
 
         System.out.print("Enter Rental Rate Name> ");
-        RentalRateEntity rentalRate = rentalRateSessionBeanRemote.retrieveRentalRateByRentalRateName(sc.nextLine().trim());
+        
+        RentalRateEntity rentalRate = null; 
+        
+        try {
+            rentalRate = rentalRateSessionBeanRemote.retrieveRentalRateByRentalRateName(sc.nextLine().trim());
+        } catch (RentalRateNotFoundException ex) {
+            System.out.println("Error viewing rental rate details");
+        }
 
         System.out.println("Rental Rate Record:");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -584,7 +594,7 @@ public class SalesManagementModule {
         try {
             rentalRateSessionBeanRemote.deleteRentalRate(rentalRate.getRentalRateID());
             System.out.println("Rental Rate: " + rentalRateName + " successfully deleted!\n");
-        } catch (DeleteRentalRateException e) {
+        } catch (DeleteRentalRateException | RentalRateNotFoundException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         }
 
@@ -789,7 +799,7 @@ public class SalesManagementModule {
         try {
             Long carID = carSessionBeanRemote.createNewCar(car, carModelName, outletAddress);
             System.out.println("New Car: " + carID + " succcessfully created!\n");
-        } catch (CarModelNotFoundException | CarModelDisabledException e) {
+        } catch (CarModelNotFoundException | CarModelDisabledException | CarLicensePlateExistsException | UnknownPersistenceException | InputDataValidationException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         }
 
@@ -824,7 +834,13 @@ public class SalesManagementModule {
         System.out.println("*** CaRMS :: Sales Management (Operations) :: View Car Details ***\n");
 
         System.out.print("Enter Car License Plate Number> ");
-        CarEntity car = carSessionBeanRemote.retrieveCarByCarLicensePlateNumber(sc.nextLine().trim());
+        CarEntity car = null; 
+        
+        try {
+            car = carSessionBeanRemote.retrieveCarByCarLicensePlateNumber(sc.nextLine().trim());
+        } catch (CarNotFoundException ex) {
+            System.out.println("Invalid Car license plate number");
+        }
 
         System.out.println("Car Record:");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -1060,7 +1076,7 @@ public class SalesManagementModule {
         try {
             carSessionBeanRemote.deleteCar(car.getCarID());
             System.out.println("Car: " + car.getLicensePlateNumber() + " successfully deleted!\n");
-        } catch (DeleteCarException e) {
+        } catch (DeleteCarException | CarNotFoundException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         }
         System.out.println("Press Enter To Continue...");

@@ -9,6 +9,7 @@ import entity.EmployeeEntity;
 import entity.OutletEntity;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.EmployeeNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -20,12 +21,12 @@ public interface EmployeeSessionBeanLocal {
 
     public Long createNewEmployee(EmployeeEntity employee, OutletEntity outlet);
 
-    public EmployeeEntity retrieveEmployeeByEmployeeID(Long employeeID);
+    public EmployeeEntity retrieveEmployeeByEmployeeID(Long employeeID) throws EmployeeNotFoundException;
 
-    public EmployeeEntity retrieveEmployeeByEmployeeUsername(String email);
+    public EmployeeEntity retrieveEmployeeByEmployeeUsername(String username) throws EmployeeNotFoundException;
 
     public EmployeeEntity loginEmployee(String email, String password) throws InvalidLoginCredentialException;
 
     public List<EmployeeEntity> retrieveAvailableEmployeesOfOutlet(OutletEntity outlet);
-    
+
 }

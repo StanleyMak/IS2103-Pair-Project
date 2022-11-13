@@ -24,8 +24,11 @@ import javax.ejb.Schedule;
 import javax.ejb.Stateless;
 import util.enumeration.StatusEnum;
 import util.exception.CarModelNotFoundException;
+import util.exception.CarNotFoundException;
 import util.exception.DispatchRecordNameExistsException;
+import util.exception.InputDataValidationException;
 import util.exception.ReservationNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -80,7 +83,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 
                 generateDispatchRecordCurrentDayReservation(reservation);
             }
-        } catch (ReservationNotFoundException e) {
+        } catch (ReservationNotFoundException | CarNotFoundException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         }
 
@@ -102,7 +105,11 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
                 CarEntity carOfCategoryOfOutlet = carSessionBeanLocal.retrievePotentialCarOfCategoryOfOutlet(reservation.getStartDateTime(), reservation.getEndDateTime(), pickupOutlet, returnOutlet, carCategory);
 
                 if (carOfCategoryOfOutlet != null) {
-                    carSessionBeanLocal.allocateCarToReservation(carOfCategoryOfOutlet.getCarID(), reservation.getReservationID());
+                    try {
+                        carSessionBeanLocal.allocateCarToReservation(carOfCategoryOfOutlet.getCarID(), reservation.getReservationID());
+                    } catch (CarNotFoundException ex) {
+                        Logger.getLogger(EjbTimerSessionBean.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     System.out.println("********** Car " + carOfCategoryOfOutlet.getLicensePlateNumber() + " at Outlet " + pickupOutlet.getAddress() + " allocated to " + customerSessionBeanLocal.retrieveCustomerOfReservationID(reservation.getReservationID()) + " for pickup on " + reservation.getStartDateTime() + "!\n");
                     break;
                 }
@@ -114,22 +121,22 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 
                 generateDispatchRecordCurrentDayReservation(reservation);
             }
-        } catch (ReservationNotFoundException e) {
+        } catch (ReservationNotFoundException | CarNotFoundException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         }
 
     }
 
     private void generateDispatchRecordCurrentDayReservation(ReservationEntity reservation) {
-        String currDate = dateTimeFormat.format(new Date());
-        System.out.println("********** Dispatch Record Generation For Current Day Reservation: Timeout at " + currDate);
-
         try {
+            String currDate = dateTimeFormat.format(new Date());
+            System.out.println("********** Dispatch Record Generation For Current Day Reservation: Timeout at " + currDate);
+
             DispatchRecordEntity newDispatch = new DispatchRecordEntity();
             CarEntity car = reservation.getCar();
             car.setStatus(StatusEnum.IN_TRANSIT);
             carSessionBeanLocal.updateCarEntity(car);
-            
+
             newDispatch.setPickUpOutlet(reservation.getCar().getCurrOutlet());
             newDispatch.setReturnOutlet(reservation.getPickUpOutlet());
 
@@ -144,9 +151,8 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 
             dispatchRecordSessionBeanLocal.createNewDispatchRecord(newDispatch);
             System.out.println("New Transit Dispatch Record Created for " + reservation.getCar().getLicensePlateNumber() + "at " + reservation.getCar().getCurrOutlet() + " at " + dispatchDateTime.toString());
-        } catch (DispatchRecordNameExistsException e) {
+        } catch (DispatchRecordNameExistsException | UnknownPersistenceException | InputDataValidationException e) {
             System.out.println("Error: " + e.getMessage() + "!\n");
         }
     }
-
 }

@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategoryEntity;
 import entity.CarEntity;
 import entity.DispatchRecordEntity;
 import entity.EmployeeEntity;
@@ -15,15 +16,24 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.enumeration.StatusEnum;
+import util.exception.CarCategoryNameExistsException;
 import util.exception.DispatchRecordNameExistsException;
 import util.exception.DispatchRecordNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -35,19 +45,51 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    
-    @Override
-    public Long createNewDispatchRecord(DispatchRecordEntity dispatchRecord) throws DispatchRecordNameExistsException {
-        try {
-            DispatchRecordEntity thisDispatchRecord = retrieveDispatchRecordByDispatchRecordName(dispatchRecord.getDispatchRecordName());
-            throw new DispatchRecordNameExistsException("Dispatch Record Already Exists");
-        } catch (DispatchRecordNotFoundException e) {
-            em.persist(dispatchRecord);
-            em.flush();
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
 
-            return dispatchRecord.getDispatchRecordID();
+    public DispatchRecordSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+    @Override
+    public Long createNewDispatchRecord(DispatchRecordEntity dispatchRecord) throws DispatchRecordNameExistsException, UnknownPersistenceException, InputDataValidationException, DispatchRecordNameExistsException {
+        
+        Set<ConstraintViolation<DispatchRecordEntity>> constraintViolations = validator.validate(dispatchRecord);
+
+        if (constraintViolations.isEmpty()) {
+            try {
+                em.persist(dispatchRecord);
+                em.flush();
+
+                return dispatchRecord.getDispatchRecordID();
+            } catch (PersistenceException ex) {
+                if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                        throw new DispatchRecordNameExistsException("Dispatch record exists");
+                    } else {
+                        throw new UnknownPersistenceException(ex.getMessage());
+                    }
+                } else {
+                    throw new UnknownPersistenceException(ex.getMessage());
+                }
+            }
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
+        
+//        try {
+//            DispatchRecordEntity thisDispatchRecord = retrieveDispatchRecordByDispatchRecordName(dispatchRecord.getDispatchRecordName());
+//            throw new DispatchRecordNameExistsException("Dispatch Record Already Exists");
+//        } catch (DispatchRecordNotFoundException e) {
+//            em.persist(dispatchRecord);
+//            em.flush();
+//
+//            return dispatchRecord.getDispatchRecordID();
+//        }
 
     }
 
@@ -87,7 +129,7 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
             } catch (ParseException e) {
                 throw new ParseException("Inalid Date/Time Format", 1); //wats the 1??
             }
-            
+
             if (!pickUpDate.equals(date)) {
                 dispatchRecords.remove(dr);
             }
@@ -101,17 +143,17 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
             DispatchRecordEntity dispatchRecord = retrieveDisptachRecordByDispatchRecordID(dispatchRecordID);
             dispatchRecord.setIsCompleted(Boolean.TRUE);
             dispatchRecord.getEmployee().setOnTransit(Boolean.FALSE);
-            
+
             CarEntity car = dispatchRecord.getReservation().getCar();
             car.setStatus(StatusEnum.AVAILABLE);
-            
+
             em.merge(dispatchRecord);
             em.merge(car);
         } catch (DispatchRecordNotFoundException e) {
             throw new DispatchRecordNotFoundException("Dispatch Record ID " + dispatchRecordID + " does not exist!");
         }
     }
-    
+
     @Override
     public void assignTransitDriver(DispatchRecordEntity dr, EmployeeEntity emp) {
         dr.setEmployee(emp);
@@ -126,5 +168,16 @@ public class DispatchRecordSessionBean implements DispatchRecordSessionBeanRemot
 //
 //        em.remove(dispatchRecord);
 //    }
+    
+    
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<DispatchRecordEntity>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
+    }
 
 }

@@ -15,16 +15,26 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.enumeration.StatusEnum;
+import util.exception.CarLicensePlateExistsException;
 import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
+import util.exception.CarNotFoundException;
 import util.exception.DeleteCarException;
+import util.exception.InputDataValidationException;
 import util.exception.ReservationNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -54,42 +64,92 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @PersistenceContext(unitName = "CARMS-ejbPU")
     private EntityManager em;
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+
+    public CarSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }
+
     @Override
-    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException, CarModelDisabledException {
-        try {
-            CarModelEntity carModel = carModelSessionBeanLocal.retrieveCarModelByCarModelName(modelName);
-            if (!carModel.getIsDisabled()) {
-                car.setModel(carModel);
+    public Long createNewCar(CarEntity car, String modelName, String outletAddress) throws CarModelNotFoundException, CarModelDisabledException, PersistenceException, CarLicensePlateExistsException, UnknownPersistenceException, InputDataValidationException {
 
-                OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
-                car.setCurrOutlet(outlet);
+        Set<ConstraintViolation<CarEntity>> constraintViolations = validator.validate(car);
 
-                em.persist(car);
-                em.flush();
-            } else {
-                throw new CarModelDisabledException("Car Model " + modelName + " is disabled");
+        if (constraintViolations.isEmpty()) {
+            try {
+                CarModelEntity carModel = carModelSessionBeanLocal.retrieveCarModelByCarModelName(modelName);
+                if (!carModel.getIsDisabled()) {
+                    car.setModel(carModel);
+
+                    OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
+                    car.setCurrOutlet(outlet);
+
+                    em.persist(car);
+                    em.flush();
+                } else {
+                    throw new CarModelDisabledException("Car Model " + modelName + " is disabled");
+                }
+                return car.getCarID();
+            } catch (PersistenceException ex) {
+                if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                        throw new CarLicensePlateExistsException("Car with this license plate exists");
+                    } else {
+                        throw new UnknownPersistenceException(ex.getMessage());
+                    }
+                } else {
+                    throw new UnknownPersistenceException(ex.getMessage());
+                }
             }
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
 
-            return car.getCarID();
-        } catch (CarModelNotFoundException e) {
-            throw new CarModelNotFoundException("Car Model Name " + modelName + " does not exist!\n");
+//        try {
+//            CarModelEntity carModel = carModelSessionBeanLocal.retrieveCarModelByCarModelName(modelName);
+//            if (!carModel.getIsDisabled()) {
+//                car.setModel(carModel);
+//
+//                OutletEntity outlet = outletSessionBeanLocal.retrieveOutletByOutletAddress(outletAddress);
+//                car.setCurrOutlet(outlet);
+//
+//                em.persist(car);
+//                em.flush();
+//            } else {
+//                throw new CarModelDisabledException("Car Model " + modelName + " is disabled");
+//            }
+//
+//            return car.getCarID();
+//        } catch (CarModelNotFoundException e) {
+//            throw new CarModelNotFoundException("Car Model Name " + modelName + " does not exist!\n");
+//        }
+    }
+
+    @Override
+    public CarEntity retrieveCarByCarID(Long carID) throws CarNotFoundException {
+        
+        CarEntity car = em.find(CarEntity.class, carID);
+        if (car != null) {
+            return car;
+        } else {
+            throw new CarNotFoundException("Car " + carID + "does not exist!"); 
         }
     }
 
     @Override
-    public CarEntity retrieveCarByCarID(Long carID) {
-        CarEntity car = em.find(CarEntity.class, carID);
-        //car.getXX().size();
-        return car;
-    }
-
-    @Override
-    public CarEntity retrieveCarByCarLicensePlateNumber(String licensePlateNumber) {
+    public CarEntity retrieveCarByCarLicensePlateNumber(String licensePlateNumber) throws CarNotFoundException {
         Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.licensePlateNumber = ?1")
                 .setParameter(1, licensePlateNumber);
         CarEntity car = (CarEntity) query.getSingleResult();
+        
+        if (car != null) {
         //car.getXX().size();
-        return car;
+            return car;
+        } else {
+            throw new CarNotFoundException("Car " + licensePlateNumber + "does not exist");
+        }
     }
 
     @Override
@@ -138,16 +198,16 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             throw new CarModelNotFoundException("Car Model Name " + modelName + " does not exist!\n");
         }
     }
-    
+
     @Override
     public void updateCarEntity(CarEntity car) {
         em.merge(car);
     }
 
     @Override
-    public void deleteCar(Long carID) throws DeleteCarException {
-        CarEntity car = retrieveCarByCarID(carID);
-
+    public void deleteCar(Long carID) throws DeleteCarException, CarNotFoundException {
+        
+        CarEntity car = retrieveCarByCarID(carID); 
         if (reservationSessionBeanLocal.retrieveReservationsOfCarID(carID).isEmpty()) {
             em.remove(car);
         } else {
@@ -349,60 +409,6 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         return availableCars.get(0);
     }
 
-//    public List<CarEntity> getAvailableCars() {
-//        List<CarEntity> cars = retrieveAllCars();
-//        List<CarEntity> availableCars = new ArrayList<>();
-//        for (CarEntity car : cars) {
-//            List<ReservationEntity> carReservations = reservationSessionBeanLocal.retrieveReservationsOfCarID(car.getCarID());
-//
-//            // add cars with no reservations
-//            if (carReservations.isEmpty() && (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR))) {
-//                availableCars.add(car);
-//                continue;
-//            }
-//
-//            if (car.getCurrOutlet().getAddress().equals(pickupOutlet.getAddress())) {
-//                boolean potential = true;
-//                for (ReservationEntity res : carReservations) {
-//                    if (pickupDateTime.compareTo(res.getEndDateTime()) < 0 && returnDateTime.compareTo(res.getStartDateTime()) > 0) {
-//                        potential = false;
-//                        break;
-//                    }
-//                }
-//
-//                if (potential) {
-//                    if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
-//                        availableCars.add(car);
-//                    }
-//                }
-//            } else {
-//                boolean potential = true;
-//                for (ReservationEntity res : carReservations) {
-//                    LocalDateTime startDateTime = LocalDateTime.ofInstant(res.getStartDateTime().toInstant(), ZoneId.systemDefault());
-//                    LocalDateTime endDateTime = LocalDateTime.ofInstant(res.getEndDateTime().toInstant(), ZoneId.systemDefault());
-//                    // factor in transit duration (2 hours)
-//                    endDateTime = endDateTime.plusHours(2);
-//                    startDateTime = startDateTime.minusHours(2);
-//
-//                    LocalDateTime pickupDateTimeLocal = LocalDateTime.ofInstant(pickupDateTime.toInstant(), ZoneId.systemDefault());
-//                    LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
-//
-//                    if (pickupDateTimeLocal.compareTo(endDateTime) < 0 && returnDateTimeLocal.compareTo(startDateTime) > 0) {
-//                        potential = false;
-//                        break;
-//                    }
-//                }
-//
-//                if (potential) {
-//                    if (!car.getStatus().equals(StatusEnum.DISABLED) && !car.getStatus().equals(StatusEnum.REPAIR)) {
-//                        availableCars.add(car);
-//                    }
-//                }
-//            }
-//        }
-//        
-//        return availableCars; 
-//    } 
     private int getNumIntersectedReservationsForCategory(Date newStartDate, Date newEndDate, CarCategoryEntity cc, OutletEntity pickUpOutlet, OutletEntity returnOutlet) {
 
         int numRes = 0;
@@ -457,8 +463,10 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 //
 //    }
     @Override
-    public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException {
+    public void allocateCarToReservation(Long carID, Long reservationID) throws ReservationNotFoundException, CarNotFoundException {
+        
         CarEntity car = retrieveCarByCarID(carID);
+        
         ReservationEntity reservation = null;
         try {
             reservation = reservationSessionBeanLocal.retrieveReservationByID(reservationID);
@@ -484,6 +492,16 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                 .setParameter(2, carModelName);
         List<CarEntity> cars = query.getResultList();
         return cars;
+    }
+
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarEntity>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
     }
 
 }

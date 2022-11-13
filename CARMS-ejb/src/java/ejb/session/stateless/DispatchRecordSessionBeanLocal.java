@@ -14,6 +14,8 @@ import java.util.List;
 import javax.ejb.Local;
 import util.exception.DispatchRecordNameExistsException;
 import util.exception.DispatchRecordNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -22,7 +24,7 @@ import util.exception.DispatchRecordNotFoundException;
 @Local
 public interface DispatchRecordSessionBeanLocal {
 
-    public Long createNewDispatchRecord(DispatchRecordEntity dispatchRecord) throws DispatchRecordNameExistsException;
+    public Long createNewDispatchRecord(DispatchRecordEntity dispatchRecord) throws DispatchRecordNameExistsException, UnknownPersistenceException, InputDataValidationException, DispatchRecordNameExistsException;
 
     public DispatchRecordEntity retrieveDisptachRecordByDispatchRecordID(Long dispatchRecordID) throws DispatchRecordNotFoundException;
 

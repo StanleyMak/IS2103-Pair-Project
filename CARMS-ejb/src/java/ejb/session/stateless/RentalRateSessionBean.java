@@ -28,6 +28,7 @@ import util.exception.CarCategoryNotFoundException;
 import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNameExistsException;
+import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -91,18 +92,28 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
 
     @Override
-    public RentalRateEntity retrieveRentalRateByRentalRateID(Long rentalRateID) {
+    public RentalRateEntity retrieveRentalRateByRentalRateID(Long rentalRateID) throws RentalRateNotFoundException {
+        
         RentalRateEntity rentalRate = em.find(RentalRateEntity.class, rentalRateID);
+        if (rentalRate != null) {
+            return rentalRate;
+        } else {
+            throw new RentalRateNotFoundException("Rental rate does not exist");
+        }
         //rentalRate.getXX().size();
-        return rentalRate;
     }
 
     @Override
-    public RentalRateEntity retrieveRentalRateByRentalRateName(String rentalRateName) {
+    public RentalRateEntity retrieveRentalRateByRentalRateName(String rentalRateName) throws RentalRateNotFoundException {
         Query query = em.createQuery("SELECT r FROM RentalRateEntity r WHERE r.rentalName = ?1")
                 .setParameter(1, rentalRateName);
         RentalRateEntity rentalRate = (RentalRateEntity) query.getSingleResult();
-        return rentalRate;
+        
+        if (rentalRate != null) {
+            return rentalRate; 
+        } else {
+            throw new RentalRateNotFoundException("Rental rate does not exist");
+        }
     }
 
     public List<RentalRateEntity> retrieveRentalRatesOfCarCategory(String carCategoryName) {
@@ -125,7 +136,8 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
 
     @Override
-    public void deleteRentalRate(Long rentalRateID) throws DeleteRentalRateException {
+    public void deleteRentalRate(Long rentalRateID) throws DeleteRentalRateException, RentalRateNotFoundException {
+        
         RentalRateEntity rentalRate = retrieveRentalRateByRentalRateID(rentalRateID);
 
         //dissociate
