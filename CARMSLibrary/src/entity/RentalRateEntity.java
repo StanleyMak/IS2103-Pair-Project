@@ -18,6 +18,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import util.enumeration.RentalRateTypeEnum;
 
 /**
@@ -34,28 +37,32 @@ public class RentalRateEntity implements Serializable, Comparable<RentalRateEnti
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rentalRateID;
     
-    //@NotNull
-    //@Column(nullable = false)
+    @NotNull
+    @Column(nullable = false)
+    @Size(min = 5)
     private String rentalName;
     
-    //@NotNull
+    @NotNull
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RentalRateTypeEnum rentalRateType;
     
-    //@NotNull
-    //@Column(nullable = false)
+    @NotNull
+    @Column(nullable = false)
     private double ratePerDay;
     
-    //@Column(nullable = false, length = 64)
+//  @Future
     private Date startDate;
-    //@Column(nullable = false, length = 64)
+    
+//  @Future
     private Date endDate;
     
+    @NotNull
+    @Column(nullable = false)
     private Boolean isDisabled;
     
-    //@ManyToOne(optional = false)
-    //@JoinColumn(nullable = false)
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private CarCategoryEntity carCategory;
 
     public RentalRateEntity() {

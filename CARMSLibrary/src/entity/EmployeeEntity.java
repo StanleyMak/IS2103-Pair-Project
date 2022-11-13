@@ -18,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import util.enumeration.EmployeeAccessRightEnum;
 
 /**
@@ -32,28 +33,26 @@ public class EmployeeEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeID;
     
-    //@Column(nullable = false)
+    @Size(min = 2)
     private String name;
     
-    //@Column(nullable = false)
+    @NotNull
+    @Column(nullable = false, unique = true)
+    @Size(min = 2)
     private String username;
     
-    //@Column(nullable = false)
+    @Column(columnDefinition = "CHAR(32) NOT NULL")
     private String password; 
    
-    //@NotNull
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EmployeeAccessRightEnum employeeAccessRight;
     
+    @NotNull
+    @Column(nullable = false)
     private Boolean onTransit;
     
-//    @OneToMany(mappedBy = "employee")
-//    private DispatchRecordEntity dispatchRecord;
-    
-    //@NotNull
-    //@ManyToOne(optional = false)
-    //@JoinColumn(nullable = false)
     @ManyToOne
     private OutletEntity outlet;
 
@@ -117,14 +116,6 @@ public class EmployeeEntity implements Serializable {
         this.employeeAccessRight = employeeAccessRight;
     }
 
-//    public DispatchRecordEntity getDispatchRecord() {
-//        return dispatchRecord;
-//    }
-//
-//    public void setDispatchRecord(DispatchRecordEntity dispatchRecord) {
-//        this.dispatchRecord = dispatchRecord;
-//    }
-
     public OutletEntity getOutlet() {
         return outlet;
     }
@@ -132,8 +123,6 @@ public class EmployeeEntity implements Serializable {
     public void setOutlet(OutletEntity outlet) {
         this.outlet = outlet;
     }
-    
-    
 
     @Override
     public int hashCode() {

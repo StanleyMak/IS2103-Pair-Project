@@ -19,6 +19,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -34,15 +36,14 @@ public class OutletEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletID;
     
-    //@NotNull
-    //@Column(nullable = false)
+    @NotNull
+    @Column(nullable = false)
+    @Size(min = 5)
     private String address;
     
-    //@Column(nullable = false)
     @Temporal(TemporalType.TIME)
     private Date openHour;
     
-    //@Column(nullable = false)
     @Temporal(TemporalType.TIME)
     private Date closeHour;
 

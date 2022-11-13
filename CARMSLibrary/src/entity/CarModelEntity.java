@@ -14,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -27,19 +29,22 @@ public class CarModelEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carModelID;
     
-    //@NotNull
-    //@Column(nullable = false, length = 64)
+    @NotNull
+    @Column(nullable = false, unique = true)
+    @Size(min = 2)
     private String modelName;
     
-    //@NotNull
-    //@Column(nullable = false, length = 64)
+    @NotNull
+    @Column(nullable = false)
+    @Size(min = 2)
     private String modelMake;
     
+    @NotNull
+    @Column(nullable = false)
     private Boolean isDisabled;
     
-    //@ManyToOne(optional = false)
-    //@JoinColumn(nullable = false)
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private CarCategoryEntity category;
 
     public CarModelEntity() {

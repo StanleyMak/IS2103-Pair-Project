@@ -16,11 +16,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -34,30 +38,38 @@ public class DispatchRecordEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dispatchRecordID;
     
-    //@Column(nullable = false, unique = true)
+    @NotNull
+    @Column(nullable = false, unique = true)
+    @Size(min = 5)
     private String dispatchRecordName;
     
-    //@Column(nullable = false)
+    @NotNull
+    @Column(nullable = false)
     private Boolean isCompleted;
     
-    //@Temporal(TemporalType.TIMESTAMP)
-    //@Column(nullable = false)
+    @NotNull
+    @Future
+    @Column(nullable = false)
     private Date pickUpTime;
     
-    //@Temporal(TemporalType.TIMESTAMP)
-    //@Column(nullable = false)
+    @NotNull
+    @Future
+    @Column(nullable = false)
     private Date returnTime;
     
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private OutletEntity pickUpOutlet;
     
     @ManyToOne
+    @JoinColumn(nullable = false)
     private OutletEntity returnOutlet;
     
     @ManyToOne
     private EmployeeEntity employee;
     
-    @OneToOne
+    @OneToOne(optional = false)
+    @JoinColumn(nullable = false)
     private ReservationEntity reservation;
 
     public DispatchRecordEntity() {

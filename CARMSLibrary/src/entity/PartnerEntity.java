@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -25,18 +26,18 @@ public class PartnerEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long partnerID;
     
-    //@NotNull
+    @NotNull
     @Column(nullable = false)
+    @Size(min = 3)
     private String username; 
     
-    //@NotNull
-    @Column(nullable = false)
+    @Column(columnDefinition = "CHAR(32) NOT NULL")
     private String password; 
 
     public PartnerEntity() {
     }
 
-    public PartnerEntity(String username, String password, String email) {
+    public PartnerEntity(String username, String password) {
         this.username = username;
         this.password = password;
     }

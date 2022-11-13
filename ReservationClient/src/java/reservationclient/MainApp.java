@@ -214,7 +214,7 @@ public class MainApp {
         System.out.print("Enter Return Outlet Address> ");
         String returnOutletAddress = sc.nextLine().trim();
         OutletEntity returnOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(returnOutletAddress);
-        LocalTime outletClosingHours = LocalDateTime.ofInstant(returnOutlet.getOpenHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
+        LocalTime outletClosingHours = LocalDateTime.ofInstant(returnOutlet.getCloseHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
 
         if (returnTime.isAfter(outletClosingHours)) {
             System.out.println("Invalid return time, outlet closes at: " + outletClosingHours + "\n");
@@ -294,7 +294,6 @@ public class MainApp {
             returnDateTime = dateTimeFormat.parse(endDateTime);
         } catch (ParseException e) {
             System.out.println("Invalid Date/Time Format");
-
         }
 
         LocalDateTime returnDateTimeLocal = LocalDateTime.ofInstant(returnDateTime.toInstant(), ZoneId.systemDefault());
@@ -303,9 +302,9 @@ public class MainApp {
         System.out.print("Enter Return Outlet Address> ");
         String returnOutletAddress = sc.nextLine().trim();
         OutletEntity returnOutlet = outletSessionBeanRemote.retrieveOutletByOutletAddress(returnOutletAddress);
-        LocalTime outletClosingHours = LocalDateTime.ofInstant(returnOutlet.getOpenHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
+        LocalTime outletClosingHours = LocalDateTime.ofInstant(returnOutlet.getCloseHour().toInstant(), ZoneId.systemDefault()).toLocalTime();
 
-        if (outletClosingHours.isBefore(outletClosingHours)) {
+        if (returnTime.isAfter(outletClosingHours)) {
             System.out.println("Invalid return time, outlet closes at: " + outletClosingHours);
         }
 
@@ -381,8 +380,12 @@ public class MainApp {
                 break;
             }
         }
-
-        reservation.setReservationCode(this.loggedInCustomer.getEmail() + " " + new Date().toString());
+        String[] dateString = new Date().toString().split(" ");
+        String finalDate = "";
+        for (int j = 0; j < dateString.length; j++) {
+           finalDate += dateString[j];
+        }
+        reservation.setReservationCode(this.loggedInCustomer.getEmail() + finalDate);
         reservation.setStartDateTime(pickupDateTime);
         reservation.setEndDateTime(returnDateTime);
         reservation.setRentalFee(rentalFee);
